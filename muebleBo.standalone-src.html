@@ -54,6 +54,7 @@
   .mb-reveal-l.mb-in{opacity:1;transform:none;transition:opacity .9s cubic-bezier(.16,.84,.44,1),transform .9s cubic-bezier(.16,.84,.44,1)}
   .mb-reveal-r{opacity:0;transform:translateX(60px)}
   .mb-reveal-r.mb-in{opacity:1;transform:none;transition:opacity .9s cubic-bezier(.16,.84,.44,1),transform .9s cubic-bezier(.16,.84,.44,1)}
+  .mb-fixed-nav{position:fixed!important;top:0;left:0;right:0;z-index:9999}
   .mb-prodcard:hover .mb-prodimg{transform:scale(1.06)}
   .mb-prodcard:hover .mb-quickview{opacity:1;transform:translateY(0)}
   .mb-catcell:hover .mb-catimg{transform:scale(1.08)}
@@ -71,7 +72,7 @@
 <div style="background:#F2F2F2;min-height:100vh;overflow-x:hidden">
 
   <!-- ============ NAVBAR + CATEGORIES (fixed) ============ -->
-  <div style="position:sticky;top:0;z-index:60">
+  <div class="mb-fixed-nav">
   <header style="background:#40403E;border-bottom:1px solid rgba(242,113,65,.22)">
     <div style="max-width:1320px;margin:0 auto;padding:0 28px;height:74px;display:flex;align-items:center;gap:34px">
       <a href="#top" style="display:flex;align-items:center;gap:11px;text-decoration:none;flex:none">
@@ -109,6 +110,7 @@
     </div>
   </div>
   </div>
+  <div style="height:119px"></div>
 
   <!-- ============ HERO (BENTO) ============ -->
   <section id="top" style="background:#F2F2F2;padding:18px 0 28px">
