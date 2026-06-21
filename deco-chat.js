@@ -224,7 +224,7 @@ function __decoInit() {
     <path d="M21 11.4a8 8 0 0 1-11.5 7.2L4 20l1.4-4.8A8 8 0 1 1 21 11.4z"/>
     <path d="M12.4 6.6l1.05 3.05 3.05 1.05-3.05 1.05-1.05 3.05-1.05-3.05-3.05-1.05 3.05-1.05z" fill="#fff" stroke="#fff" stroke-width="0.5"/>
   </svg>`;
-  fab.addEventListener('pointerup', (e) => { e.preventDefault(); e.stopPropagation(); toggle(); });
+  fab.onclick = function() { toggle(); };
   document.body.appendChild(fab);
 
   const fabCss = document.createElement('style');
