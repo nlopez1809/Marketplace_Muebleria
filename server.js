@@ -101,7 +101,7 @@ app.post('/api/chat', async (req, res) => {
 
   try {
     const response = await anthropic.messages.create({
-      model: 'claude-sonnet-4-20250514',
+      model: 'claude-sonnet-4-6-20250627',
       max_tokens: 1024,
       system: SYSTEM_PROMPT,
       messages: history,
