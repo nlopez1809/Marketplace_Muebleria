@@ -1,4 +1,4 @@
-document.addEventListener('DOMContentLoaded', () => {
+function __decoInit() {
   const API_URL = '/api/chat';
   const SESSION_ID = 'deco-' + Math.random().toString(36).slice(2, 10);
   let open = false;
@@ -257,4 +257,9 @@ document.addEventListener('DOMContentLoaded', () => {
   }, 500);
 
   setTimeout(() => clearInterval(origInterval), 10000);
-});
+}
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', __decoInit);
+} else {
+  __decoInit();
+}
