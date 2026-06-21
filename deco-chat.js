@@ -216,28 +216,15 @@ function __decoInit() {
     if (el) el.remove();
   }
 
-  // Floating action button
-  const fab = document.createElement('button');
-  fab.className = 'deco-fab';
-  fab.title = 'Abrir Deco IA';
-  fab.innerHTML = `<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
-    <path d="M21 11.4a8 8 0 0 1-11.5 7.2L4 20l1.4-4.8A8 8 0 1 1 21 11.4z"/>
-    <path d="M12.4 6.6l1.05 3.05 3.05 1.05-3.05 1.05-1.05 3.05-1.05-3.05-3.05-1.05 3.05-1.05z" fill="#fff" stroke="#fff" stroke-width="0.5"/>
-  </svg>`;
-  fab.onclick = function() { toggle(); };
-  document.documentElement.appendChild(fab);
-
-  const fabCss = document.createElement('style');
-  fabCss.textContent = `
-    .deco-fab{position:fixed;bottom:28px;right:28px;z-index:2147483647;width:60px;height:60px;border-radius:50%;border:none;
-      background:linear-gradient(118deg,#7E5BC4 0%,#9B6FC9 42%,#D8BE8C 100%);
-      box-shadow:0 4px 16px rgba(126,91,196,.4);cursor:pointer;display:flex;align-items:center;justify-content:center;
-      transition:transform .2s,box-shadow .2s;animation:decoFabPulse 2.5s infinite}
-    .deco-fab:hover{transform:scale(1.08);box-shadow:0 6px 22px rgba(126,91,196,.5)}
-    .deco-panel.open~.deco-fab,.deco-overlay.open~.deco-fab{display:none}
-    @keyframes decoFabPulse{0%{box-shadow:0 4px 16px rgba(126,91,196,.4)}50%{box-shadow:0 4px 16px rgba(126,91,196,.4),0 0 0 10px rgba(126,91,196,.12)}100%{box-shadow:0 4px 16px rgba(126,91,196,.4)}}
-  `;
-  document.head.appendChild(fabCss);
+  // Connect to the FAB button inside the dc-runtime template
+  const hookFab = setInterval(() => {
+    const fab = document.getElementById('deco-fab-trigger');
+    if (!fab) return;
+    if (fab._decoHooked) { clearInterval(hookFab); return; }
+    fab._decoHooked = true;
+    fab.onclick = function(e) { e.stopPropagation(); toggle(); };
+    clearInterval(hookFab);
+  }, 200);
 
   // Expose toggle for the existing "Deco IA" buttons in the page
   window.__decoToggle = toggle;
