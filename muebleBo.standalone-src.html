@@ -70,8 +70,9 @@
 
 <div style="background:#F2F2F2;min-height:100vh;overflow-x:hidden">
 
-  <!-- ============ NAVBAR ============ -->
-  <header style="position:sticky;top:0;z-index:60;background:#40403E;border-bottom:1px solid rgba(242,113,65,.22)">
+  <!-- ============ NAVBAR + CATEGORIES (fixed) ============ -->
+  <div style="position:sticky;top:0;z-index:60">
+  <header style="background:#40403E;border-bottom:1px solid rgba(242,113,65,.22)">
     <div style="max-width:1320px;margin:0 auto;padding:0 28px;height:74px;display:flex;align-items:center;gap:34px">
       <a href="#top" style="display:flex;align-items:center;gap:11px;text-decoration:none;flex:none">
         <svg width="34" height="34" viewBox="0 0 100 100" fill="none" stroke="#F27141" stroke-width="8.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 51V80q0 8 8 8h40q8 0 8-8V51"></path><path d="M13 57 50 22l37 35"></path><path d="M34 42V28"></path></svg>
@@ -106,6 +107,7 @@
         <a href="#catalogo" style="color:#595957;text-decoration:none;font-size:12px;letter-spacing:.06em;flex:none" style-hover="color:#F27141">{{ c }}</a>
       </sc-for>
     </div>
+  </div>
   </div>
 
   <!-- ============ HERO (BENTO) ============ -->
