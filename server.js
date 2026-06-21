@@ -83,13 +83,20 @@ const SYSTEM_PROMPT = `Eres "Deco IA", el asistente virtual de InCassa DECO, una
 - Si preguntan algo fuera de muebles/decoración, redirige amablemente
 - Respuestas cortas y claras (máximo 3 párrafos)`;
 
+const TOKEN_LIMIT = 10000;
 const conversations = new Map();
+const tokenUsage = new Map();
 
 app.post('/api/chat', async (req, res) => {
   const { message, sessionId } = req.body;
 
   if (!message || !sessionId) {
     return res.status(400).json({ error: 'message y sessionId son requeridos' });
+  }
+
+  const used = tokenUsage.get(sessionId) || 0;
+  if (used >= TOKEN_LIMIT) {
+    return res.json({ reply: 'Has alcanzado el límite de esta sesión. Por favor, contáctanos por WhatsApp al +591 70000000 para seguir conversando. ¡Será un gusto atenderte! 😊' });
   }
 
   if (!conversations.has(sessionId)) {
@@ -110,11 +117,14 @@ app.post('/api/chat', async (req, res) => {
     const assistantMessage = response.content[0].text;
     history.push({ role: 'assistant', content: assistantMessage });
 
+    const sessionTokens = response.usage.input_tokens + response.usage.output_tokens;
+    tokenUsage.set(sessionId, used + sessionTokens);
+
     if (history.length > 40) {
       history.splice(0, 2);
     }
 
-    res.json({ reply: assistantMessage });
+    res.json({ reply: assistantMessage, tokensUsed: used + sessionTokens, tokenLimit: TOKEN_LIMIT });
   } catch (error) {
     console.error('Error calling Claude API:', error.message);
     res.status(500).json({ error: 'Error al procesar tu mensaje. Intenta de nuevo.' });
@@ -123,7 +133,10 @@ app.post('/api/chat', async (req, res) => {
 
 app.post('/api/chat/reset', (req, res) => {
   const { sessionId } = req.body;
-  if (sessionId) conversations.delete(sessionId);
+  if (sessionId) {
+    conversations.delete(sessionId);
+    tokenUsage.delete(sessionId);
+  }
   res.json({ ok: true });
 });
 
