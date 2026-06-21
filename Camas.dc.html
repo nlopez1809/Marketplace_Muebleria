@@ -1,0 +1,658 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+<link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@400;500;600;700&family=DM+Serif+Display:ital@0;1&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{background:#F2F2F2;font-family:'Inter',sans-serif;color:#40403E;-webkit-font-smoothing:antialiased}
+  ::selection{background:#F27141;color:#40403E}
+  ::-webkit-scrollbar{width:11px;height:11px}
+  ::-webkit-scrollbar-track{background:#E4E4E3}
+  ::-webkit-scrollbar-thumb{background:#cfcdc7}
+  ::-webkit-scrollbar-thumb:hover{background:#F27141}
+  .mbx-scroll::-webkit-scrollbar{height:6px}
+  @keyframes mbxPulse{0%{box-shadow:0 0 0 0 rgba(37,211,102,.55)}70%{box-shadow:0 0 0 18px rgba(37,211,102,0)}100%{box-shadow:0 0 0 0 rgba(37,211,102,0)}}
+  @keyframes mbxBump{0%{transform:scale(1)}35%{transform:scale(1.35)}100%{transform:scale(1)}}
+  @keyframes mbxRipple{to{transform:scale(2.6);opacity:0}}
+  @keyframes mbxReveal{from{opacity:0;transform:translateY(26px)}to{opacity:1;transform:none}}
+  .mbx-prodcard:hover .mbx-prodimg{transform:scale(1.05)}
+  .mbx-prodcard:hover .mbx-quick{opacity:1;transform:translateY(0)}
+  @media (prefers-reduced-motion: reduce){*{animation-duration:.001ms!important;transition-duration:.001ms!important;scroll-behavior:auto!important}}
+</style>
+</helmet>
+
+<div ref="{{ mainRef }}" style="background:#F2F2F2;min-height:100vh;transition:margin-left .42s cubic-bezier(.16,.84,.44,1)">
+
+  <!-- ============ NAVBAR ============ -->
+  <header style="position:sticky;top:0;z-index:60;background:#40403E;border-bottom:1px solid rgba(242,113,65,.22)">
+    <div style="max-width:1320px;margin:0 auto;padding:0 28px;height:74px;display:flex;align-items:center;gap:34px">
+      <a href="muebleBo.dc.html" style="display:flex;align-items:center;gap:11px;text-decoration:none;flex:none">
+        <svg width="34" height="34" viewBox="0 0 100 100" fill="none" stroke="#F27141" stroke-width="8.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 51V80q0 8 8 8h40q8 0 8-8V51"></path><path d="M13 57 50 22l37 35"></path><path d="M34 42V28"></path></svg>
+        <span style="display:flex;flex-direction:column;line-height:1">
+          <span style="font-family:'Comfortaa',sans-serif;font-weight:500;font-size:21px;letter-spacing:.01em;color:#F2F2F2">InCassa</span>
+          <span style="font-family:'Comfortaa',sans-serif;font-weight:600;font-size:9px;letter-spacing:.42em;color:#C9C9C7;margin-top:3px">DECO</span>
+        </span>
+      </a>
+      <div style="flex:1;max-width:560px;position:relative">
+        <input placeholder="Buscar camas, veladores, colchones…" style="width:100%;height:44px;background:#4a4a48;border:1px solid #5a5a57;border-radius:2px;color:#F2F2F2;padding:0 44px 0 16px;font-family:'Inter';font-size:14px;outline:none" style-focus="border-color:#F27141" />
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#9A9A98" stroke-width="2" style="position:absolute;right:15px;top:13px"><circle cx="11" cy="11" r="7"></circle><path d="M21 21l-4.3-4.3"></path></svg>
+      </div>
+      <nav style="display:flex;gap:26px;align-items:center">
+        <button onClick="{{ noop }}" style="background:none;border:none;cursor:pointer;display:flex;align-items:center" title="Favoritos">
+          <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="#C9C9C7" stroke-width="1.7"><path d="M12 21s-7.5-4.6-10-9.3C.6 8.9 2 5.5 5.2 5.5c2 0 3.2 1.2 3.8 2.3C9.6 6.7 10.8 5.5 12.8 5.5 16 5.5 17.4 8.9 16 11.7 13.5 16.4 12 21 12 21z"></path></svg>
+          <sc-if value="{{ hasWishlist }}" hint-placeholder-val="{{ false }}"><span style="background:#F27141;color:#40403E;font-size:10px;font-weight:700;border-radius:20px;min-width:16px;height:16px;display:inline-flex;align-items:center;justify-content:center;margin-left:-6px;margin-top:-12px;padding:0 4px">{{ wishlistCount }}</span></sc-if>
+        </button>
+        <button onClick="{{ noop }}" style="background:none;border:none;cursor:pointer;position:relative;display:flex;align-items:center" title="Carrito">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#F2F2F2" stroke-width="1.7"><path d="M6 6h15l-1.5 9h-12z"></path><path d="M6 6L5 2H2"></path><circle cx="9" cy="20" r="1.4"></circle><circle cx="18" cy="20" r="1.4"></circle></svg>
+          <sc-if value="{{ hasCart }}" hint-placeholder-val="{{ false }}"><span ref="{{ cartBadgeRef }}" style="position:absolute;top:-7px;right:-9px;background:#F27141;color:#40403E;font-size:10px;font-weight:700;border-radius:20px;min-width:18px;height:18px;display:flex;align-items:center;justify-content:center;padding:0 4px">{{ cartCount }}</span></sc-if>
+        </button>
+      </nav>
+    </div>
+  </header>
+
+  <!-- ============ CATEGORY NAV ============ -->
+  <div style="background:#fff;border-bottom:1px solid #E4E4E3">
+    <div class="mbx-scroll" style="max-width:1320px;margin:0 auto;padding:16px 28px;display:flex;gap:32px;align-items:center;justify-content:flex-start;overflow-x:auto;white-space:nowrap">
+      <button onClick="{{ toggleDeco }}" title="Abrir Deco IA, tu asistente" style="flex:none;background:linear-gradient(118deg,#7E5BC4 0%,#9B6FC9 42%,#D8BE8C 100%);color:#FFFFFF;border:none;border-radius:999px;padding:9px 17px;font-family:'Comfortaa',sans-serif;font-weight:700;font-size:11px;letter-spacing:.14em;text-transform:uppercase;cursor:pointer;display:flex;align-items:center;gap:7px;box-shadow:0 1px 6px rgba(192,101,201,.25);transition:filter .2s,transform .15s" style-hover="filter:brightness(1.07)" style-active="transform:scale(.96)">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.4a8 8 0 0 1-11.5 7.2L4 20l1.4-4.8A8 8 0 1 1 21 11.4z"></path><path d="M12.4 6.6l1.05 3.05 3.05 1.05-3.05 1.05-1.05 3.05-1.05-3.05-3.05-1.05 3.05-1.05z" fill="#FFFFFF" stroke="#FFFFFF" stroke-width="0.5"></path></svg>
+        Deco IA
+      </button>
+      <a href="muebleBo.dc.html" style="color:#40403E;text-decoration:none;font-size:11.5px;letter-spacing:.13em;text-transform:uppercase;font-weight:500" style-hover="color:#F27141">Nuevo</a>
+      <a href="muebleBo.dc.html" style="color:#40403E;text-decoration:none;font-size:11.5px;letter-spacing:.13em;text-transform:uppercase;font-weight:500" style-hover="color:#F27141">Sala</a>
+      <a href="muebleBo.dc.html" style="color:#40403E;text-decoration:none;font-size:11.5px;letter-spacing:.13em;text-transform:uppercase;font-weight:500" style-hover="color:#F27141">Comedor</a>
+      <a href="Camas.dc.html" style="color:#F27141;text-decoration:none;font-size:11.5px;letter-spacing:.13em;text-transform:uppercase;font-weight:700;border-bottom:2px solid #F27141;padding-bottom:14px;margin-bottom:-16px">Dormitorio</a>
+      <a href="muebleBo.dc.html" style="color:#40403E;text-decoration:none;font-size:11.5px;letter-spacing:.13em;text-transform:uppercase;font-weight:500" style-hover="color:#F27141">Iluminación</a>
+      <a href="muebleBo.dc.html" style="color:#40403E;text-decoration:none;font-size:11.5px;letter-spacing:.13em;text-transform:uppercase;font-weight:500" style-hover="color:#F27141">Almacenamiento</a>
+      <a href="muebleBo.dc.html" style="color:#40403E;text-decoration:none;font-size:11.5px;letter-spacing:.13em;text-transform:uppercase;font-weight:500" style-hover="color:#F27141">Exterior</a>
+      <a href="muebleBo.dc.html" style="color:#F27141;text-decoration:none;font-size:11.5px;letter-spacing:.13em;text-transform:uppercase;font-weight:600" style-hover="color:#D9602E">Ofertas</a>
+    </div>
+  </div>
+
+  <!-- ============ HEADER / BREADCRUMB / TITLE ============ -->
+  <div style="max-width:1320px;margin:0 auto;padding:30px 28px 0">
+    <div style="font-size:12px;color:#737373;letter-spacing:.02em;margin-bottom:24px">
+      <a href="muebleBo.dc.html" style="color:#737373;text-decoration:none" style-hover="color:#F27141">Inicio</a>
+      <span style="margin:0 8px">/</span>
+      <a href="muebleBo.dc.html" style="color:#737373;text-decoration:none" style-hover="color:#F27141">Dormitorio</a>
+      <span style="margin:0 8px">/</span>
+      <span style="color:#40403E">Camas</span>
+    </div>
+    <h1 style="font-family:'DM Serif Display',serif;font-size:48px;letter-spacing:.01em;text-transform:uppercase;color:#40403E;line-height:1">Camas</h1>
+    <p style="font-size:14px;color:#737373;margin-top:14px;max-width:560px;line-height:1.6">Cabeceras tapizadas, capitoné y bases con guardado. Armado e instalación incluidos, con entrega en ventana horaria de 2 h.</p>
+
+    <!-- subcat chips -->
+    <div class="mbx-scroll" style="display:flex;gap:10px;margin-top:26px;overflow-x:auto;padding-bottom:4px">
+      <sc-for list="{{ subChips }}" as="c" hint-placeholder-count="9">
+        <button onClick="{{ c.toggle }}" style="flex:none;cursor:pointer;font-size:12.5px;letter-spacing:.02em;padding:9px 16px;border-radius:30px;border:1px solid {{ c.border }};background:{{ c.bg }};color:{{ c.color }};transition:all .18s">{{ c.label }}</button>
+      </sc-for>
+    </div>
+  </div>
+
+  <!-- ============ FILTER BAR ============ -->
+  <div style="position:sticky;top:74px;z-index:40;background:#F2F2F2;border-bottom:1px solid #E4E4E3;margin-top:26px">
+    <div style="max-width:1320px;margin:0 auto;padding:14px 28px;display:flex;align-items:center;gap:8px">
+
+      <button onClick="{{ toggleAll }}" style="display:flex;align-items:center;gap:9px;background:none;border:1px solid #d8d5cf;border-radius:2px;padding:10px 16px;cursor:pointer;font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;font-weight:600;color:#40403E" style-hover="border-color:#40403E">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 6h18M6 12h12M10 18h4"></path></svg>
+        Todos los filtros
+      </button>
+
+      <div style="position:relative">
+        <button onClick="{{ toggleMedida }}" style="display:flex;align-items:center;gap:7px;background:none;border:none;cursor:pointer;padding:10px 14px;font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;font-weight:600;color:#40403E">Medida <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M6 9l6 6 6-6"></path></svg></button>
+        <sc-if value="{{ menuMedida }}" hint-placeholder-val="{{ false }}">
+          <div style="position:absolute;top:calc(100% + 6px);left:0;z-index:90;background:#fff;border:1px solid #E4E4E3;border-radius:3px;box-shadow:0 18px 50px rgba(64,64,62,.16);padding:14px;min-width:210px">
+            <sc-for list="{{ sizeOpts }}" as="o" hint-placeholder-count="4">
+              <button onClick="{{ o.toggle }}" style="display:flex;align-items:center;gap:10px;width:100%;background:none;border:none;cursor:pointer;padding:8px 6px;text-align:left;font-size:13.5px;color:#40403E" style-hover="color:#F27141">
+                <span style="width:16px;height:16px;border-radius:2px;border:1.5px solid {{ o.box }};background:{{ o.fill }};flex:none"></span>{{ o.label }}
+              </button>
+            </sc-for>
+          </div>
+        </sc-if>
+      </div>
+
+      <div style="position:relative">
+        <button onClick="{{ togglePrecio }}" style="display:flex;align-items:center;gap:7px;background:none;border:none;cursor:pointer;padding:10px 14px;font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;font-weight:600;color:#40403E">Precio <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M6 9l6 6 6-6"></path></svg></button>
+        <sc-if value="{{ menuPrecio }}" hint-placeholder-val="{{ false }}">
+          <div style="position:absolute;top:calc(100% + 6px);left:0;z-index:90;background:#fff;border:1px solid #E4E4E3;border-radius:3px;box-shadow:0 18px 50px rgba(64,64,62,.16);padding:14px;min-width:230px">
+            <sc-for list="{{ priceOpts }}" as="o" hint-placeholder-count="4">
+              <button onClick="{{ o.set }}" style="display:flex;align-items:center;gap:10px;width:100%;background:none;border:none;cursor:pointer;padding:8px 6px;text-align:left;font-size:13.5px;color:#40403E" style-hover="color:#F27141">
+                <span style="width:15px;height:15px;border-radius:50%;border:1.5px solid {{ o.box }};display:flex;align-items:center;justify-content:center;flex:none"><span style="width:7px;height:7px;border-radius:50%;background:{{ o.fill }}"></span></span>{{ o.label }}
+              </button>
+            </sc-for>
+          </div>
+        </sc-if>
+      </div>
+
+      <div style="position:relative">
+        <button onClick="{{ toggleColor }}" style="display:flex;align-items:center;gap:7px;background:none;border:none;cursor:pointer;padding:10px 14px;font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;font-weight:600;color:#40403E">Color <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M6 9l6 6 6-6"></path></svg></button>
+        <sc-if value="{{ menuColor }}" hint-placeholder-val="{{ false }}">
+          <div style="position:absolute;top:calc(100% + 6px);left:0;z-index:90;background:#fff;border:1px solid #E4E4E3;border-radius:3px;box-shadow:0 18px 50px rgba(64,64,62,.16);padding:14px;min-width:200px">
+            <sc-for list="{{ colorOpts }}" as="o" hint-placeholder-count="6">
+              <button onClick="{{ o.toggle }}" style="display:flex;align-items:center;gap:11px;width:100%;background:none;border:none;cursor:pointer;padding:7px 6px;text-align:left;font-size:13.5px;color:{{ o.color }}">
+                <span style="width:18px;height:18px;border-radius:50%;background:{{ o.hex }};border:1.5px solid {{ o.ring }};flex:none"></span>{{ o.label }}
+              </button>
+            </sc-for>
+          </div>
+        </sc-if>
+      </div>
+
+      <div style="flex:1"></div>
+
+      <span style="font-size:13px;color:#737373;margin-right:6px">{{ resultCount }} productos</span>
+      <div style="position:relative">
+        <button onClick="{{ toggleOrden }}" style="display:flex;align-items:center;gap:7px;background:none;border:none;cursor:pointer;padding:10px 4px;font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;font-weight:600;color:#40403E">{{ sortLabel }} <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M6 9l6 6 6-6"></path></svg></button>
+        <sc-if value="{{ menuOrden }}" hint-placeholder-val="{{ false }}">
+          <div style="position:absolute;top:calc(100% + 6px);right:0;z-index:90;background:#fff;border:1px solid #E4E4E3;border-radius:3px;box-shadow:0 18px 50px rgba(64,64,62,.16);padding:14px;min-width:230px">
+            <sc-for list="{{ sortOpts }}" as="o" hint-placeholder-count="4">
+              <button onClick="{{ o.set }}" style="display:flex;align-items:center;gap:10px;width:100%;background:none;border:none;cursor:pointer;padding:8px 6px;text-align:left;font-size:13.5px;color:#40403E" style-hover="color:#F27141">
+                <span style="width:15px;height:15px;border-radius:50%;border:1.5px solid {{ o.box }};display:flex;align-items:center;justify-content:center;flex:none"><span style="width:7px;height:7px;border-radius:50%;background:{{ o.fill }}"></span></span>{{ o.label }}
+              </button>
+            </sc-for>
+          </div>
+        </sc-if>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ ACTIVE FILTERS ============ -->
+  <sc-if value="{{ hasActive }}" hint-placeholder-val="{{ false }}">
+    <div style="max-width:1320px;margin:0 auto;padding:18px 28px 0;display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+      <button onClick="{{ clearAll }}" style="background:none;border:none;cursor:pointer;font-size:12px;color:#40403E;text-decoration:underline;text-underline-offset:3px;letter-spacing:.02em">Limpiar todo</button>
+      <sc-for list="{{ activeChips }}" as="c" hint-placeholder-count="2">
+        <button onClick="{{ c.remove }}" style="display:flex;align-items:center;gap:8px;background:#E4E4E3;border:none;border-radius:30px;padding:8px 14px;cursor:pointer;font-size:12.5px;color:#40403E" style-hover="background:#dcd9d3">
+          {{ c.label }}
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#737373" stroke-width="2"><path d="M6 6l12 12M18 6L6 18"></path></svg>
+        </button>
+      </sc-for>
+    </div>
+  </sc-if>
+
+  <!-- ============ PRODUCT GRID ============ -->
+  <section id="productos" style="max-width:1320px;margin:0 auto;padding:30px 28px 90px">
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:28px 26px">
+      <sc-for list="{{ catalog }}" as="p" hint-placeholder-count="8">
+        <div class="mbx-prodcard" style="animation:mbxReveal .5s ease both">
+          <div style="position:relative;aspect-ratio:4/5;overflow:hidden;background:#ECEAE7;border-radius:2px;cursor:pointer" onClick="{{ p.open }}">
+            <img src="{{ p.img }}" class="mbx-prodimg" style="width:100%;height:100%;object-fit:cover;object-position:center;transition:transform .7s cubic-bezier(.16,.84,.44,1);display:block" />
+            <span style="position:absolute;top:12px;left:12px" innerHTML="{{ p.badgeHtml }}"></span>
+            <button onClick="{{ p.wish }}" style="position:absolute;top:11px;right:11px;width:34px;height:34px;border-radius:50%;border:none;background:rgba(255,255,255,.92);cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(0,0,0,.1)" style-hover="background:#fff">
+              <svg width="17" height="17" viewBox="0 0 24 24" stroke="#F27141" stroke-width="1.8" fill="{{ p.wishFill }}"><path d="M12 21s-7.5-4.6-10-9.3C.6 8.9 2 5.5 5.2 5.5c2 0 3.2 1.2 3.8 2.3C9.6 6.7 10.8 5.5 12.8 5.5 16 5.5 17.4 8.9 16 11.7 13.5 16.4 12 21 12 21z"></path></svg>
+            </button>
+            <div class="mbx-quick" style="position:absolute;left:0;right:0;bottom:0;background:rgba(64,64,62,.82);backdrop-filter:blur(4px);color:#F2F2F2;text-align:center;padding:11px;font-size:11px;letter-spacing:.12em;text-transform:uppercase;opacity:0;transform:translateY(100%);transition:all .35s cubic-bezier(.16,.84,.44,1)">Vista rápida</div>
+          </div>
+          <div style="padding:15px 2px 0">
+            <div style="font-size:15px;font-weight:500;color:#40403E;margin-bottom:3px">{{ p.name }}</div>
+            <div style="font-size:12.5px;color:#9A9A98;margin-bottom:9px">{{ p.sub }}</div>
+            <div style="display:flex;align-items:baseline;gap:9px;margin-bottom:11px">
+              <span style="font-size:14.5px;color:#40403E">{{ p.priceText }}</span>
+              <sc-if value="{{ p.old }}" hint-placeholder-val="x"><span style="font-size:12.5px;color:#a5a39d;text-decoration:line-through">{{ p.old }}</span></sc-if>
+            </div>
+            <div style="display:flex;align-items:center;gap:7px">
+              <sc-for list="{{ p.swColors }}" as="sw" hint-placeholder-count="4">
+                <span title="{{ sw.title }}" style="width:26px;height:26px;border-radius:50%;background:{{ sw.hex }};border:1px solid rgba(0,0,0,.14);box-shadow:inset 0 0 0 2px #fff;cursor:pointer;transition:box-shadow .15s" style-hover="box-shadow:inset 0 0 0 2px #fff, 0 0 0 1.5px #40403E"></span>
+              </sc-for>
+              <sc-if value="{{ p.swMore }}" hint-placeholder-val="x"><span style="font-size:13px;color:#737373;margin-left:3px;letter-spacing:.01em;cursor:pointer">+ {{ p.swMore }} más</span></sc-if>
+            </div>
+          </div>
+        </div>
+      </sc-for>
+    </div>
+    <sc-if value="{{ empty }}" hint-placeholder-val="{{ false }}">
+      <div style="text-align:center;padding:90px 0;color:#737373">
+        <div style="font-family:'DM Serif Display',serif;font-size:24px;color:#40403E;margin-bottom:10px">Sin resultados</div>
+        <div style="font-size:14px;margin-bottom:22px">No hay camas con esos filtros.</div>
+        <button onClick="{{ clearAll }}" style="background:#40403E;color:#F2F2F2;border:none;border-radius:2px;padding:13px 26px;font-size:11px;letter-spacing:.1em;text-transform:uppercase;font-weight:600;cursor:pointer">Limpiar filtros</button>
+      </div>
+    </sc-if>
+  </section>
+
+  <!-- ============ FOOTER ============ -->
+  <footer style="background:#40403E;color:#C9C9C7;padding:54px 28px 30px">
+    <div style="max-width:1320px;margin:0 auto;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:18px">
+      <a href="muebleBo.dc.html" style="display:flex;align-items:center;gap:10px;text-decoration:none">
+        <svg width="30" height="30" viewBox="0 0 100 100" fill="none" stroke="#F27141" stroke-width="8.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 51V80q0 8 8 8h40q8 0 8-8V51"></path><path d="M13 57 50 22l37 35"></path><path d="M34 42V28"></path></svg>
+        <span style="display:flex;flex-direction:column;line-height:1">
+          <span style="font-family:'Comfortaa',sans-serif;font-weight:500;font-size:19px;color:#F2F2F2">InCassa</span>
+          <span style="font-family:'Comfortaa',sans-serif;font-weight:600;font-size:8.5px;letter-spacing:.4em;color:#C9C9C7;margin-top:3px">DECO</span>
+        </span>
+      </a>
+      <div style="display:flex;flex-wrap:wrap;gap:8px">
+        <sc-for list="{{ payMethods }}" as="m" hint-placeholder-count="5">
+          <span style="font-size:10px;letter-spacing:.04em;border:1px solid rgba(242,113,65,.3);border-radius:2px;padding:6px 9px;color:#C9C9C7">{{ m }}</span>
+        </sc-for>
+      </div>
+    </div>
+    <div style="max-width:1320px;margin:26px auto 0;padding-top:22px;border-top:1px solid rgba(242,113,65,.16);display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px;font-size:11px;color:#737373">
+      <span>© 2026 InCassa Deco S.R.L. · Todos los derechos reservados</span>
+      <span>NIT 1029384756 · La Paz, Bolivia</span>
+    </div>
+  </footer>
+
+  <!-- WhatsApp -->
+  <button onClick="{{ noop }}" style="position:fixed;bottom:26px;right:26px;z-index:55;width:60px;height:60px;border-radius:50%;border:none;background:#25D366;cursor:pointer;display:flex;align-items:center;justify-content:center;animation:mbxPulse 2.4s ease-out infinite;box-shadow:0 8px 24px rgba(37,211,102,.4)" title="WhatsApp">
+    <svg width="32" height="32" viewBox="0 0 24 24" fill="#fff"><path d="M12 2a10 10 0 0 0-8.6 15l-1.3 4.8 4.9-1.3A10 10 0 1 0 12 2zm0 18.2a8.2 8.2 0 0 1-4.2-1.2l-.3-.2-2.9.8.8-2.8-.2-.3A8.2 8.2 0 1 1 12 20.2zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8s-.4-.1-.6.1-.6.8-.8 1-.3.2-.5.1a6.7 6.7 0 0 1-2-1.2 7.4 7.4 0 0 1-1.4-1.7c-.1-.3 0-.4.1-.5l.4-.5.3-.4v-.4l-.8-1.9c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3 3 3 0 0 0-.9 2.2 5.2 5.2 0 0 0 1.1 2.7 11.9 11.9 0 0 0 4.6 4c.6.3 1.1.4 1.5.6a3.6 3.6 0 0 0 1.6.1c.5-.1 1.5-.6 1.7-1.2s.2-1.1.2-1.2-.2-.2-.4-.3z"></path></svg>
+  </button>
+
+  <!-- close-menus backdrop -->
+  <sc-if value="{{ menuOpen }}" hint-placeholder-val="{{ false }}">
+    <div onClick="{{ closeMenus }}" style="position:fixed;inset:0;z-index:35"></div>
+  </sc-if>
+
+  <!-- ============ ALL-FILTERS DRAWER ============ -->
+  <sc-if value="{{ menuAll }}" hint-placeholder-val="{{ false }}">
+    <div onClick="{{ closeMenus }}" style="position:fixed;inset:0;z-index:100;background:rgba(64,64,62,.45);display:flex;justify-content:flex-end">
+      <div onClick="{{ stop }}" style="width:380px;max-width:90vw;height:100%;background:#fff;overflow-y:auto;padding:30px 28px;box-shadow:-20px 0 60px rgba(0,0,0,.2)">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:26px">
+          <div style="font-family:'DM Serif Display',serif;font-size:24px;color:#40403E">Filtros</div>
+          <button onClick="{{ closeMenus }}" style="background:none;border:none;cursor:pointer;color:#737373"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 6l12 12M18 6L6 18"></path></svg></button>
+        </div>
+
+        <div style="font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:#737373;font-weight:600;margin-bottom:12px">Medida</div>
+        <div style="display:flex;flex-direction:column;gap:2px;margin-bottom:26px">
+          <sc-for list="{{ sizeOpts }}" as="o" hint-placeholder-count="4">
+            <button onClick="{{ o.toggle }}" style="display:flex;align-items:center;gap:11px;background:none;border:none;cursor:pointer;padding:8px 2px;text-align:left;font-size:14px;color:#40403E"><span style="width:17px;height:17px;border-radius:2px;border:1.5px solid {{ o.box }};background:{{ o.fill }};flex:none"></span>{{ o.label }}</button>
+          </sc-for>
+        </div>
+
+        <div style="font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:#737373;font-weight:600;margin-bottom:12px">Estilo</div>
+        <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:26px">
+          <sc-for list="{{ styleOpts }}" as="o" hint-placeholder-count="6">
+            <button onClick="{{ o.toggle }}" style="cursor:pointer;font-size:12.5px;padding:8px 14px;border-radius:30px;border:1px solid {{ o.border }};background:{{ o.bg }};color:{{ o.color }}">{{ o.label }}</button>
+          </sc-for>
+        </div>
+
+        <div style="font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:#737373;font-weight:600;margin-bottom:12px">Precio</div>
+        <div style="display:flex;flex-direction:column;gap:2px;margin-bottom:26px">
+          <sc-for list="{{ priceOpts }}" as="o" hint-placeholder-count="4">
+            <button onClick="{{ o.set }}" style="display:flex;align-items:center;gap:11px;background:none;border:none;cursor:pointer;padding:8px 2px;text-align:left;font-size:14px;color:#40403E"><span style="width:16px;height:16px;border-radius:50%;border:1.5px solid {{ o.box }};display:flex;align-items:center;justify-content:center;flex:none"><span style="width:8px;height:8px;border-radius:50%;background:{{ o.fill }}"></span></span>{{ o.label }}</button>
+          </sc-for>
+        </div>
+
+        <div style="font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:#737373;font-weight:600;margin-bottom:12px">Color</div>
+        <div style="display:flex;flex-wrap:wrap;gap:10px;margin-bottom:34px">
+          <sc-for list="{{ colorOpts }}" as="o" hint-placeholder-count="6">
+            <button onClick="{{ o.toggle }}" title="{{ o.label }}" style="width:34px;height:34px;border-radius:50%;background:{{ o.hex }};border:2px solid {{ o.ring }};cursor:pointer"></button>
+          </sc-for>
+        </div>
+
+        <div style="display:flex;gap:10px">
+          <button onClick="{{ clearAll }}" style="flex:1;background:#fff;border:1px solid #d8d5cf;border-radius:2px;padding:14px;font-size:11px;letter-spacing:.1em;text-transform:uppercase;font-weight:600;cursor:pointer;color:#40403E">Limpiar</button>
+          <button onClick="{{ closeMenus }}" style="flex:1;background:#40403E;border:none;border-radius:2px;padding:14px;font-size:11px;letter-spacing:.1em;text-transform:uppercase;font-weight:600;cursor:pointer;color:#F2F2F2">Ver {{ resultCount }}</button>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+
+  <!-- ============ PRODUCT LIGHTBOX ============ -->
+  <sc-if value="{{ lbOpen }}" hint-placeholder-val="{{ false }}">
+    <div onClick="{{ lbClose }}" style="position:fixed;inset:0;z-index:110;background:rgba(64,64,62,.82);backdrop-filter:blur(6px);display:flex;align-items:center;justify-content:center;padding:24px">
+      <div onClick="{{ stop }}" style="background:#fff;border-radius:4px;overflow:hidden;width:100%;max-width:1000px;max-height:92vh;display:grid;grid-template-columns:1.1fr 1fr;box-shadow:0 40px 100px rgba(0,0,0,.5)">
+        <div style="position:relative;background:#ECEAE7;min-height:460px">
+          <img src="{{ lbImg }}" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center" />
+          <span style="position:absolute;top:16px;left:16px" innerHTML="{{ lbBadgeHtml }}"></span>
+          <button onClick="{{ lbPrev }}" style="position:absolute;left:14px;top:50%;transform:translateY(-50%);width:42px;height:42px;border-radius:50%;border:none;background:rgba(255,255,255,.92);cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 3px 12px rgba(0,0,0,.2)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#40403E" stroke-width="2"><path d="M15 5l-7 7 7 7"></path></svg></button>
+          <button onClick="{{ lbNext }}" style="position:absolute;right:14px;top:50%;transform:translateY(-50%);width:42px;height:42px;border-radius:50%;border:none;background:rgba(255,255,255,.92);cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 3px 12px rgba(0,0,0,.2)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#40403E" stroke-width="2"><path d="M9 5l7 7-7 7"></path></svg></button>
+        </div>
+        <div style="padding:38px 36px;overflow-y:auto;display:flex;flex-direction:column">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:16px">
+            <div style="font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:#F27141;font-weight:600">InCassa Deco · Dormitorio</div>
+            <button onClick="{{ lbClose }}" style="background:none;border:none;cursor:pointer;color:#737373;width:30px;height:30px" style-hover="color:#40403E"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 6l12 12M18 6L6 18"></path></svg></button>
+          </div>
+          <h3 style="font-family:'DM Serif Display',serif;font-size:32px;line-height:1.1;color:#40403E;margin-bottom:8px">{{ lbName }}</h3>
+          <div style="font-size:13.5px;color:#9A9A98;margin-bottom:20px">{{ lbSub }}</div>
+          <div style="display:flex;align-items:baseline;gap:11px;margin-bottom:6px">
+            <span style="font-size:30px;font-weight:600;color:#40403E">{{ lbPrice }}</span>
+            <sc-if value="{{ lbOld }}" hint-placeholder-val="x"><span style="font-size:16px;color:#a5a39d;text-decoration:line-through">{{ lbOld }}</span></sc-if>
+            <sc-if value="{{ lbDiscount }}" hint-placeholder-val="x"><span style="font-size:11px;font-weight:700;color:#144659;background:rgba(20,70,89,.1);padding:4px 8px;border-radius:2px">{{ lbDiscount }}</span></sc-if>
+          </div>
+          <div style="font-size:12px;color:#144659;margin-bottom:22px">Entrega 4–6 días · ventana horaria de 2 h</div>
+
+          <div style="font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:#737373;margin-bottom:10px">Tapiz</div>
+          <span innerHTML="{{ lbSwatchHtml }}" style="margin-bottom:22px;display:inline-block"></span>
+
+          <div style="border-top:1px solid #E4E4E3;border-bottom:1px solid #E4E4E3;padding:18px 0;margin-bottom:24px;display:grid;grid-template-columns:1fr 1fr;gap:14px">
+            <sc-for list="{{ lbAttrs }}" as="a" hint-placeholder-count="4">
+              <div>
+                <div style="font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:#737373;margin-bottom:4px">{{ a.k }}</div>
+                <div style="font-size:14px;color:#40403E;font-weight:500">{{ a.v }}</div>
+              </div>
+            </sc-for>
+          </div>
+
+          <div style="margin-top:auto;display:flex;flex-direction:column;gap:10px">
+            <button onClick="{{ lbAdd }}" class="mbx-add" style="width:100%;background:#40403E;color:#F2F2F2;border:none;border-radius:2px;padding:16px;font-size:12px;letter-spacing:.1em;text-transform:uppercase;font-weight:600;cursor:pointer;position:relative;overflow:hidden;transition:background .2s" style-hover="background:#F27141">Agregar al carrito</button>
+            <button onClick="{{ noop }}" style="width:100%;background:#fff;color:#25963f;border:1px solid #25963f;border-radius:2px;padding:15px;font-size:12px;letter-spacing:.06em;text-transform:uppercase;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:9px" style-hover="background:#f1faf3"><svg width="18" height="18" viewBox="0 0 24 24" fill="#25963f"><path d="M12 2a10 10 0 0 0-8.6 15l-1.3 4.8 4.9-1.3A10 10 0 1 0 12 2z"></path></svg>Consultar por WhatsApp</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+
+  <!-- toast -->
+  <sc-if value="{{ toastOpen }}" hint-placeholder-val="{{ false }}">
+    <div style="position:fixed;bottom:26px;left:50%;transform:translateX(-50%);z-index:120;background:#40403E;color:#F2F2F2;border:1px solid rgba(242,113,65,.4);border-radius:3px;padding:14px 22px;display:flex;align-items:center;gap:12px;box-shadow:0 20px 50px rgba(0,0,0,.35)">
+      <span style="width:8px;height:8px;border-radius:50%;background:#F27141"></span>
+      <span style="font-size:13px">{{ toastMsg }}</span>
+    </div>
+  </sc-if>
+
+</div>
+
+<!-- ============ DECO CHAT PANEL ============ -->
+<aside ref="{{ decoPanelRef }}" style="position:fixed;top:0;left:0;height:100vh;width:360px;background:#FAFAF9;z-index:80;display:flex;flex-direction:column;box-shadow:14px 0 50px rgba(40,40,38,.16);border-right:1px solid #E4E4E3;transform:translateX(-100%);transition:transform .42s cubic-bezier(.16,.84,.44,1)">
+
+  <!-- header -->
+  <div style="display:flex;align-items:center;gap:11px;padding:18px 16px 15px;background:#FFFFFF;border-bottom:1px solid #ECECEA">
+    <div style="flex:none;width:40px;height:40px;border-radius:50%;background:linear-gradient(118deg,#7E5BC4 0%,#9B6FC9 42%,#D8BE8C 100%);display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(192,101,201,.28)">
+      <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.4a8 8 0 0 1-11.5 7.2L4 20l1.4-4.8A8 8 0 1 1 21 11.4z"></path><path d="M12.4 6.6l1.05 3.05 3.05 1.05-3.05 1.05-1.05 3.05-1.05-3.05-3.05-1.05 3.05-1.05z" fill="#FFFFFF" stroke="#FFFFFF" stroke-width="0.5"></path></svg>
+    </div>
+    <div style="display:flex;flex-direction:column;line-height:1.15">
+      <span style="font-family:'Comfortaa',sans-serif;font-weight:600;font-size:17px;color:#40403E">Deco IA</span>
+      <span style="font-size:10px;letter-spacing:.05em;color:#9A9A98;margin-top:2px">Tu asistente de InCassa</span>
+    </div>
+    <button onClick="{{ closeDeco }}" title="Cerrar" style="margin-left:auto;background:none;border:none;cursor:pointer;width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#737373;transition:background .2s,color .2s" style-hover="background:#F1F1EF;color:#40403E">
+      <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><path d="M6 6l12 12M18 6L6 18"></path></svg>
+    </button>
+  </div>
+
+  <!-- messages -->
+  <div style="flex:1;overflow-y:auto;padding:20px 16px 16px;display:flex;flex-direction:column;gap:11px">
+    <sc-for list="{{ decoMessages }}" as="m" hint-placeholder-count="1">
+      <div style="align-self:{{ m.align }};max-width:82%;background:{{ m.bg }};color:#40403E;border:{{ m.border }};border-radius:{{ m.radius }};padding:12px 14px;font-size:13.5px;line-height:1.5;box-shadow:0 1px 2px rgba(40,40,38,.05)">{{ m.text }}</div>
+    </sc-for>
+    <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:3px">
+      <sc-for list="{{ decoSuggestions }}" as="s" hint-placeholder-count="2">
+        <button onClick="{{ s.go }}" style="background:#FFFFFF;border:1px solid #E2E2DF;color:#5A5A57;font-size:12px;padding:8px 13px;border-radius:18px;cursor:pointer;transition:border-color .2s,color .2s" style-hover="border-color:#F27141;color:#F27141">{{ s.label }}</button>
+      </sc-for>
+    </div>
+  </div>
+
+  <!-- input -->
+  <div style="padding:13px 14px;background:#FFFFFF;border-top:1px solid #ECECEA;display:flex;gap:9px;align-items:center">
+    <input ref="{{ decoInputRef }}" value="{{ decoInputVal }}" onInput="{{ setDecoInput }}" onKeyDown="{{ decoKey }}" placeholder="Escribe tu pregunta…" style="flex:1;height:44px;background:#F4F4F2;border:1px solid #E4E4E2;border-radius:22px;padding:0 17px;font-family:'Inter';font-size:13.5px;color:#40403E;outline:none" style-focus="border-color:#F27141;background:#FFFFFF" />
+    <button onClick="{{ sendDeco }}" title="Enviar" style="flex:none;width:44px;height:44px;border-radius:50%;border:none;background:#F27141;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .2s" style-hover="background:#D9602E">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#40403E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2L11 13"></path><path d="M22 2l-7 20-4-9-9-4z"></path></svg>
+    </button>
+  </div>
+</aside>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1320,&quot;height&quot;:900}}">
+class Component extends DCLogic {
+  state = {
+    cart: [], wishlist: [],
+    f: { inStock:false, sizes:[], styles:[], colors:[], price:'all', sort:'rel' },
+    menu: null,          // 'medida'|'precio'|'color'|'orden'|'all'
+    lbId: null, lbIdx: 0,
+    toast: null,
+    deco: { open:false },
+    decoInput: '',
+    decoMessages: [ { role:'bot', text:'¡Hola! Soy Deco IA ✨ ¿Buscas una cama para un dormitorio en particular, o prefieres que te muestre lo más vendido?' } ]
+  };
+
+  COLORS = {
+    'Marfil':'#EDEAE3','Lino':'#D9CFBE','Arena':'#C9BBA1','Camel':'#B0895E',
+    'Champagne':'#D8C4A0','Gris':'#9A9A98','Grafito':'#5b5b59','Petróleo':'#144659',
+    'Hueso':'#E6E1D6','Verde salvia':'#AEB8A2'
+  };
+
+  PRODUCTS = [
+    {id:'aurora',img:'assets/camas/9.png',name:'Cama Aurora',sub:'Cabecera canutillo, patas doradas',price:6900,old:8200,badge:'MÁS VENDIDO',size:'King',styles:['Capitoné','Patas doradas','Cabecera tapizada'],colors:['Marfil','Gris','Champagne','Camel','Petróleo'],material:'Bouclé marfil',dims:'200 × 215 × 140 cm',warranty:'7 años',stock:true},
+    {id:'pampa',img:'assets/camas/8.png',name:'Cama Pampa',sub:'Set con veladores incluidos',price:7800,old:null,badge:'NUEVO',size:'King',styles:['Con veladores','Cabecera tapizada'],colors:['Gris','Lino','Arena','Grafito'],material:'Lino + melamina',dims:'200 × 210 × 120 cm',warranty:'5 años',includes:'2 veladores',stock:true},
+    {id:'versalles',img:'assets/camas/6.png',name:'Cama Versalles',sub:'Capitoné chesterfield, patas doradas',price:8900,old:null,badge:'EXCLUSIVO',size:'King',styles:['Capitoné','Patas doradas'],colors:['Champagne','Camel','Marfil','Petróleo','Grafito'],material:'Terciopelo capitoné',dims:'200 × 215 × 150 cm',warranty:'7 años',stock:true},
+    {id:'vector',img:'assets/camas/10.png',name:'Cama Vector',sub:'Cabecera geométrica iluminada',price:7200,old:null,badge:'NUEVO',size:'King',styles:['Geométrica','Cabecera tapizada'],colors:['Grafito','Petróleo','Gris','Marfil'],material:'Lino grafito',dims:'200 × 212 × 130 cm',warranty:'5 años',stock:true},
+    {id:'gatsby',img:'assets/camas/3.png',name:'Cama Gatsby',sub:'Cabecera art déco en abanico',price:6700,old:null,badge:'EXCLUSIVO',size:'Queen',styles:['Geométrica','Cabecera tapizada'],colors:['Hueso','Champagne','Camel','Arena'],material:'Terciopelo',dims:'160 × 215 × 145 cm',warranty:'5 años',stock:false},
+    {id:'origami',img:'assets/camas/5.png',name:'Cama Origami',sub:'Cabecera geométrica diagonal',price:6200,old:null,badge:null,size:'Queen',styles:['Geométrica','Cabecera tapizada'],colors:['Arena','Marfil','Lino','Camel'],material:'Lino y nogal',dims:'160 × 212 × 150 cm',warranty:'5 años',stock:true},
+    {id:'nordica',img:'assets/camas/2.png',name:'Cama Nórdica',sub:'Cabecera wingback acolchada',price:5900,old:null,badge:'MÁS VENDIDO',size:'Queen',styles:['Wingback','Cabecera tapizada'],colors:['Marfil','Petróleo','Verde salvia','Gris','Arena'],material:'Pana suave',dims:'160 × 210 × 140 cm',warranty:'5 años',stock:true},
+    {id:'boutique',img:'assets/camas/1.png',name:'Cama Boutique',sub:'Wingback en lino texturado',price:5600,old:null,badge:null,size:'Queen',styles:['Wingback','Cabecera tapizada'],colors:['Lino','Arena','Marfil','Camel'],material:'Lino texturado',dims:'160 × 210 × 130 cm',warranty:'5 años',stock:true},
+    {id:'sirius',img:'assets/camas/7.png',name:'Cama Sirius',sub:'Cabecera alta acolchada',price:5400,old:null,badge:null,size:'Queen',styles:['Cabecera tapizada'],colors:['Grafito','Gris','Petróleo'],material:'Lino gris',dims:'160 × 210 × 150 cm',warranty:'5 años',stock:false},
+    {id:'nube',img:'assets/camas/13.png',name:'Cama Nube',sub:'Cabecera redondeada acolchada',price:5100,old:null,badge:null,size:'Queen',styles:['Cabecera tapizada'],colors:['Arena','Champagne','Marfil','Verde salvia'],material:'Lino arena',dims:'160 × 210 × 120 cm',warranty:'5 años',stock:true},
+    {id:'lina',img:'assets/camas/11.png',name:'Cama Lina',sub:'Cabecera canutillo vertical',price:4800,old:null,badge:null,size:'Queen',styles:['Cabecera tapizada'],colors:['Lino','Gris','Arena'],material:'Lino beige',dims:'160 × 205 × 135 cm',warranty:'3 años',stock:false},
+    {id:'toscana',img:'assets/camas/4.png',name:'Cama Toscana',sub:'Base tapizada 2 plazas',price:4300,old:5200,badge:'OFERTA',size:'2 plazas',styles:['Cabecera tapizada'],colors:['Camel','Arena','Lino'],material:'Chenille',dims:'140 × 200 × 120 cm',warranty:'3 años',stock:true},
+    {id:'savana',img:'assets/camas/12.png',name:'Cama Savana',sub:'Línea infantil, cabecera nube',price:3200,old:null,badge:'NUEVO',size:'Infantil',styles:['Infantil','Cabecera tapizada'],colors:['Marfil','Verde salvia','Champagne','Arena'],material:'Bouclé',dims:'100 × 190 × 110 cm',warranty:'3 años',stock:true}
+  ];
+
+  SIZES = ['King','Queen','2 plazas','Infantil'];
+  STYLES = ['Cabecera tapizada','Capitoné','Wingback','Geométrica','Con veladores','Patas doradas','Infantil'];
+  COLOR_LIST = ['Marfil','Lino','Arena','Camel','Champagne','Gris','Grafito','Petróleo','Verde salvia'];
+  PRICES = [
+    {value:'all',label:'Cualquier precio'},
+    {value:'0-5000',label:'Hasta Bs 5.000'},
+    {value:'5000-7000',label:'Bs 5.000 – 7.000'},
+    {value:'7000+',label:'Más de Bs 7.000'}
+  ];
+  SORTS = [
+    {value:'rel',label:'Relevancia'},
+    {value:'price-asc',label:'Precio: menor a mayor'},
+    {value:'price-desc',label:'Precio: mayor a menor'},
+    {value:'new',label:'Novedades'}
+  ];
+
+  fmt(n){ return 'Bs ' + n.toLocaleString('es-BO'); }
+
+  badgeStyle(kind){
+    const m={'EXCLUSIVO':['#E4E4E3','#40403E'],'MÁS VENDIDO':['#40403E','#F2F2F2'],'NUEVO':['#144659','#F2F2F2'],'OFERTA':['#F27141','#40403E']};
+    return m[kind]||['#E4E4E3','#40403E'];
+  }
+  badgeHtml(kind){
+    if(!kind) return '';
+    const [bg,fg]=this.badgeStyle(kind);
+    return `<span style="display:inline-block;font-size:10px;letter-spacing:.1em;text-transform:uppercase;font-weight:700;padding:5px 9px;border-radius:2px;background:${bg};color:${fg}">${kind}</span>`;
+  }
+  swatchHtml(colors){
+    const max=4;
+    const shown=colors.slice(0,max);
+    const sw = shown.map(c=>`<span title="${c}" style="width:26px;height:26px;border-radius:50%;background:${this.COLORS[c]||'#ccc'};border:1px solid rgba(0,0,0,.14);box-shadow:inset 0 0 0 2px #fff;cursor:pointer;transition:box-shadow .15s" onmouseover="this.style.boxShadow='inset 0 0 0 2px #fff, 0 0 0 1.5px #40403E'" onmouseout="this.style.boxShadow='inset 0 0 0 2px #fff'"></span>`).join('');
+    const more = colors.length>max ? `<span style="font-size:13px;color:#737373;margin-left:5px;letter-spacing:.01em;cursor:pointer">+ ${colors.length-max} más</span>` : '';
+    return `<span style="display:inline-flex;align-items:center;gap:7px">${sw}${more}</span>`;
+  }
+  bigSwatchHtml(colors){
+    const sw = colors.map(c=>`<span title="${c}" style="display:inline-flex;flex-direction:column;align-items:center;gap:5px"><span style="width:30px;height:30px;border-radius:50%;background:${this.COLORS[c]||'#ccc'};border:1.5px solid #E4E4E3"></span><span style="font-size:10px;color:#737373">${c}</span></span>`).join('');
+    return `<span style="display:inline-flex;gap:14px">${sw}</span>`;
+  }
+
+  // ---- filter mutators ----
+  arrToggle(key,val){
+    this.setState(s=>{ const a=s.f[key]; const na = a.includes(val)? a.filter(x=>x!==val):[...a,val]; return {f:{...s.f,[key]:na}}; });
+  }
+  setF(key,val){ this.setState(s=>({f:{...s.f,[key]:val}})); }
+  toggleInStock(){ this.setState(s=>({f:{...s.f,inStock:!s.f.inStock}})); }
+  clearAll(){ this.setState({f:{inStock:false,sizes:[],styles:[],colors:[],price:'all',sort:'rel'}}); }
+
+  // ---- menus ----
+  toggleMenu(name){ this.setState(s=>({menu: s.menu===name? null : name})); }
+  closeMenus(){ this.setState({menu:null}); }
+
+  // ---- deco chat panel ----
+  toggleDeco(){ this.setState(s=>({deco:{...s.deco,open:!s.deco.open}}), ()=>{ if(this.state.deco.open&&this._decoInput) try{this._decoInput.focus();}catch(e){} }); }
+  closeDeco(){ this.setState(s=>({deco:{...s.deco,open:false}})); }
+  sendDeco(){
+    const t=(this.state.decoInput||'').trim(); if(!t) return;
+    this.setState(s=>({ decoMessages:[...s.decoMessages,{role:'user',text:t}], decoInput:'' }));
+    clearTimeout(this._decoT);
+    this._decoT=setTimeout(()=>{
+      this.setState(s=>({ decoMessages:[...s.decoMessages,{role:'bot',text:'¡Genial! Estoy preparando algunas recomendaciones para ti. Mientras tanto puedes explorar todo el catálogo de camas más abajo.'}] }));
+    },700);
+  }
+  scrollToProducts(){ const el=document.getElementById('productos'); if(el) window.scrollTo({top:el.getBoundingClientRect().top+window.scrollY-90, behavior:this._reduce?'auto':'smooth'}); }
+  _applyDeco(){
+    const open=this.state.deco.open;
+    if(this._decoPanel) this._decoPanel.style.transform = open ? 'translateX(0)' : 'translateX(-100%)';
+    if(this._main) this._main.style.marginLeft = open ? '360px' : '0';
+  }
+
+  // ---- cart / wishlist ----
+  addToCart(id,e){
+    if(e){ if(e.stopPropagation)e.stopPropagation(); this.ripple(e); }
+    const p=this.PRODUCTS.find(x=>x.id===id);
+    this.setState(s=>({cart:[...s.cart,id], toast:'“'+p.name+'” agregada al carrito'}));
+    this.bump();
+    clearTimeout(this._tt); this._tt=setTimeout(()=>this.setState({toast:null}),2200);
+  }
+  bump(){ if(this._reduce)return; requestAnimationFrame(()=>{ const el=this._badge; if(el){ el.style.animation='none'; void el.offsetWidth; el.style.animation='mbxBump .45s cubic-bezier(.2,1.4,.4,1)'; } }); }
+  ripple(e){
+    if(this._reduce)return;
+    const b=e.currentTarget; if(!b||!b.getBoundingClientRect)return;
+    const r=b.getBoundingClientRect(); const sp=document.createElement('span'); const sz=Math.max(r.width,r.height);
+    sp.style.cssText=`position:absolute;border-radius:50%;background:rgba(242,242,242,.4);pointer-events:none;width:${sz}px;height:${sz}px;left:${e.clientX-r.left-sz/2}px;top:${e.clientY-r.top-sz/2}px;transform:scale(0);animation:mbxRipple .6s ease-out;`;
+    b.appendChild(sp); setTimeout(()=>sp.remove(),600);
+  }
+  toggleWish(id){ this.setState(s=>({wishlist: s.wishlist.includes(id)? s.wishlist.filter(x=>x!==id):[...s.wishlist,id]})); }
+
+  // ---- lightbox ----
+  filteredIds(){ return this.computeFiltered().map(p=>p.id); }
+  openLb(id){ const ids=this.filteredIds(); this.setState({lbId:id, lbIdx:ids.indexOf(id), menu:null}); document.body.style.overflow='hidden'; }
+  lbClose(){ this.setState({lbId:null}); document.body.style.overflow=''; }
+  lbNav(d){ const ids=this.filteredIds(); if(!ids.length)return; let i=(this.state.lbIdx+d+ids.length)%ids.length; this.setState({lbIdx:i, lbId:ids[i]}); }
+
+  computeFiltered(){
+    const f=this.state.f;
+    let list=this.PRODUCTS.filter(p=>
+      (!f.inStock || p.stock) &&
+      (f.sizes.length===0 || f.sizes.includes(p.size)) &&
+      (f.styles.length===0 || p.styles.some(s=>f.styles.includes(s))) &&
+      (f.colors.length===0 || p.colors.some(c=>f.colors.includes(c))) &&
+      this.priceOk(p.price,f.price)
+    );
+    if(f.sort==='price-asc') list=[...list].sort((a,b)=>a.price-b.price);
+    else if(f.sort==='price-desc') list=[...list].sort((a,b)=>b.price-a.price);
+    else if(f.sort==='new') list=[...list].sort((a,b)=>(b.badge==='NUEVO'?1:0)-(a.badge==='NUEVO'?1:0));
+    return list;
+  }
+  priceOk(p,r){ if(r==='all')return true; if(r==='0-5000')return p<5000; if(r==='5000-7000')return p>=5000&&p<=7000; if(r==='7000+')return p>7000; return true; }
+
+  componentDidMount(){
+    this._reduce=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    this._onKey=(e)=>{ if(e.key==='Escape'&&this.state.deco.open){ this.closeDeco(); return; } if(!this.state.lbId)return; if(e.key==='ArrowRight')this.lbNav(1); else if(e.key==='ArrowLeft')this.lbNav(-1); else if(e.key==='Escape')this.lbClose(); };
+    window.addEventListener('keydown',this._onKey);
+  }
+  componentWillUnmount(){ window.removeEventListener('keydown',this._onKey); clearTimeout(this._tt); clearTimeout(this._decoT); document.body.style.overflow=''; }
+  componentDidUpdate(){ this._applyDeco(); }
+
+  renderVals(){
+    const self=this; const f=this.state.f;
+    const filtered=this.computeFiltered();
+
+    const catalog=filtered.map(p=>({
+      ...p,
+      priceText:'Desde '+this.fmt(p.price),
+      old: p.old? this.fmt(p.old):null,
+      badgeHtml:this.badgeHtml(p.badge),
+      swColors: p.colors.slice(0,4).map(c=>({hex:this.COLORS[c]||'#ccc', title:c})),
+      swMore: p.colors.length>4 ? (p.colors.length-4) : null,
+      wishFill: this.state.wishlist.includes(p.id)?'#F27141':'none',
+      open:()=>self.openLb(p.id),
+      wish:(e)=>{ if(e&&e.stopPropagation)e.stopPropagation(); self.toggleWish(p.id); }
+    }));
+
+    // subcat quick chips
+    const chip=(label,active,toggle)=>({label,toggle, active,
+      border: active?'#40403E':'#d8d5cf', bg: active?'#40403E':'#fff', color: active?'#F2F2F2':'#40403E'});
+    const subChips=[
+      chip('En stock', f.inStock, ()=>this.toggleInStock()),
+      ...this.SIZES.map(sz=>chip(sz, f.sizes.includes(sz), ()=>this.arrToggle('sizes',sz))),
+      chip('Capitoné', f.styles.includes('Capitoné'), ()=>this.arrToggle('styles','Capitoné')),
+      chip('Wingback', f.styles.includes('Wingback'), ()=>this.arrToggle('styles','Wingback')),
+      chip('Geométrica', f.styles.includes('Geométrica'), ()=>this.arrToggle('styles','Geométrica')),
+      chip('Con veladores', f.styles.includes('Con veladores'), ()=>this.arrToggle('styles','Con veladores'))
+    ];
+
+    const sizeOpts=this.SIZES.map(sz=>{ const a=f.sizes.includes(sz); return {label:sz, active:a, toggle:()=>this.arrToggle('sizes',sz), box:a?'#F27141':'#c4c1bb', fill:a?'#F27141':'transparent'}; });
+    const styleOpts=this.STYLES.map(st=>{ const a=f.styles.includes(st); return {label:st, active:a, toggle:()=>this.arrToggle('styles',st), border:a?'#40403E':'#d8d5cf', bg:a?'#40403E':'#fff', color:a?'#F2F2F2':'#40403E'}; });
+    const colorOpts=this.COLOR_LIST.map(c=>{ const a=f.colors.includes(c); return {label:c, hex:this.COLORS[c], active:a, toggle:()=>this.arrToggle('colors',c), ring:a?'#F27141':'#E4E4E3', color:a?'#F27141':'#40403E'}; });
+    const priceOpts=this.PRICES.map(o=>{ const a=f.price===o.value; return {label:o.label, set:()=>this.setF('price',o.value), box:a?'#F27141':'#c4c1bb', fill:a?'#F27141':'transparent'}; });
+    const sortOpts=this.SORTS.map(o=>{ const a=f.sort===o.value; return {label:o.label, set:()=>{ this.setF('sort',o.value); this.closeMenus(); }, box:a?'#F27141':'#c4c1bb', fill:a?'#F27141':'transparent'}; });
+    const sortLabel='Ordenar: '+(this.SORTS.find(o=>o.value===f.sort).label);
+
+    // active chips
+    const ac=[];
+    if(f.inStock) ac.push({label:'En stock', remove:()=>this.toggleInStock()});
+    f.sizes.forEach(sz=>ac.push({label:sz, remove:()=>this.arrToggle('sizes',sz)}));
+    f.styles.forEach(st=>ac.push({label:st, remove:()=>this.arrToggle('styles',st)}));
+    f.colors.forEach(c=>ac.push({label:c, remove:()=>this.arrToggle('colors',c)}));
+    if(f.price!=='all') ac.push({label:this.PRICES.find(p=>p.value===f.price).label, remove:()=>this.setF('price','all')});
+
+    // lightbox
+    const lp=this.state.lbId? this.PRODUCTS.find(x=>x.id===this.state.lbId):null;
+    const attrs=lp? [
+      {k:'Medida',v:lp.size},
+      {k:'Material',v:lp.material},
+      {k:'Dimensiones',v:lp.dims},
+      {k:lp.includes?'Incluye':'Garantía', v:lp.includes||lp.warranty}
+    ]:[];
+
+    return {
+      noop:()=>{}, stop:(e)=>{ if(e&&e.stopPropagation)e.stopPropagation(); },
+      cartCount:this.state.cart.length, hasCart:this.state.cart.length>0, cartBadgeRef:(el)=>{this._badge=el;},
+      wishlistCount:this.state.wishlist.length, hasWishlist:this.state.wishlist.length>0,
+      payMethods:['QR Banco Unión','BNB','Bisa','Transferencia','Contra-entrega'],
+
+      subChips,
+      toggleAll:()=>this.toggleMenu('all'),
+      toggleMedida:()=>this.toggleMenu('medida'),
+      togglePrecio:()=>this.toggleMenu('precio'),
+      toggleColor:()=>this.toggleMenu('color'),
+      toggleOrden:()=>this.toggleMenu('orden'),
+      menuMedida:this.state.menu==='medida', menuPrecio:this.state.menu==='precio',
+      menuColor:this.state.menu==='color', menuOrden:this.state.menu==='orden', menuAll:this.state.menu==='all',
+      menuOpen: this.state.menu!==null && this.state.menu!=='all',
+      closeMenus:()=>this.closeMenus(),
+
+      sizeOpts, styleOpts, colorOpts, priceOpts, sortOpts, sortLabel,
+      activeChips:ac, hasActive:ac.length>0, clearAll:()=>this.clearAll(),
+
+      resultCount:filtered.length,
+      catalog, empty:filtered.length===0,
+
+      lbOpen:!!lp,
+      lbImg: lp?lp.img:'',
+      lbName: lp?lp.name:'', lbSub: lp?lp.sub:'',
+      lbBadgeHtml: lp?this.badgeHtml(lp.badge):'',
+      lbPrice: lp?this.fmt(lp.price):'',
+      lbOld: lp&&lp.old? this.fmt(lp.old):null,
+      lbDiscount: lp&&lp.old? ('-'+Math.round((1-lp.price/lp.old)*100)+'%'):null,
+      lbSwatchHtml: lp?this.bigSwatchHtml(lp.colors):'',
+      lbAttrs:attrs,
+      lbClose:()=>this.lbClose(),
+      lbNext:(e)=>{ if(e&&e.stopPropagation)e.stopPropagation(); this.lbNav(1); },
+      lbPrev:(e)=>{ if(e&&e.stopPropagation)e.stopPropagation(); this.lbNav(-1); },
+      lbAdd:(e)=>{ if(lp)this.addToCart(lp.id,e); },
+
+      toastOpen:!!this.state.toast, toastMsg:this.state.toast||'',
+
+      // ---- deco chat panel ----
+      toggleDeco: ()=>this.toggleDeco(),
+      closeDeco: ()=>this.closeDeco(),
+      decoPanelRef: (el)=>{ this._decoPanel=el; if(el) el.style.transform = this.state.deco.open ? 'translateX(0)' : 'translateX(-100%)'; },
+      mainRef: (el)=>{ this._main=el; if(el) el.style.marginLeft = this.state.deco.open ? '360px' : '0'; },
+      decoMessages: this.state.decoMessages.map(m=>({
+        text:m.text,
+        align: m.role==='bot' ? 'flex-start' : 'flex-end',
+        bg: m.role==='bot' ? '#FFFFFF' : '#F8C9AE',
+        border: m.role==='bot' ? '1px solid #ECECEA' : 'none',
+        radius: m.role==='bot' ? '4px 16px 16px 16px' : '16px 16px 4px 16px'
+      })),
+      decoInputVal: this.state.decoInput,
+      setDecoInput: (e)=>this.setState({decoInput:e.target.value}),
+      sendDeco: ()=>this.sendDeco(),
+      decoKey: (e)=>{ if(e.key==='Enter'){ e.preventDefault(); this.sendDeco(); } },
+      decoInputRef: (el)=>{ this._decoInput=el; },
+      decoSuggestions: [
+        { label:'Camas King', go:()=>{ this.setState(s=>({f:{...s.f,sizes:['King']}})); this.scrollToProducts(); } },
+        { label:'Estilo capitoné', go:()=>{ this.setState(s=>({f:{...s.f,styles:['Capitoné']}})); this.scrollToProducts(); } }
+      ]
+    };
+  }
+}
+</script>
+</body>
+</html>
