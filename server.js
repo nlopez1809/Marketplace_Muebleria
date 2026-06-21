@@ -13,6 +13,20 @@ const anthropic = new Anthropic.default({
   apiKey: process.env.ANTHROPIC_API_KEY,
 });
 
+const ASESORES = [
+  { nombre: 'Carlos', telefono: '59170000001' },
+  { nombre: 'María', telefono: '59170000002' },
+];
+let asesorIndex = 0;
+
+function getAsesorDeTurno() {
+  const asesor = ASESORES[asesorIndex % ASESORES.length];
+  asesorIndex++;
+  return asesor;
+}
+
+const sessionAdvisor = new Map();
+
 const SYSTEM_PROMPT = `Eres "Deco IA", el asistente virtual de InCassa DECO, una mueblería premium en Bolivia especializada en muebles de alta calidad con diseño moderno y elegante.
 
 ## TU PERSONALIDAD
@@ -69,7 +83,10 @@ Cada producto tiene un LINK que DEBES incluir cuando lo recomiendes. Usa formato
 - Siempre saluda al iniciar la conversación
 - Haz preguntas para entender la necesidad antes de recomendar
 - Menciona precios cuando sea relevante
-- Si el cliente está listo para comprar, dale el WhatsApp: +591 70000000
+- Cuando el cliente muestre intención clara de compra (pide precio final, pregunta cómo comprar, dice "lo quiero", "me interesa comprarlo", quiere saber disponibilidad para comprar, etc.), derívalo al asesor de turno usando EXACTAMENTE este formato:
+  ¡Excelente elección! Te conecto con **NOMBRE_ASESOR**, nuestro asesor de ventas, para que te ayude a concretar tu compra:
+  [💬 Chatear con NOMBRE_ASESOR por WhatsApp](https://wa.me/TELEFONO_ASESOR?text=MENSAJE_CODIFICADO)
+  Donde MENSAJE_CODIFICADO es el texto codificado para URL con el formato: "Hola NOMBRE_ASESOR, soy cliente de InCassa DECO. Estoy interesado/a en: NOMBRE_PRODUCTO (Bs PRECIO). ¿Podrías ayudarme a concretar la compra?"
 - No hables de competidores
 - Si preguntan algo fuera de muebles/decoración, redirige amablemente
 - Respuestas cortas y claras (máximo 3 párrafos)
@@ -96,14 +113,21 @@ app.post('/api/chat', async (req, res) => {
     conversations.set(sessionId, []);
   }
 
+  if (!sessionAdvisor.has(sessionId)) {
+    sessionAdvisor.set(sessionId, getAsesorDeTurno());
+  }
+  const asesor = sessionAdvisor.get(sessionId);
+
   const history = conversations.get(sessionId);
   history.push({ role: 'user', content: message });
+
+  const dynamicPrompt = SYSTEM_PROMPT + `\n\n## ASESOR DE TURNO\nEl asesor asignado a esta conversación es **${asesor.nombre}** (teléfono: ${asesor.telefono}). Usa estos datos cuando debas derivar al cliente.`;
 
   try {
     const response = await anthropic.messages.create({
       model: 'claude-haiku-4-5',
       max_tokens: 1024,
-      system: SYSTEM_PROMPT,
+      system: dynamicPrompt,
       messages: history,
     });
 
@@ -129,6 +153,7 @@ app.post('/api/chat/reset', (req, res) => {
   if (sessionId) {
     conversations.delete(sessionId);
     tokenUsage.delete(sessionId);
+    sessionAdvisor.delete(sessionId);
   }
   res.json({ ok: true });
 });

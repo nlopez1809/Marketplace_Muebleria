@@ -196,7 +196,7 @@ function __decoInit() {
 
   function formatMessage(text) {
     let safe = text.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-    safe = safe.replace(/\[([^\]]+)\]\((\/[^\s)]+)\)/g, '<a href="$2" target="_blank" style="color:inherit;text-decoration:underline;font-weight:600">$1</a>');
+    safe = safe.replace(/\[([^\]]+)\]\(((?:\/|https?:\/\/)[^\s)]+)\)/g, '<a href="$2" target="_blank" style="color:inherit;text-decoration:underline;font-weight:600">$1</a>');
     safe = safe.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
     return safe;
   }
