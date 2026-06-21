@@ -158,6 +158,11 @@ app.post('/api/chat/reset', (req, res) => {
   res.json({ ok: true });
 });
 
+app.get('/api/asesor', (req, res) => {
+  const asesor = ASESORES[asesorIndex % ASESORES.length];
+  res.json(asesor);
+});
+
 const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => {
   console.log(`Servidor InCassa DECO corriendo en http://localhost:${PORT}`);
