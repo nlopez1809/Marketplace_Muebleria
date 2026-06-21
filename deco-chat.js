@@ -194,10 +194,17 @@ function __decoInit() {
     inputEl.focus();
   }
 
+  function formatMessage(text) {
+    let safe = text.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    safe = safe.replace(/\[([^\]]+)\]\((\/[^\s)]+)\)/g, '<a href="$2" target="_blank" style="color:inherit;text-decoration:underline;font-weight:600">$1</a>');
+    safe = safe.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
+    return safe;
+  }
+
   function addBubble(text, type) {
     const div = document.createElement('div');
     div.className = 'deco-bubble ' + type;
-    div.textContent = text;
+    div.innerHTML = formatMessage(text);
     msgsEl.appendChild(div);
     msgsEl.scrollTop = msgsEl.scrollHeight;
   }
