@@ -1,4 +1,4 @@
-(() => {
+document.addEventListener('DOMContentLoaded', () => {
   const API_URL = '/api/chat';
   const SESSION_ID = 'deco-' + Math.random().toString(36).slice(2, 10);
   let open = false;
@@ -257,4 +257,4 @@
   }, 500);
 
   setTimeout(() => clearInterval(origInterval), 10000);
-})();
+});
