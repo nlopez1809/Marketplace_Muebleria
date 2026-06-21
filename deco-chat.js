@@ -86,8 +86,8 @@ function __decoInit() {
     </div>
   `;
 
-  document.body.appendChild(overlay);
-  document.body.appendChild(panel);
+  document.documentElement.appendChild(overlay);
+  document.documentElement.appendChild(panel);
 
   const msgsEl = panel.querySelector('#deco-msgs');
   const inputEl = panel.querySelector('#deco-input');
@@ -225,11 +225,11 @@ function __decoInit() {
     <path d="M12.4 6.6l1.05 3.05 3.05 1.05-3.05 1.05-1.05 3.05-1.05-3.05-3.05-1.05 3.05-1.05z" fill="#fff" stroke="#fff" stroke-width="0.5"/>
   </svg>`;
   fab.onclick = function() { toggle(); };
-  document.body.appendChild(fab);
+  document.documentElement.appendChild(fab);
 
   const fabCss = document.createElement('style');
   fabCss.textContent = `
-    .deco-fab{position:fixed;bottom:28px;right:28px;z-index:9997;width:60px;height:60px;border-radius:50%;border:none;
+    .deco-fab{position:fixed;bottom:28px;right:28px;z-index:2147483647;width:60px;height:60px;border-radius:50%;border:none;
       background:linear-gradient(118deg,#7E5BC4 0%,#9B6FC9 42%,#D8BE8C 100%);
       box-shadow:0 4px 16px rgba(126,91,196,.4);cursor:pointer;display:flex;align-items:center;justify-content:center;
       transition:transform .2s,box-shadow .2s;animation:decoFabPulse 2.5s infinite}
