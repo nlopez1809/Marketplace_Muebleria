@@ -196,7 +196,16 @@ function __decoInit() {
 
   function formatMessage(text) {
     let safe = text.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-    safe = safe.replace(/\[([^\]]+)\]\(((?:\/|https?:\/\/)[^\s)]+)\)/g, '<a href="$2" target="_blank" style="color:inherit;text-decoration:underline;font-weight:600">$1</a>');
+    safe = safe.replace(/\[([^\]]+)\]\(((?:\/|https?:\/\/)[^\s)]+)\)/g, function(m, label, url) {
+      if (url.includes('#producto-')) {
+        var pid = url.split('#producto-')[1];
+        return '<a href="#" data-producto="' + pid + '" style="color:#7E5BC4;text-decoration:underline;font-weight:600;cursor:pointer">' + label + '</a>';
+      }
+      if (url.includes('wa.me')) {
+        return '<a href="' + url + '" target="_blank" style="color:inherit;text-decoration:underline;font-weight:600">' + label + '</a>';
+      }
+      return '<a href="' + url + '" target="_blank" style="color:inherit;text-decoration:underline;font-weight:600">' + label + '</a>';
+    });
     safe = safe.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
     return safe;
   }
@@ -205,6 +214,15 @@ function __decoInit() {
     const div = document.createElement('div');
     div.className = 'deco-bubble ' + type;
     div.innerHTML = formatMessage(text);
+    div.querySelectorAll('a[data-producto]').forEach(function(a) {
+      a.addEventListener('click', function(e) {
+        e.preventDefault();
+        var pid = a.getAttribute('data-producto');
+        if (window.__decoOpenProduct) {
+          window.__decoOpenProduct(pid);
+        }
+      });
+    });
     msgsEl.appendChild(div);
     msgsEl.scrollTop = msgsEl.scrollHeight;
   }

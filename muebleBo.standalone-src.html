@@ -980,6 +980,8 @@ class Component extends DCLogic {
   componentDidMount(){
     this.loadAsesores();
     this.loadProductsFromAPI();
+    const self = this;
+    window.__decoOpenProduct = function(pid){ self.openLb(pid); };
     this._reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     // reveal observer
     this._io = new IntersectionObserver((ents)=>{
