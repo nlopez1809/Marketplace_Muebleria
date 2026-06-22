@@ -809,6 +809,12 @@ class Component extends DCLogic {
   _asesoresList = [];
   _asesorIdx = 0;
 
+  loadProductsFromAPI(){
+    fetch('/api/products').then(r=>r.json()).then(list=>{
+      if(list && list.length){ this.PRODUCTS = list; this.setState({}); }
+    }).catch(()=>{});
+  }
+
   loadAsesores(){
     if(this._asesoresLoaded) return;
     fetch('/api/asesor').then(r=>r.json()).then(list=>{
@@ -973,6 +979,7 @@ class Component extends DCLogic {
 
   componentDidMount(){
     this.loadAsesores();
+    this.loadProductsFromAPI();
     this._reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     // reveal observer
     this._io = new IntersectionObserver((ents)=>{
