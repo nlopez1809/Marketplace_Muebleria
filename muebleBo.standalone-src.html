@@ -669,15 +669,21 @@ class Component extends DCLogic {
     };
   }
 
-  // ---- cart / wishlist ----
+  // ---- asesores ----
+  _asesores = [
+    { nombre: 'Carlos', telefono: '59170000001' },
+    { nombre: 'María', telefono: '59170000002' },
+  ];
+  _asesorIdx = 0;
+
   contactarAsesor(p){
-    fetch('/api/asesor').then(r=>r.json()).then(asesor=>{
-      const msg = encodeURIComponent('Hola '+asesor.nombre+', soy cliente de InCassa DECO. Estoy interesado/a en: '+p.name+' (Bs '+p.price.toLocaleString('es-BO')+').¿Podrías ayudarme con más información?');
-      window.open('https://wa.me/'+asesor.telefono+'?text='+msg, '_blank');
-    }).catch(()=>{
-      window.open('https://wa.me/59170000001', '_blank');
-    });
+    const asesor = this._asesores[this._asesorIdx % this._asesores.length];
+    this._asesorIdx++;
+    const msg = encodeURIComponent('Hola '+asesor.nombre+', soy cliente de InCassa DECO. Estoy interesado/a en: '+p.name+' (Bs '+p.price.toLocaleString('es-BO')+'). ¿Podrías ayudarme con más información?');
+    window.location.href = 'https://wa.me/'+asesor.telefono+'?text='+msg;
   }
+
+  // ---- cart / wishlist ----
 
   addToCart(id,e){
     if(e){ if(e.stopPropagation)e.stopPropagation(); this.ripple(e); }
