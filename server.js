@@ -52,6 +52,23 @@ const SYSTEM_PROMPT = `Eres "Deco IA", el asistente virtual de InCassa DECO, una
 - Eres experto en decoración de interiores y muebles
 - Nunca inventas productos que no existan en el catálogo
 
+## CAPTURA DE DATOS DEL CLIENTE
+Es importante registrar los datos del cliente para brindarle un mejor seguimiento. Durante la conversación, cuando el cliente muestre interés real en un producto (después de la fase de descubrimiento), pedí sus datos de forma natural y amable:
+
+1. Primero pedí el **nombre completo** como parte natural de la conversación: "Por cierto, ¿con quién tengo el gusto de conversar?" o "¿Me compartís tu nombre para darte una atención más personalizada?"
+2. Luego pedí el **número de celular**: "¿Me pasás tu número de celular? Así nuestro asesor te puede contactar directamente con las mejores opciones"
+3. Finalmente pedí el **número de carnet de identidad (CI)**: "Para completar tu registro y que puedas acceder a nuestro financiamiento sin intereses, ¿me compartís tu número de CI?"
+
+IMPORTANTE: Cuando el cliente te proporcione sus datos, SIEMPRE incluí al final de tu respuesta (invisible para el cliente) una línea con este formato exacto:
+<!--LEAD:{"nombre":"Nombre Completo","telefono":"numero","ci":"numero"}-->
+
+- Incluí esta etiqueta CADA VEZ que recibas datos nuevos o actualizados
+- Si solo te dieron el nombre, poné los demás campos vacíos: <!--LEAD:{"nombre":"Juan Pérez","telefono":"","ci":""}-->
+- Si ya tenés datos previos y te dan uno nuevo, incluí TODOS los datos recopilados hasta el momento
+- No menciones esta etiqueta al cliente, es solo para el sistema
+- No seas invasivo pidiendo los datos — hacelo de forma conversacional y natural
+- Si el cliente no quiere dar algún dato, respetá su decisión y seguí adelante
+
 ## CATÁLOGO DE PRODUCTOS
 Cada producto tiene un LINK que DEBES incluir cuando lo recomiendes. Usa formato: [Ver producto](LINK)
 
@@ -193,7 +210,36 @@ app.post('/api/chat', async (req, res) => {
       messages: history,
     });
 
-    const assistantMessage = response.content[0].text;
+    let assistantMessage = response.content[0].text;
+
+    const leadMatch = assistantMessage.match(/<!--LEAD:(.*?)-->/);
+    if (leadMatch) {
+      try {
+        const leadData = JSON.parse(leadMatch[1]);
+        data = loadData();
+        const existing = data.leads.find(l => l.sessionId === sessionId);
+        if (existing) {
+          if (leadData.nombre) existing.nombre = leadData.nombre;
+          if (leadData.telefono) existing.telefono = leadData.telefono;
+          if (leadData.ci) existing.ci = leadData.ci;
+          existing.updatedAt = new Date().toISOString();
+        } else {
+          data.leads.push({
+            id: Date.now(),
+            sessionId,
+            nombre: leadData.nombre || '',
+            telefono: leadData.telefono || '',
+            ci: leadData.ci || '',
+            productoInteres: '',
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString()
+          });
+        }
+        saveData(data);
+      } catch (e) { console.error('Error parsing lead:', e.message); }
+      assistantMessage = assistantMessage.replace(/<!--LEAD:.*?-->/g, '').trim();
+    }
+
     history.push({ role: 'assistant', content: assistantMessage });
 
     const sessionTokens = response.usage.input_tokens + response.usage.output_tokens;
@@ -472,6 +518,22 @@ app.delete('/api/admin/asesores/:id', (req, res) => {
   if (idx === -1) return res.status(404).json({ error: 'Asesor no encontrado' });
 
   data.asesores.splice(idx, 1);
+  saveData(data);
+  res.json({ ok: true });
+});
+
+// ── Admin: Leads ──
+
+app.get('/api/admin/leads', (req, res) => {
+  data = loadData();
+  res.json(data.leads || []);
+});
+
+app.delete('/api/admin/leads/:id', (req, res) => {
+  data = loadData();
+  const idx = (data.leads || []).findIndex(l => l.id === parseInt(req.params.id));
+  if (idx === -1) return res.status(404).json({ error: 'Lead no encontrado' });
+  data.leads.splice(idx, 1);
   saveData(data);
   res.json({ ok: true });
 });

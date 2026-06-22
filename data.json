@@ -16,5 +16,6 @@
   "asesores": [
     { "id": 1, "nombre": "Norman López", "telefono": "59176806091" },
     { "id": 2, "nombre": "Boris Nogales", "telefono": "59165315486" }
-  ]
+  ],
+  "leads": []
 }
