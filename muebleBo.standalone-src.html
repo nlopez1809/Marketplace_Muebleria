@@ -67,6 +67,69 @@
     *{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important;scroll-behavior:auto!important}
     .mb-reveal,.mb-reveal-l,.mb-reveal-r{opacity:1!important;transform:none!important}
   }
+
+  /* ---- RESPONSIVE ---- */
+  @media(max-width:1024px){
+    .mb-nav-search{display:none!important}
+    .mb-nav-links{display:none!important}
+    .mb-hero-banner{height:320px!important}
+    .mb-hero-logo svg{width:60px!important;height:60px!important}
+    .mb-hero-title{font-size:38px!important}
+    .mb-hero-subtitle{font-size:16px!important}
+    .mb-bento-text{font-size:28px!important}
+    .mb-diff-grid{grid-template-columns:1fr!important}
+    .mb-cat-grid{grid-template-columns:repeat(3,1fr)!important}
+    .mb-prod-grid{grid-template-columns:repeat(3,1fr)!important}
+    .mb-editorial-grid{grid-template-columns:1fr 1fr!important;grid-auto-rows:200px!important}
+    .mb-editorial-grid>*{grid-column:auto!important;grid-row:auto!important}
+    .mb-stats-grid{grid-template-columns:repeat(2,1fr)!important}
+    .mb-catalog-layout{grid-template-columns:1fr!important}
+    .mb-catalog-sidebar{display:none!important}
+    .mb-catalog-grid{grid-template-columns:repeat(2,1fr)!important}
+    .mb-footer-grid{grid-template-columns:repeat(2,1fr)!important;gap:30px 40px!important}
+    .mb-lb-grid{grid-template-columns:1fr!important;max-height:95vh!important;overflow-y:auto!important}
+    .mb-lb-gallery{min-height:300px!important;max-height:400px!important}
+    .mb-lb-thumbs{display:flex!important}
+  }
+
+  @media(max-width:640px){
+    .mb-hero-banner{height:240px!important}
+    .mb-hero-overlay-content{left:20px!important;bottom:20px!important}
+    .mb-hero-overlay-logo{left:20px!important;top:20px!important;gap:12px!important}
+    .mb-hero-logo svg{width:40px!important;height:40px!important}
+    .mb-hero-title{font-size:28px!important}
+    .mb-hero-subtitle{font-size:13px!important;letter-spacing:.3em!important}
+    .mb-hero-tagline{font-size:18px!important}
+    .mb-bento-row{grid-template-columns:1fr!important}
+    .mb-bento-cell{height:180px!important}
+    .mb-bento-text{font-size:22px!important}
+    .mb-cat-grid{grid-template-columns:repeat(2,1fr)!important}
+    .mb-prod-grid{grid-template-columns:repeat(2,1fr)!important;gap:14px!important}
+    .mb-editorial-grid{grid-template-columns:1fr!important;grid-auto-rows:180px!important}
+    .mb-stats-grid{grid-template-columns:1fr 1fr!important;gap:16px!important}
+    .mb-catalog-grid{grid-template-columns:1fr 1fr!important;gap:14px!important}
+    .mb-footer-grid{grid-template-columns:1fr!important}
+    .mb-promo-inner{flex-direction:column!important;text-align:center!important}
+    .mb-promo-title{font-size:24px!important}
+    .mb-section-title{font-size:28px!important}
+    .mb-section-pad{padding-left:16px!important;padding-right:16px!important}
+    .mb-container{padding-left:14px!important;padding-right:14px!important}
+    .mb-lb-grid{grid-template-columns:1fr!important}
+    .mb-lb-info{padding:20px!important}
+    .mb-lb-name{font-size:24px!important}
+    .mb-lb-price{font-size:22px!important}
+    .mb-testi-wrap{flex-direction:column!important}
+    .mb-testi-quote{font-size:15px!important}
+    .mb-marquee-section{display:none!important}
+    .mb-newlabel{font-size:26px!important}
+  }
+
+  @media(max-width:420px){
+    .mb-prod-grid{grid-template-columns:1fr!important}
+    .mb-catalog-grid{grid-template-columns:1fr!important}
+    .mb-cat-grid{grid-template-columns:repeat(2,1fr)!important}
+    .mb-hero-banner{height:200px!important}
+  }
 </style>
 <script src="image-slot.js"></script>
 <style>
@@ -87,13 +150,13 @@
           <span style="font-family:'Comfortaa',sans-serif;font-weight:600;font-size:9px;letter-spacing:.42em;color:#C9C9C7;margin-top:3px">DECO</span>
         </span>
       </a>
-      <div style="flex:1;max-width:560px;position:relative">
+      <div class="mb-nav-search" style="flex:1;max-width:560px;position:relative">
         <input placeholder="Buscar sofás, mesas, lámparas…" style="width:100%;height:44px;background:#4a4a48;border:1px solid #5a5a57;border-radius:2px;color:#F2F2F2;padding:0 44px 0 16px;font-family:'Inter';font-size:14px;outline:none" style-focus="border-color:#F27141" />
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#737373" stroke-width="2" style="position:absolute;right:15px;top:13px"><circle cx="11" cy="11" r="7"></circle><path d="M21 21l-4.3-4.3"></path></svg>
       </div>
       <nav style="display:flex;gap:26px;align-items:center">
-        <a href="#catalogo" style="color:#D6D6D4;text-decoration:none;font-size:11px;letter-spacing:.1em;text-transform:uppercase;font-weight:500" style-hover="color:#F27141">Catálogo</a>
-        <a href="#editorial" style="color:#D6D6D4;text-decoration:none;font-size:11px;letter-spacing:.1em;text-transform:uppercase;font-weight:500" style-hover="color:#F27141">Ambientes</a>
+        <a href="#catalogo" class="mb-nav-links" style="color:#D6D6D4;text-decoration:none;font-size:11px;letter-spacing:.1em;text-transform:uppercase;font-weight:500" style-hover="color:#F27141">Catálogo</a>
+        <a href="#editorial" class="mb-nav-links" style="color:#D6D6D4;text-decoration:none;font-size:11px;letter-spacing:.1em;text-transform:uppercase;font-weight:500" style-hover="color:#F27141">Ambientes</a>
         <button onClick="{{ noop }}" style="background:none;border:none;cursor:pointer;display:flex;align-items:center" title="Favoritos">
           <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="#D6D6D4" stroke-width="1.7"><path d="M12 21s-7.5-4.6-10-9.3C.6 8.9 2 5.5 5.2 5.5c2 0 3.2 1.2 3.8 2.3C9.6 6.7 10.8 5.5 12.8 5.5 16 5.5 17.4 8.9 16 11.7 13.5 16.4 12 21 12 21z"></path></svg>
           <sc-if value="{{ hasWishlist }}" hint-placeholder-val="{{ false }}"><span style="background:#F27141;color:#40403E;font-size:10px;font-weight:700;border-radius:20px;min-width:16px;height:16px;display:inline-flex;align-items:center;justify-content:center;margin-left:-6px;margin-top:-12px;padding:0 4px">{{ wishlistCount }}</span></sc-if>
@@ -122,30 +185,30 @@
     <div style="max-width:1320px;margin:0 auto;padding:0 18px;display:flex;flex-direction:column;gap:14px">
 
       <!-- BANNER -->
-      <div style="position:relative;border-radius:4px;overflow:hidden;height:452px;background:#2f2f2e">
+      <div class="mb-hero-banner" style="position:relative;border-radius:4px;overflow:hidden;height:452px;background:#2f2f2e">
         <image-slot id="incassa-hero" style="position:absolute;inset:0;width:100%;height:100%;display:block" shape="rect" fit="cover" src="{{ slotHero }}" placeholder="Arrastrá aquí la foto del showroom (sala / sofás)"></image-slot>
         <div style="position:absolute;inset:0;background:linear-gradient(100deg,rgba(28,28,27,.82) 0%,rgba(28,28,27,.34) 45%,rgba(28,28,27,0) 73%);pointer-events:none"></div>
-        <div style="position:absolute;left:46px;top:42px;display:flex;align-items:center;gap:20px;pointer-events:none">
-          <svg width="96" height="96" viewBox="0 0 100 100" fill="none" stroke="#F27141" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 51V80q0 8 8 8h40q8 0 8-8V51"></path><path d="M13 57 50 22l37 35"></path><path d="M34 42V28"></path></svg>
+        <div class="mb-hero-overlay-logo" style="position:absolute;left:46px;top:42px;display:flex;align-items:center;gap:20px;pointer-events:none">
+          <span class="mb-hero-logo"><svg width="96" height="96" viewBox="0 0 100 100" fill="none" stroke="#F27141" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 51V80q0 8 8 8h40q8 0 8-8V51"></path><path d="M13 57 50 22l37 35"></path><path d="M34 42V28"></path></svg></span>
           <span style="display:flex;flex-direction:column;line-height:.9">
-            <span style="font-family:'Comfortaa',sans-serif;font-weight:500;font-size:60px;letter-spacing:.005em;color:#F2F2F2;text-shadow:0 2px 22px rgba(0,0,0,.45)">InCassa</span>
-            <span style="font-family:'Comfortaa',sans-serif;font-weight:600;font-size:22px;letter-spacing:.5em;color:#F2F2F2;margin-left:7px;margin-top:7px;text-shadow:0 2px 14px rgba(0,0,0,.45)">DECO</span>
+            <span class="mb-hero-title" style="font-family:'Comfortaa',sans-serif;font-weight:500;font-size:60px;letter-spacing:.005em;color:#F2F2F2;text-shadow:0 2px 22px rgba(0,0,0,.45)">InCassa</span>
+            <span class="mb-hero-subtitle" style="font-family:'Comfortaa',sans-serif;font-weight:600;font-size:22px;letter-spacing:.5em;color:#F2F2F2;margin-left:7px;margin-top:7px;text-shadow:0 2px 14px rgba(0,0,0,.45)">DECO</span>
           </span>
         </div>
-        <div style="position:absolute;left:46px;bottom:40px;max-width:440px">
-          <p style="font-family:'DM Serif Display',serif;font-style:italic;font-size:25px;line-height:1.25;color:#F2F2F2;margin-bottom:20px;text-shadow:0 2px 20px rgba(0,0,0,.55)">Diseño que se queda en casa.</p>
+        <div class="mb-hero-overlay-content" style="position:absolute;left:46px;bottom:40px;max-width:440px">
+          <p class="mb-hero-tagline" style="font-family:'DM Serif Display',serif;font-style:italic;font-size:25px;line-height:1.25;color:#F2F2F2;margin-bottom:20px;text-shadow:0 2px 20px rgba(0,0,0,.55)">Diseño que se queda en casa.</p>
           <button onClick="{{ scrollToProducts }}" style="background:#F27141;color:#40403E;border:none;border-radius:2px;padding:15px 28px;font-size:12px;letter-spacing:.1em;text-transform:uppercase;font-weight:600;cursor:pointer;transition:background .2s" style-hover="background:#D9602E">Explorar colección</button>
         </div>
       </div>
 
       <!-- ROW A -->
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
-        <div style="position:relative;border-radius:4px;overflow:hidden;height:258px;background:#2f2f2e">
+      <div class="mb-bento-row" style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+        <div class="mb-bento-cell" style="position:relative;border-radius:4px;overflow:hidden;height:258px;background:#2f2f2e">
           <image-slot id="incassa-melamina" style="position:absolute;inset:0;width:100%;height:100%;display:block" shape="rect" fit="cover" src="{{ slotMelamina }}" placeholder="Foto · Melamina"></image-slot>
           <div style="position:absolute;inset:0;background:linear-gradient(135deg,rgba(28,28,27,.52),rgba(28,28,27,.06) 55%);pointer-events:none"></div>
           <button onClick="{{ goMelamina }}" style="position:absolute;left:30px;top:26px;background:none;border:none;cursor:pointer;padding:0;font-family:'Comfortaa',sans-serif;font-weight:300;font-size:44px;letter-spacing:.05em;color:#F2F2F2;text-shadow:0 2px 16px rgba(0,0,0,.55);transition:opacity .25s,letter-spacing .35s" style-hover="opacity:.82;letter-spacing:.1em">MELAMINA</button>
         </div>
-        <div style="position:relative;border-radius:4px;overflow:hidden;height:258px;background:#2f2f2e">
+        <div class="mb-bento-cell" style="position:relative;border-radius:4px;overflow:hidden;height:258px;background:#2f2f2e">
           <image-slot id="incassa-comedor" style="position:absolute;inset:0;width:100%;height:100%;display:block" shape="rect" fit="cover" src="{{ slotComedor }}" placeholder="Foto · Comedor"></image-slot>
           <div style="position:absolute;inset:0;background:linear-gradient(135deg,rgba(28,28,27,.52),rgba(28,28,27,.06) 55%);pointer-events:none"></div>
           <button onClick="{{ goComedor }}" style="position:absolute;left:30px;top:26px;background:none;border:none;cursor:pointer;padding:0;font-family:'Comfortaa',sans-serif;font-weight:300;font-size:44px;letter-spacing:.05em;color:#F2F2F2;text-shadow:0 2px 16px rgba(0,0,0,.55);transition:opacity .25s,letter-spacing .35s" style-hover="opacity:.82;letter-spacing:.1em">COMEDOR</button>
@@ -153,13 +216,13 @@
       </div>
 
       <!-- ROW B -->
-      <div style="display:grid;grid-template-columns:1fr 1.18fr;gap:14px">
-        <div style="position:relative;border-radius:4px;overflow:hidden;height:300px;background:#2f2f2e">
+      <div class="mb-bento-row" style="display:grid;grid-template-columns:1fr 1.18fr;gap:14px">
+        <div class="mb-bento-cell" style="position:relative;border-radius:4px;overflow:hidden;height:300px;background:#2f2f2e">
           <image-slot id="incassa-camas" style="position:absolute;inset:0;width:100%;height:100%;display:block" shape="rect" fit="cover" src="{{ slotCamas }}" placeholder="Foto · Camas"></image-slot>
           <div style="position:absolute;inset:0;background:linear-gradient(200deg,rgba(28,28,27,.55),rgba(28,28,27,.05) 55%);pointer-events:none"></div>
           <button onClick="{{ goCamas }}" style="position:absolute;left:30px;bottom:26px;background:none;border:none;cursor:pointer;padding:0;font-family:'Comfortaa',sans-serif;font-weight:300;font-size:44px;letter-spacing:.05em;color:#F2F2F2;text-shadow:0 2px 16px rgba(0,0,0,.55);transition:opacity .25s,letter-spacing .35s" style-hover="opacity:.82;letter-spacing:.1em">CAMAS</button>
         </div>
-        <div style="position:relative;border-radius:4px;overflow:hidden;height:300px;background:#2f2f2e">
+        <div class="mb-bento-cell" style="position:relative;border-radius:4px;overflow:hidden;height:300px;background:#2f2f2e">
           <image-slot id="incassa-sofas" style="position:absolute;inset:0;width:100%;height:100%;display:block" shape="rect" fit="cover" src="{{ slotSofas }}" placeholder="Foto · Sofás"></image-slot>
           <div style="position:absolute;inset:0;background:linear-gradient(160deg,rgba(28,28,27,.5),rgba(28,28,27,.05) 55%);pointer-events:none"></div>
           <button onClick="{{ goSofas }}" style="position:absolute;right:34px;top:26px;background:none;border:none;cursor:pointer;padding:0;font-family:'Comfortaa',sans-serif;font-weight:300;font-size:44px;letter-spacing:.05em;color:#F2F2F2;text-shadow:0 2px 16px rgba(0,0,0,.55);transition:opacity .25s,letter-spacing .35s" style-hover="opacity:.82;letter-spacing:.1em">SOFAS</button>
@@ -170,7 +233,7 @@
 
   <!-- ============ DIFFERENTIATORS ============ -->
   <section style="background:#40403E;border-top:1px solid rgba(242,113,65,.14);color:#F2F2F2">
-    <div style="max-width:1320px;margin:0 auto;padding:0 28px;display:grid;grid-template-columns:repeat(3,1fr)">
+    <div class="mb-diff-grid" style="max-width:1320px;margin:0 auto;padding:0 28px;display:grid;grid-template-columns:repeat(3,1fr)">
       <sc-for list="{{ diffs }}" as="d" hint-placeholder-count="3">
         <div style="padding:34px 26px;border-left:1px solid rgba(242,113,65,.14);display:flex;gap:16px;align-items:flex-start">
           <div style="flex:none;width:42px;height:42px;border:1px solid rgba(242,113,65,.45);border-radius:50%;display:flex;align-items:center;justify-content:center;color:#F27141">{{ d.icon }}</div>
@@ -189,11 +252,11 @@
       <div class="mb-reveal" style="display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:36px;gap:20px">
         <div>
           <div style="font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:#F27141;margin-bottom:10px">Explora por espacio</div>
-          <h2 style="font-family:'DM Serif Display',serif;font-size:42px;letter-spacing:-.6px;color:#40403E">Para cada <span style="font-style:italic;color:#F27141">rincón</span></h2>
+          <h2 class="mb-section-title" style="font-family:'DM Serif Display',serif;font-size:42px;letter-spacing:-.6px;color:#40403E">Para cada <span style="font-style:italic;color:#F27141">rincón</span></h2>
         </div>
         <a href="#catalogo" style="color:#40403E;text-decoration:none;font-size:11px;letter-spacing:.1em;text-transform:uppercase;font-weight:600;border-bottom:1px solid #F27141;padding-bottom:3px" style-hover="color:#F27141">Ver todo</a>
       </div>
-      <div style="display:grid;grid-template-columns:repeat(6,1fr);gap:14px">
+      <div class="mb-cat-grid" style="display:grid;grid-template-columns:repeat(6,1fr);gap:14px">
         <sc-for list="{{ catGrid }}" as="c" hint-placeholder-count="6">
           <a href="#catalogo" class="mb-catcell mb-reveal" style="position:relative;text-decoration:none;border-radius:3px;overflow:hidden;aspect-ratio:3/4;display:block;background:#E4E4E3">
             <div class="mb-catimg" style="position:absolute;inset:0;background-size:cover;background-position:center;transition:transform .7s cubic-bezier(.16,.84,.44,1);background-image:{{ c.img }}"></div>
@@ -210,9 +273,9 @@
     <div style="max-width:1320px;margin:0 auto">
       <div class="mb-reveal" style="margin-bottom:38px">
         <div style="font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:#F27141;margin-bottom:10px">Lo más querido</div>
-        <h2 style="font-family:'DM Serif Display',serif;font-size:42px;letter-spacing:-.6px;color:#40403E">Selección de la <span style="font-style:italic;color:#F27141">casa</span></h2>
+        <h2 class="mb-section-title" style="font-family:'DM Serif Display',serif;font-size:42px;letter-spacing:-.6px;color:#40403E">Selección de la <span style="font-style:italic;color:#F27141">casa</span></h2>
       </div>
-      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:22px">
+      <div class="mb-prod-grid" style="display:grid;grid-template-columns:repeat(4,1fr);gap:22px">
         <sc-for list="{{ featured }}" as="p" hint-placeholder-count="8">
           <div class="mb-prodcard mb-reveal" style="background:#fff;border-radius:3px;overflow:hidden;box-shadow:0 1px 3px rgba(64,64,62,.06)">
             <div style="position:relative;aspect-ratio:1/1;overflow:hidden;background:#E4E4E3;cursor:pointer" onClick="{{ p.open }}">
@@ -253,17 +316,17 @@
   <!-- ============ PROMO BANNER ============ -->
   <section style="background:#40403E;position:relative;overflow:hidden">
     <div style="position:absolute;top:0;bottom:0;width:38%;left:0;pointer-events:none"><div style="position:absolute;top:0;bottom:0;width:90px;background:linear-gradient(90deg,transparent,rgba(242,113,65,.5),transparent);animation:mbGlint 5.5s ease-in-out infinite"></div></div>
-    <div style="position:relative;max-width:1320px;margin:0 auto;padding:46px 28px;display:flex;align-items:center;justify-content:space-between;gap:24px;flex-wrap:wrap">
+    <div class="mb-promo-inner" style="position:relative;max-width:1320px;margin:0 auto;padding:46px 28px;display:flex;align-items:center;justify-content:space-between;gap:24px;flex-wrap:wrap">
       <div>
         <div style="font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:#F27141;margin-bottom:8px">Estrena temporada</div>
-        <div style="font-family:'DM Serif Display',serif;font-size:34px;color:#F2F2F2">Hasta <span style="font-style:italic;color:#F27141">25% off</span> en comedor</div>
+        <div class="mb-promo-title" style="font-family:'DM Serif Display',serif;font-size:34px;color:#F2F2F2">Hasta <span style="font-style:italic;color:#F27141">25% off</span> en comedor</div>
       </div>
       <button onClick="{{ scrollToCatalog }}" style="background:#F27141;color:#40403E;border:none;border-radius:2px;padding:15px 28px;font-size:12px;letter-spacing:.1em;text-transform:uppercase;font-weight:600;cursor:pointer" style-hover="background:#D9602E">Ver ofertas</button>
     </div>
   </section>
 
   <!-- ============ MARQUEE ============ -->
-  <section style="background:#383837;padding:30px 0;border-top:1px solid rgba(242,113,65,.14);border-bottom:1px solid rgba(242,113,65,.14)">
+  <section class="mb-marquee-section" style="background:#383837;padding:30px 0;border-top:1px solid rgba(242,113,65,.14);border-bottom:1px solid rgba(242,113,65,.14)">
     <div class="mb-marquee-wrap" style="overflow:hidden">
       <div class="mb-marquee-track" style="display:flex;gap:44px;width:max-content;align-items:center">
         <sc-for list="{{ marqueeItems }}" as="m" hint-placeholder-count="14">
@@ -283,7 +346,7 @@
         <div style="font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:#F27141;margin-bottom:10px">Ambientes reales</div>
         <h2 style="font-family:'DM Serif Display',serif;font-size:44px;letter-spacing:-.6px;color:#40403E">Inspírate en cada <span style="font-style:italic;color:#F27141">espacio</span></h2>
       </div>
-      <div style="display:grid;grid-template-columns:repeat(12,1fr);grid-auto-rows:120px;gap:16px">
+      <div class="mb-editorial-grid" style="display:grid;grid-template-columns:repeat(12,1fr);grid-auto-rows:120px;gap:16px">
         <sc-for list="{{ editorial }}" as="e" hint-placeholder-count="5">
           <div class="{{ e.reveal }}" style="grid-column:{{ e.col }};grid-row:{{ e.row }};border-radius:3px;overflow:hidden;position:relative;background:#E4E4E3;background-image:{{ e.img }}">
             <div style="position:absolute;inset:0;background:linear-gradient(180deg,transparent 50%,rgba(64,64,62,.6))"></div>
@@ -305,7 +368,7 @@
     <div ref="{{ floatBRef }}" style="position:absolute;bottom:14%;left:7%;width:120px;height:150px;border-radius:3px;background-size:cover;background-position:center;box-shadow:0 30px 60px rgba(0,0,0,.5);animation:mbFloat 9s ease-in-out infinite 1s;background-image:{{ floatB }}"></div>
     <div style="position:relative;max-width:1320px;margin:0 auto;padding:80px 28px;width:100%;text-align:center">
       <div class="mb-reveal" style="font-family:'DM Serif Display',serif;font-size:40px;letter-spacing:-.6px;max-width:700px;margin:0 auto 56px">Una nueva forma de amueblar <span style="font-style:italic;color:#F27141">Bolivia</span></div>
-      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:30px;max-width:980px;margin:0 auto">
+      <div class="mb-stats-grid" style="display:grid;grid-template-columns:repeat(4,1fr);gap:30px;max-width:980px;margin:0 auto">
         <sc-for list="{{ stats }}" as="s" hint-placeholder-count="4">
           <div class="mb-reveal">
             <div style="font-family:'DM Serif Display',serif;font-size:50px;color:#F27141;line-height:1"><span class="mb-counter" data-target="{{ s.target }}" data-suffix="{{ s.suffix }}" data-prefix="{{ s.prefix }}" data-decimals="{{ s.decimals }}">{{ s.shown }}</span></div>
@@ -322,7 +385,7 @@
       <div class="mb-reveal" style="display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:34px;gap:16px">
         <div>
           <div style="font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:#F27141;margin-bottom:10px">Recién llegados</div>
-          <h2 style="font-family:'DM Serif Display',serif;font-size:42px;letter-spacing:-.6px;color:#40403E">Novedades del <span style="font-style:italic;color:#F27141">taller</span></h2>
+          <h2 class="mb-section-title" style="font-family:'DM Serif Display',serif;font-size:42px;letter-spacing:-.6px;color:#40403E">Novedades del <span style="font-style:italic;color:#F27141">taller</span></h2>
         </div>
         <div style="display:flex;gap:10px">
           <button onClick="{{ carouselPrev }}" style="width:46px;height:46px;border-radius:50%;border:1px solid #40403E;background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center" style-hover="background:#40403E;color:#F2F2F2">
@@ -352,7 +415,7 @@
   <section ref="{{ testiWrapRef }}" style="background:#40403E;color:#F2F2F2;padding:90px 28px">
     <div style="max-width:820px;margin:0 auto;text-align:center;min-height:230px">
       <div style="color:#F27141;font-family:'DM Serif Display',serif;font-size:60px;line-height:.5;height:30px">“</div>
-      <p style="font-family:'DM Serif Display',serif;font-size:30px;line-height:1.4;letter-spacing:-.4px;margin-bottom:30px;transition:opacity .5s" ref="{{ testiQuoteRef }}">{{ testiQuote }}</p>
+      <p class="mb-testi-quote" style="font-family:'DM Serif Display',serif;font-size:30px;line-height:1.4;letter-spacing:-.4px;margin-bottom:30px;transition:opacity .5s" ref="{{ testiQuoteRef }}">{{ testiQuote }}</p>
       <div style="font-size:13px;font-weight:600;letter-spacing:.04em" ref="{{ testiNameRef }}">{{ testiName }}</div>
       <div style="font-size:12px;color:#737373;margin-top:4px" ref="{{ testiCityRef }}">{{ testiCity }}</div>
       <div style="display:flex;gap:8px;justify-content:center;margin-top:34px">
@@ -370,8 +433,8 @@
         <div style="font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:#F27141;margin-bottom:10px">Catálogo completo</div>
         <h2 style="font-family:'DM Serif Display',serif;font-size:46px;letter-spacing:-.7px;color:#40403E">Todo el <span style="font-style:italic;color:#F27141">mobiliario</span></h2>
       </div>
-      <div style="display:grid;grid-template-columns:248px 1fr;gap:40px;align-items:start">
-        <aside style="position:sticky;top:96px">
+      <div class="mb-catalog-layout" style="display:grid;grid-template-columns:248px 1fr;gap:40px;align-items:start">
+        <aside class="mb-catalog-sidebar" style="position:sticky;top:96px">
           <div style="background:#fff;border-radius:3px;padding:24px;box-shadow:0 1px 3px rgba(64,64,62,.06)">
             <div style="font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:#40403E;font-weight:700;margin-bottom:16px;display:flex;justify-content:space-between;align-items:center">Filtros <button onClick="{{ resetFilters }}" style="background:none;border:none;color:#F27141;font-size:10px;letter-spacing:.06em;cursor:pointer;text-transform:uppercase">Limpiar</button></div>
 
@@ -406,7 +469,7 @@
           <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:22px">
             <span style="font-size:13px;color:#737373">{{ catalogCount }} productos</span>
           </div>
-          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:22px">
+          <div class="mb-catalog-grid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:22px">
             <sc-for list="{{ catalog }}" as="p" hint-placeholder-count="9">
               <div class="mb-prodcard" style="background:#fff;border-radius:3px;overflow:hidden;box-shadow:0 1px 3px rgba(64,64,62,.06)">
                 <div style="position:relative;aspect-ratio:1/1;overflow:hidden;background:#E4E4E3;cursor:pointer" onClick="{{ p.open }}">
@@ -447,7 +510,7 @@
   <!-- ============ FOOTER ============ -->
   <footer style="background:#40403E;color:#C9C9C7;padding:70px 28px 34px">
     <div style="max-width:1320px;margin:0 auto">
-      <div style="display:grid;grid-template-columns:1.4fr 1fr 1fr 1fr 1.2fr;gap:40px;padding-bottom:52px;border-bottom:1px solid rgba(242,113,65,.16)">
+      <div class="mb-footer-grid" style="display:grid;grid-template-columns:1.4fr 1fr 1fr 1fr 1.2fr;gap:40px;padding-bottom:52px;border-bottom:1px solid rgba(242,113,65,.16)">
         <div>
           <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px">
             <svg width="30" height="30" viewBox="0 0 100 100" fill="none" stroke="#F27141" stroke-width="8.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 51V80q0 8 8 8h40q8 0 8-8V51"></path><path d="M13 57 50 22l37 35"></path><path d="M34 42V28"></path></svg>
@@ -494,10 +557,10 @@
   <!-- ============ PRODUCT LIGHTBOX ============ -->
   <sc-if value="{{ lbOpen }}" hint-placeholder-val="{{ false }}">
     <div onClick="{{ lbClose }}" style="position:fixed;inset:0;z-index:100;background:rgba(64,64,62,.84);backdrop-filter:blur(6px);display:flex;align-items:center;justify-content:center;padding:24px">
-      <div onClick="{{ stop }}" style="background:#fff;border-radius:4px;overflow:hidden;width:100%;max-width:1040px;max-height:92vh;display:grid;grid-template-columns:1.15fr 1fr;box-shadow:0 40px 100px rgba(0,0,0,.6)">
+      <div onClick="{{ stop }}" class="mb-lb-grid" style="background:#fff;border-radius:4px;overflow:hidden;width:100%;max-width:1040px;max-height:92vh;display:grid;grid-template-columns:1.15fr 1fr;box-shadow:0 40px 100px rgba(0,0,0,.6)">
 
         <!-- gallery -->
-        <div style="position:relative;background:#E4E4E3;display:flex;flex-direction:column">
+        <div class="mb-lb-gallery" style="position:relative;background:#E4E4E3;display:flex;flex-direction:column">
           <div ref="{{ zoomRef }}" onClick="{{ toggleZoom }}" onMouseMove="{{ zoomMove }}" onMouseLeave="{{ zoomLeave }}" style="position:relative;flex:1;min-height:440px;overflow:hidden;cursor:{{ zoomCursor }}">
             <div style="position:absolute;inset:0;background-size:cover;background-position:center;transition:transform .15s ease-out;transform:scale({{ zoomScale }});transform-origin:{{ zoomOrigin }};background-image:{{ lbCurrentImg }}"></div>
 
@@ -526,14 +589,14 @@
         </div>
 
         <!-- panel -->
-        <div style="padding:38px 36px;overflow-y:auto;display:flex;flex-direction:column">
+        <div class="mb-lb-info" style="padding:38px 36px;overflow-y:auto;display:flex;flex-direction:column">
           <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:18px">
             <div style="font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:#F27141;font-weight:600">{{ lbBrand }}</div>
             <button onClick="{{ lbClose }}" style="background:none;border:none;cursor:pointer;color:#737373;width:30px;height:30px" style-hover="color:#40403E">
               <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 6l12 12M18 6L6 18"></path></svg>
             </button>
           </div>
-          <h3 style="font-family:'DM Serif Display',serif;font-size:32px;line-height:1.1;color:#40403E;margin-bottom:14px">{{ lbName }}</h3>
+          <h3 class="mb-lb-name" style="font-family:'DM Serif Display',serif;font-size:32px;line-height:1.1;color:#40403E;margin-bottom:14px">{{ lbName }}</h3>
           <div style="display:flex;align-items:center;gap:8px;margin-bottom:18px">
             <span style="display:flex;gap:1px">{{ lbStars }}</span>
             <span style="font-size:12px;color:#737373">{{ lbRatingText }}</span>
