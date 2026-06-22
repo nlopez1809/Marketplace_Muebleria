@@ -14,8 +14,8 @@ const anthropic = new Anthropic.default({
 });
 
 const ASESORES = [
-  { nombre: 'Carlos', telefono: '59170000001' },
-  { nombre: 'María', telefono: '59170000002' },
+  { nombre: 'Norman López', telefono: '59176806091' },
+  { nombre: 'Boris Nogales', telefono: '59165315486' },
 ];
 let asesorIndex = 0;
 
