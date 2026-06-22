@@ -670,13 +670,21 @@ class Component extends DCLogic {
   }
 
   // ---- asesores ----
+  _asesoresLoaded = false;
+  _asesoresList = [];
+  _asesorIdx = 0;
+
+  loadAsesores(){
+    if(this._asesoresLoaded) return;
+    fetch('/api/asesor').then(r=>r.json()).then(list=>{
+      this._asesoresList = list;
+      this._asesoresLoaded = true;
+    }).catch(()=>{});
+  }
+
   contactarAsesor(p){
-    const asesores = [
-      { nombre: 'Carlos', telefono: '59170000001' },
-      { nombre: 'María', telefono: '59170000002' },
-    ];
-    if(!this._asesorIdx) this._asesorIdx = 0;
-    const asesor = asesores[this._asesorIdx % asesores.length];
+    if(!this._asesoresList.length){ this.loadAsesores(); return; }
+    const asesor = this._asesoresList[this._asesorIdx % this._asesoresList.length];
     this._asesorIdx++;
     const precio = typeof p.price === 'number' ? p.price.toLocaleString('es-BO') : p.price;
     const msg = encodeURIComponent('Hola '+asesor.nombre+', soy cliente de InCassa DECO. Estoy interesado/a en: '+p.name+' (Bs '+precio+'). Podrías ayudarme con más información?');
@@ -769,6 +777,7 @@ class Component extends DCLogic {
   scrollTo(sel){ const el=document.querySelector(sel); if(el) el.scrollIntoView ? window.scrollTo({top:el.getBoundingClientRect().top+window.scrollY-80,behavior:this._reduce?'auto':'smooth'}):0; }
 
   componentDidMount(){
+    this.loadAsesores();
     this._reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     // reveal observer
     this._io = new IntersectionObserver((ents)=>{

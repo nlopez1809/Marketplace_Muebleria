@@ -159,8 +159,7 @@ app.post('/api/chat/reset', (req, res) => {
 });
 
 app.get('/api/asesor', (req, res) => {
-  const asesor = ASESORES[asesorIndex % ASESORES.length];
-  res.json(asesor);
+  res.json(ASESORES);
 });
 
 const PORT = process.env.PORT || 3001;
