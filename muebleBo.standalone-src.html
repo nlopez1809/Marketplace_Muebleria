@@ -670,16 +670,16 @@ class Component extends DCLogic {
   }
 
   // ---- asesores ----
-  _asesores = [
-    { nombre: 'Carlos', telefono: '59170000001' },
-    { nombre: 'María', telefono: '59170000002' },
-  ];
-  _asesorIdx = 0;
-
   contactarAsesor(p){
-    const asesor = this._asesores[this._asesorIdx % this._asesores.length];
+    const asesores = [
+      { nombre: 'Carlos', telefono: '59170000001' },
+      { nombre: 'María', telefono: '59170000002' },
+    ];
+    if(!this._asesorIdx) this._asesorIdx = 0;
+    const asesor = asesores[this._asesorIdx % asesores.length];
     this._asesorIdx++;
-    const msg = encodeURIComponent('Hola '+asesor.nombre+', soy cliente de InCassa DECO. Estoy interesado/a en: '+p.name+' (Bs '+p.price.toLocaleString('es-BO')+'). ¿Podrías ayudarme con más información?');
+    const precio = typeof p.price === 'number' ? p.price.toLocaleString('es-BO') : p.price;
+    const msg = encodeURIComponent('Hola '+asesor.nombre+', soy cliente de InCassa DECO. Estoy interesado/a en: '+p.name+' (Bs '+precio+'). Podrías ayudarme con más información?');
     window.location.href = 'https://wa.me/'+asesor.telefono+'?text='+msg;
   }
 
