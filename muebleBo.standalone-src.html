@@ -158,7 +158,7 @@
         <a href="#catalogo" class="mb-nav-links" style="color:#D6D6D4;text-decoration:none;font-size:11px;letter-spacing:.1em;text-transform:uppercase;font-weight:500" style-hover="color:#F27141">Catálogo</a>
         <a href="#editorial" class="mb-nav-links" style="color:#D6D6D4;text-decoration:none;font-size:11px;letter-spacing:.1em;text-transform:uppercase;font-weight:500" style-hover="color:#F27141">Ambientes</a>
         <button onClick="{{ noop }}" style="background:none;border:none;cursor:pointer;display:flex;align-items:center" title="Favoritos">
-          <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="#D6D6D4" stroke-width="1.7"><path d="M12 21s-7.5-4.6-10-9.3C.6 8.9 2 5.5 5.2 5.5c2 0 3.2 1.2 3.8 2.3C9.6 6.7 10.8 5.5 12.8 5.5 16 5.5 17.4 8.9 16 11.7 13.5 16.4 12 21 12 21z"></path></svg>
+          <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="#D6D6D4" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78L12 21.23l8.84-8.84a5.5 5.5 0 0 0 0-7.78z"/></svg>
           <sc-if value="{{ hasWishlist }}" hint-placeholder-val="{{ false }}"><span style="background:#F27141;color:#40403E;font-size:10px;font-weight:700;border-radius:20px;min-width:16px;height:16px;display:inline-flex;align-items:center;justify-content:center;margin-left:-6px;margin-top:-12px;padding:0 4px">{{ wishlistCount }}</span></sc-if>
         </button>
         <button onClick="{{ openCart }}" style="background:none;border:none;cursor:pointer;position:relative;display:flex;align-items:center" title="Carrito">
