@@ -768,14 +768,20 @@ class Component extends DCLogic {
     return out;
   }
 
+  pollinationsUrl(p, variant){
+    const angles=['front view','side view','in a modern room setting','close-up detail of material and texture'];
+    const typeNames={sofa:'sofa',table:'dining table',chair:'lounge chair',bed:'king size bed',lamp:'floor lamp',cabinet:'cabinet',outdoor:'outdoor armchair'};
+    const typeName=typeNames[p.type]||p.type;
+    const prompt=encodeURIComponent(`Professional furniture product photo, ${p.name}, ${typeName}, ${p.material}, ${angles[variant]}, minimalist background, studio lighting, photorealistic, high quality`);
+    return `https://image.pollinations.ai/prompt/${prompt}?width=600&height=600&nologo=true&seed=${p.id.charCodeAt(0)*100+variant}`;
+  }
+
   prodImg(p, variant){
     const v = variant||0;
     if(p.images && p.images[v]){
       return 'url("'+encodeURI(p.images[v])+'")';
     }
-    const labels=['Estudio','Ambiente','Detalle','Lateral'];
-    const angles=[135,60,200,310];
-    return this.ph(p.tones[0], p.tones[1], p.type, labels[v], angles[v]);
+    return 'url("'+this.pollinationsUrl(p,v)+'")';
   }
 
   mapProduct(p){
