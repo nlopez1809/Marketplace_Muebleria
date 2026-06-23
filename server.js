@@ -172,7 +172,7 @@ Seguí este flujo natural en cada conversación:
 - Nunca seas agresivo ni presiones demasiado — mantené el tono premium y cálido de la marca
 - Si el cliente dice que no, respetá su decisión y dejá la puerta abierta: "Perfecto, cuando quieras estamos aquí para ayudarte"`;
 
-const TOKEN_LIMIT = 10000;
+const TOKEN_LIMIT = 100000;
 const conversations = new Map();
 const tokenUsage = new Map();
 
