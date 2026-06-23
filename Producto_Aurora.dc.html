@@ -99,7 +99,7 @@
       <span style="margin:0 8px">/</span>
       <a href="Camas.dc.html" style="color:#737373;text-decoration:none" style-hover="color:#F27141">Camas</a>
       <span style="margin:0 8px">/</span>
-      <span style="color:#40403E">Cama Aurora</span>
+      <span style="color:#40403E">{{ productName }}</span>
     </div>
   </div>
 
@@ -153,7 +153,7 @@
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#40403E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"></path></svg>
               Sube una foto de tu ambiente
             </button>
-            <p style="margin-top:16px;max-width:380px;font-size:13.5px;line-height:1.6;color:#6f6f6c">Nuestra IA colocará la <b style="color:#40403E">Cama Aurora</b> en tu espacio para que veas cómo luce — a escala real — antes de comprarla.</p>
+            <p style="margin-top:16px;max-width:380px;font-size:13.5px;line-height:1.6;color:#6f6f6c">Nuestra IA colocará <b style="color:#40403E">{{ productName }}</b> en tu espacio para que veas cómo luce — a escala real — antes de comprarla.</p>
             <div style="margin-top:18px;display:flex;align-items:center;gap:8px;font-size:11px;color:#9A9A98;letter-spacing:.04em">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#9A9A98" stroke-width="1.8"><path d="M21 15l-5-5L5 21"></path><path d="M3 5h18v14H3z"></path><circle cx="8.5" cy="9" r="1.4"></circle></svg>
               JPG o PNG · arrastra o haz clic para subir
@@ -179,7 +179,7 @@
               <span style="position:absolute;bottom:-1%;right:-2%;width:11px;height:11px;background:#fff;border:2px solid #F27141;border-radius:2px;transform:translate(50%,50%)"></span>
               <!-- tag -->
               <div style="position:absolute;top:-3%;left:50%;transform:translate(-50%,-150%);background:#40403E;color:#F2F2F2;font-size:10.5px;letter-spacing:.06em;padding:5px 11px;border-radius:30px;white-space:nowrap;display:flex;align-items:center;gap:6px;box-shadow:0 6px 16px rgba(0,0,0,.25)">
-                <span style="width:6px;height:6px;border-radius:50%;background:#F27141"></span>Cama Aurora · {{ colorName }}
+                <span style="width:6px;height:6px;border-radius:50%;background:#F27141"></span>{{ productName }} · {{ colorName }}
               </div>
             </div>
 
@@ -242,7 +242,7 @@
         </div>
         <div style="display:flex;align-items:center;gap:10px;background:#fff;border:1px solid #ECEAE6;border-radius:3px;padding:13px 14px">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#40403E" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" style="flex:none"><path d="M12 2l8 4v6c0 5-3.5 8-8 10-4.5-2-8-5-8-10V6z"></path></svg>
-          <div><div style="font-size:12.5px;font-weight:600;color:#40403E;line-height:1.2">7 años garantía</div><div style="font-size:11px;color:#9A9A98;margin-top:2px">estructura y herrajes</div></div>
+          <div><div style="font-size:12.5px;font-weight:600;color:#40403E;line-height:1.2">{{ warrantyText }} garantía</div><div style="font-size:11px;color:#9A9A98;margin-top:2px">estructura y herrajes</div></div>
         </div>
         <div style="display:flex;align-items:center;gap:10px;background:#fff;border:1px solid #ECEAE6;border-radius:3px;padding:13px 14px">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#40403E" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" style="flex:none"><path d="M3 12a9 9 0 1 0 9-9"></path><path d="M3 3v6h6"></path></svg>
@@ -253,13 +253,13 @@
 
     <!-- ====== RIGHT: INFO PANEL ====== -->
     <div class="mbx-rightcol" style="position:sticky;top:98px">
-      <div style="font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:#F27141;font-weight:600;margin-bottom:10px">InCassa Deco · Dormitorio</div>
-      <h1 style="font-family:'DM Serif Display',serif;font-size:42px;line-height:1.05;color:#40403E;margin-bottom:10px">Cama Aurora</h1>
+      <div style="font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:#F27141;font-weight:600;margin-bottom:10px">InCassa Deco · {{ productCat }}</div>
+      <h1 style="font-family:'DM Serif Display',serif;font-size:42px;line-height:1.05;color:#40403E;margin-bottom:10px">{{ productName }}</h1>
       <div style="display:flex;align-items:center;gap:12px;margin-bottom:18px">
         <span style="display:flex;gap:2px">
           <sc-for list="{{ stars }}" as="s" hint-placeholder-count="5"><svg width="15" height="15" viewBox="0 0 24 24" fill="{{ s.fill }}" stroke="none"><path d="M12 2l3 6.3 6.9 1-5 4.9 1.2 6.8L12 17.8 5.9 21l1.2-6.8-5-4.9 6.9-1z"></path></svg></sc-for>
         </span>
-        <span style="font-size:13px;color:#737373">4.8 · 126 reseñas</span>
+        <span style="font-size:13px;color:#737373">{{ ratingText }}</span>
         <span style="width:4px;height:4px;border-radius:50%;background:#cfcdc7"></span>
         <span style="font-size:13px;color:#25963f;font-weight:600">En stock</span>
       </div>
@@ -359,7 +359,7 @@
     <div class="mbx-buybar-row" style="max-width:1320px;margin:0 auto;padding:13px 28px;display:flex;align-items:center;gap:20px">
       <div style="width:46px;height:46px;border-radius:3px;overflow:hidden;flex:none;background:#ECEAE7;display:none" class="mbx-bb-thumb"><img src="assets/producto/ambiente.png" style="width:100%;height:100%;object-fit:cover" /></div>
       <div style="min-width:0">
-        <div style="font-family:'Comfortaa',sans-serif;font-weight:600;font-size:15px;color:#40403E;line-height:1.1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Cama Aurora <span style="color:#9A9A98;font-weight:400;font-family:'Inter'">· {{ colorName }} · King</span></div>
+        <div style="font-family:'Comfortaa',sans-serif;font-weight:600;font-size:15px;color:#40403E;line-height:1.1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ productName }} <span style="color:#9A9A98;font-weight:400;font-family:'Inter'">· {{ colorName }}</span></div>
         <div style="display:flex;align-items:baseline;gap:8px;margin-top:2px">
           <span style="font-size:16px;font-weight:600;color:#40403E">{{ priceText }}</span>
           <span style="font-size:12px;color:#a5a39d;text-decoration:line-through">{{ oldText }}</span>
@@ -422,8 +422,15 @@
   </div>
   <div style="flex:1;overflow-y:auto;padding:20px 16px 16px;display:flex;flex-direction:column;gap:11px">
     <sc-for list="{{ decoMessages }}" as="m" hint-placeholder-count="2">
-      <div style="align-self:{{ m.align }};max-width:82%;background:{{ m.bg }};color:#40403E;border:{{ m.border }};border-radius:{{ m.radius }};padding:12px 14px;font-size:13.5px;line-height:1.5;box-shadow:0 1px 2px rgba(40,40,38,.05)">{{ m.text }}</div>
+      <div ref="{{ m.ref }}" style="align-self:{{ m.align }};max-width:82%;background:{{ m.bg }};color:#40403E;border:{{ m.border }};border-radius:{{ m.radius }};padding:12px 14px;font-size:13.5px;line-height:1.5;box-shadow:0 1px 2px rgba(40,40,38,.05);white-space:pre-wrap"></div>
     </sc-for>
+    <sc-if value="{{ decoLoading }}" hint-placeholder-val="{{ false }}">
+      <div style="align-self:flex-start;background:#FFFFFF;border:1px solid #ECECEA;border-radius:4px 16px 16px 16px;padding:14px 20px;display:flex;gap:5px;align-items:center">
+        <span style="width:7px;height:7px;background:#F27141;border-radius:50%;animation:mbxBump 1.2s infinite"></span>
+        <span style="width:7px;height:7px;background:#F27141;border-radius:50%;animation:mbxBump 1.2s infinite .15s"></span>
+        <span style="width:7px;height:7px;background:#F27141;border-radius:50%;animation:mbxBump 1.2s infinite .3s"></span>
+      </div>
+    </sc-if>
     <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:3px">
       <sc-for list="{{ decoSuggestions }}" as="s" hint-placeholder-count="2">
         <button onClick="{{ s.go }}" style="background:#FFFFFF;border:1px solid #E2E2DF;color:#5A5A57;font-size:12px;padding:8px 13px;border-radius:18px;cursor:pointer;transition:border-color .2s,color .2s" style-hover="border-color:#F27141;color:#F27141">{{ s.label }}</button>
@@ -441,205 +448,223 @@
 <script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1320,&quot;height&quot;:980},&quot;arStartState&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;empty&quot;,&quot;placed&quot;],&quot;default&quot;:&quot;empty&quot;,&quot;tsType&quot;:&quot;'empty'|'placed'&quot;}}">
 class Component extends DCLogic {
   state = {
-    ar: 'empty',           // 'empty' | 'placed'
-    activeMedia: 0,        // index into MEDIA (0 = product photo)
+    ar: 'empty',
+    activeMedia: 0,
     bedX: 0, bedScale: 100,
     colorIdx: 0,
     deliveryIdx: 0,
     materialIdx: 0,
     cart: 0,
-    lb: null,              // gallery item or null
+    lb: null,
     toast: null,
     deco: false,
     decoInput: '',
-    decoMessages: [ { role:'bot', text:'¡Hola! Soy Deco IA ✨ Sube una foto de tu dormitorio y coloco la Cama Aurora a escala real para que veas cómo queda.' } ]
+    _decoLoading: false,
+    decoMessages: [ { role:'bot', text:'¡Hola! Bienvenido/a a InCassa DECO ✨ Soy Deco IA, tu asistente personal de muebles y decoración. Para brindarte una atención personalizada, ¿con quién tengo el gusto de conversar?' } ],
+    _product: null
   };
 
-  COLORS = {
-    'Marfil':'#EDEAE3','Gris':'#9A9A98','Champagne':'#D8C4A0','Camel':'#B0895E','Petróleo':'#144659'
-  };
+  FALLBACK = { id:'aurora', name:'Cama Aurora', cat:'Dormitorio', type:'bed', price:6900, old:8200, badge:'Más vendido', material:'Terciopelo', city:'La Paz', rating:4.8, reviews:126, tones:['#6b5236','#4f3c27'], city2:'4-6 días', dims:'200 × 215 cm', weight:'72 kg', warranty:'7 años', desc:'Cabecera tapizada con estructura premium y base con guardado.', images:[] };
+
+  COLORS = { 'Marfil':'#EDEAE3','Gris':'#9A9A98','Champagne':'#D8C4A0','Camel':'#B0895E','Petróleo':'#144659' };
   COLOR_LIST = ['Marfil','Gris','Champagne','Camel','Petróleo'];
-
-  PRICE = 6900; OLD = 8200;
-
-  DELIVERY = [
-    {label:'Estándar', note:'4–6 días hábiles'},
-    {label:'Express', note:'Entrega en 48 h'},
-    {label:'Programada', note:'Elige fecha y hora'}
-  ];
+  DELIVERY = [ {label:'Estándar', note:'4–6 días hábiles'}, {label:'Express', note:'Entrega en 48 h'}, {label:'Programada', note:'Elige fecha y hora'} ];
   MATERIALS = ['Bouclé', 'Lino', 'Terciopelo', 'Pana'];
 
-  MEDIA = [
-    {kind:'photo', label:'Ambiente', img:'assets/producto/ambiente.png', pos:'center',  fit:'cover'},
-    {kind:'ar',    label:'Ver en tu casa'},
-    {kind:'photo', label:'Producto', img:'assets/producto/blanco.png',   pos:'center',  fit:'contain'},
-    {kind:'photo', label:'En uso',   img:'assets/producto/pareja.png',   pos:'center',  fit:'cover'},
-    {kind:'video', label:'Video',    img:'assets/producto/pareja.png',   src:'assets/producto/video.mp4', pos:'center'},
-    {kind:'photo', label:'Medidas',  img:'assets/producto/medidas.png',  pos:'center',  fit:'contain'}
-  ];
+  getProduct(){ return this.state._product || this.FALLBACK; }
+
+  getMedia(){
+    var p=this.getProduct(), imgs=p.images||[], media=[];
+    if(imgs.length>0){ media.push({kind:'photo', label:'Producto', img:'/uploads/productos/'+imgs[0], pos:'center', fit:'cover'}); }
+    else { media.push({kind:'photo', label:'Producto', img:this._genImg(p,0), pos:'center', fit:'cover'}); }
+    media.push({kind:'ar', label:'Ver en tu casa'});
+    if(imgs.length>1){ for(var i=1;i<imgs.length;i++) media.push({kind:'photo', label:'Foto '+(i+1), img:'/uploads/productos/'+imgs[i], pos:'center', fit:'cover'}); }
+    else { media.push({kind:'photo', label:'Detalle', img:this._genImg(p,1), pos:'center', fit:'contain'}); media.push({kind:'photo', label:'Lateral', img:this._genImg(p,2), pos:'center', fit:'cover'}); }
+    return media;
+  }
+
+  ICONS = { sofa:'M12 50h76v22a4 4 0 0 1-4 4h-4v6h-8v-6H28v6h-8v-6h-4a4 4 0 0 1-4-4z M12 50v-8a6 6 0 0 1 6-6h64a6 6 0 0 1 6 6v8 M24 50v-6h52v6', chair:'M30 18h40v44H30z M30 62v20 M70 62v20 M30 44h40', table:'M12 40h76v6H12z M20 46v36 M82 46v36 M40 46v30 M62 46v30', bed:'M10 60h80v18H10z M10 60V46a6 6 0 0 1 6-6h22v20 M52 60V40h22a6 6 0 0 1 6 6v14 M14 78v6 M86 78v6', lamp:'M50 16l-13 26h26z M50 42v36 M36 84h28', cabinet:'M22 18h56v62H22z M50 18v62 M40 49h-5 M65 49h-5 M28 80v6 M72 80v6', outdoor:'M30 42h40v8H30z M34 50v30 M66 50v30 M30 42c0-11 8-18 20-18s20 7 20 18' };
+
+  _genImg(p, variant){
+    var t=p.tones||['#595957','#737373'], c1=t[0]||'#595957', c2=t[1]||'#737373';
+    var icon=this.ICONS[p.type]||this.ICONS.sofa;
+    var labels=['Estudio','Ambiente','Detalle','Lateral'], angles=[135,60,200,310];
+    var v=variant||0, a=angles[v]||135, lab=labels[v]||'';
+    var rad=a*Math.PI/180, x2=(50+Math.cos(rad)*50).toFixed(1), y2=(50+Math.sin(rad)*50).toFixed(1);
+    var txt=lab?(“<text x='300' y='560' font-family='Inter,sans-serif' font-size='20' letter-spacing='3' fill='”+c1+”' opacity='0.5' text-anchor='middle'>”+lab.toUpperCase()+”</text>”):'';
+    var svg=”<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 600 600'><defs><linearGradient id='g' x1='0%' y1='0%' x2='”+x2+”%' y2='”+y2+”%'><stop offset='0' stop-color='”+c2+”'/><stop offset='1' stop-color='”+c1+”'/></linearGradient></defs><rect width='600' height='600' fill='url(#g)'/><g transform='translate(150 150) scale(3)' fill='none' stroke='”+c1+”' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round' opacity='0.42'><path d='”+icon+”'/></g>”+txt+”</svg>”;
+    return “data:image/svg+xml,”+encodeURIComponent(svg);
+  }
 
   fmt(n){ return 'Bs ' + n.toLocaleString('es-BO'); }
 
-  ico(path, stroke){ return `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="${stroke||'#F27141'}" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">${path}</svg>`; }
+  _fmtDeco(text){
+    var s=text.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    s=s.replace(/\[([^\]]+)\]\(#producto-([a-zA-Z0-9_-]+)\)/g,'<a href=”Producto_Aurora.dc.html?id=$2” style=”color:#F27141;text-decoration:underline;font-weight:600”>$1</a>');
+    s=s.replace(/\[([^\]]+)\]\(((?:\/|https?:\/\/)[^\s)]+)\)/g,'<a href=”$2” target=”_blank” style=”color:#F27141;text-decoration:underline;font-weight:600”>$1</a>');
+    s=s.replace(/\*\*([^*]+)\*\*/g,'<strong>$1</strong>');
+    return s;
+  }
 
-  // ---- AR ----
+  loadProduct(){
+    var params=new URLSearchParams(window.location.search);
+    var pid=params.get('id');
+    if(!pid) return;
+    var self=this;
+    fetch('/api/products').then(function(r){return r.json();}).then(function(list){
+      var found=list.find(function(p){return p.id===pid;});
+      if(found) self.setState({_product:found});
+    }).catch(function(){});
+  }
+
   selectMedia(i){ this.setState({activeMedia:i}); }
   placeBed(){ this.setState({ar:'placed', bedX:0, bedScale:100}); }
   resetAr(){ this.setState({ar:'empty'}); }
-  moveLeft(){ this.setState(s=>({bedX: Math.max(s.bedX-7, -22)}), ()=>this._applyBed()); }
-  moveRight(){ this.setState(s=>({bedX: Math.min(s.bedX+7, 22)}), ()=>this._applyBed()); }
-  scaleUp(){ this.setState(s=>({bedScale: Math.min(s.bedScale+8, 132)}), ()=>this._applyBed()); }
-  scaleDown(){ this.setState(s=>({bedScale: Math.max(s.bedScale-8, 64)}), ()=>this._applyBed()); }
-  _applyBed(){ if(this._bedBox){ this._bedBox.style.transform = `translateX(calc(-50% + ${this.state.bedX}%))`; this._bedBox.style.width = (58*this.state.bedScale/100)+'%'; } }
+  moveLeft(){ this.setState(function(s){return{bedX:Math.max(s.bedX-7,-22)};}, function(){this._applyBed();}.bind(this)); }
+  moveRight(){ this.setState(function(s){return{bedX:Math.min(s.bedX+7,22)};}, function(){this._applyBed();}.bind(this)); }
+  scaleUp(){ this.setState(function(s){return{bedScale:Math.min(s.bedScale+8,132)};}, function(){this._applyBed();}.bind(this)); }
+  scaleDown(){ this.setState(function(s){return{bedScale:Math.max(s.bedScale-8,64)};}, function(){this._applyBed();}.bind(this)); }
+  _applyBed(){ if(this._bedBox){ this._bedBox.style.transform='translateX(calc(-50% + '+this.state.bedX+'%))'; this._bedBox.style.width=(58*this.state.bedScale/100)+'%'; } }
 
-  // ---- selectors ----
   pickColor(i){ this.setState({colorIdx:i}); }
   pickDelivery(i){ this.setState({deliveryIdx:i}); }
   pickMaterial(i){ this.setState({materialIdx:i}); }
 
-  // ---- gallery / lightbox ----
   openVideoLb(m){ this.setState({lb:{kind:'video', src:m.src, label:m.label}}); document.body.style.overflow='hidden'; }
   openLb(g){ this.setState({lb:g}); document.body.style.overflow='hidden'; }
   lbClose(){ this.setState({lb:null}); document.body.style.overflow=''; }
 
-  // ---- cart ----
-  addCart(){ const c=this.COLOR_LIST[this.state.colorIdx]; this.setState(s=>({cart:s.cart+1, toast:'“Cama Aurora · '+c+'” añadida al carrito'})); this.bump(); clearTimeout(this._tt); this._tt=setTimeout(()=>this.setState({toast:null}),2400); }
-  buyNow(){ this.setState({toast:'Procediendo al pago — Cama Aurora'}); clearTimeout(this._tt); this._tt=setTimeout(()=>this.setState({toast:null}),2400); }
-  bump(){ if(this._reduce)return; requestAnimationFrame(()=>{ const el=this._badge; if(el){ el.style.animation='none'; void el.offsetWidth; el.style.animation='mbxBump .45s cubic-bezier(.2,1.4,.4,1)'; } }); }
+  addCart(){ var p=this.getProduct(); var c=this.COLOR_LIST[this.state.colorIdx]; this.setState(function(s){return{cart:s.cart+1, toast:'”'+p.name+' · '+c+'” añadida al carrito'};}); this.bump(); clearTimeout(this._tt); this._tt=setTimeout(function(){this.setState({toast:null});}.bind(this),2400); }
+  buyNow(){ var p=this.getProduct(); this.setState({toast:'Procediendo al pago — '+p.name}); clearTimeout(this._tt); this._tt=setTimeout(function(){this.setState({toast:null});}.bind(this),2400); }
+  bump(){ if(this._reduce)return; requestAnimationFrame(function(){ var el=this._badge; if(el){ el.style.animation='none'; void el.offsetWidth; el.style.animation='mbxBump .45s cubic-bezier(.2,1.4,.4,1)'; } }.bind(this)); }
 
-  // ---- deco ----
-  toggleDeco(){ this.setState(s=>({deco:!s.deco}), ()=>{ if(this.state.deco&&this._decoInput) try{this._decoInput.focus();}catch(e){} }); }
+  toggleDeco(){ this.setState(function(s){return{deco:!s.deco};}, function(){ if(this.state.deco&&this._decoInput) try{this._decoInput.focus();}catch(e){} }.bind(this)); }
   closeDeco(){ this.setState({deco:false}); }
   sendDeco(){
-    const t=(this.state.decoInput||'').trim(); if(!t) return;
-    this.setState(s=>({ decoMessages:[...s.decoMessages,{role:'user',text:t}], decoInput:'' }));
-    clearTimeout(this._decoT);
-    this._decoT=setTimeout(()=>{ this.setState(s=>({ decoMessages:[...s.decoMessages,{role:'bot',text:'Perfecto. Usa el botón “Sube una foto de tu ambiente” en el visualizador y verás la Cama Aurora colocada en tu propio dormitorio.'}] })); },700);
+    var t=(this.state.decoInput||'').trim(); if(!t) return;
+    if(!this._decoSessionId) this._decoSessionId='deco-prod-'+Math.random().toString(36).slice(2,10);
+    this.setState(function(s){return{ decoMessages:[].concat(s.decoMessages,[{role:'user',text:t}]), decoInput:'', _decoLoading:true };});
+    var self=this;
+    fetch('/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:t,sessionId:this._decoSessionId})})
+      .then(function(r){return r.json();})
+      .then(function(data){
+        var reply=data.reply||'Lo siento, hubo un error. Intenta de nuevo.';
+        self.setState(function(s){return{decoMessages:[].concat(s.decoMessages,[{role:'bot',text:reply}]),_decoLoading:false};});
+      })
+      .catch(function(){
+        self.setState(function(s){return{decoMessages:[].concat(s.decoMessages,[{role:'bot',text:'Error de conexión. Intenta de nuevo.'}]),_decoLoading:false};});
+      });
   }
-  _applyDeco(){ const open=this.state.deco; if(this._decoPanel) this._decoPanel.style.transform = open?'translateX(0)':'translateX(-100%)'; if(this._main) this._main.style.marginLeft = open?'360px':'0'; if(this._buyBar) this._buyBar.style.left = open?'360px':'0'; }
+  _applyDeco(){ var open=this.state.deco; if(this._decoPanel) this._decoPanel.style.transform=open?'translateX(0)':'translateX(-100%)'; if(this._main) this._main.style.marginLeft=open?'360px':'0'; if(this._buyBar) this._buyBar.style.left=open?'360px':'0'; }
 
   componentDidMount(){
     this._reduce=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    const sp = (this.props.arStartState)||'empty';
+    this.loadProduct();
+    var sp=(this.props.arStartState)||'empty';
     if(sp==='placed') this.setState({activeMedia:1, ar:'placed'});
-    this._onKey=(e)=>{ if(e.key==='Escape'){ if(this.state.lb){this.lbClose();return;} if(this.state.deco){this.closeDeco();return;} } };
+    this._onKey=function(e){ if(e.key==='Escape'){ if(this.state.lb){this.lbClose();return;} if(this.state.deco){this.closeDeco();return;} } }.bind(this);
     window.addEventListener('keydown',this._onKey);
   }
-  componentWillUnmount(){ window.removeEventListener('keydown',this._onKey); clearTimeout(this._tt); clearTimeout(this._decoT); document.body.style.overflow=''; }
+  componentWillUnmount(){ window.removeEventListener('keydown',this._onKey); clearTimeout(this._tt); document.body.style.overflow=''; }
   componentDidUpdate(){ this._applyDeco(); }
 
   renderVals(){
-    const self=this;
-    const colorName=this.COLOR_LIST[this.state.colorIdx];
+    var self=this;
+    var p=this.getProduct();
+    var colorName=this.COLOR_LIST[this.state.colorIdx];
+    var MEDIA=this.getMedia();
 
-    const swatches=this.COLOR_LIST.map((c,i)=>{ const a=i===this.state.colorIdx; return {
-      name:c, hex:this.COLORS[c], pick:()=>this.pickColor(i),
-      ring:a?'#F27141':'#E4E4E3', txt:a?'#40403E':'#737373', weight:a?'600':'400'
-    }; });
+    var swatches=this.COLOR_LIST.map(function(c,i){ var a=i===self.state.colorIdx; return { name:c, hex:self.COLORS[c], pick:function(){self.pickColor(i);}, ring:a?'#F27141':'#E4E4E3', txt:a?'#40403E':'#737373', weight:a?'600':'400' }; });
+    var deliveryChips=this.DELIVERY.map(function(d,i){ var a=i===self.state.deliveryIdx; return { label:d.label, note:d.note, pick:function(){self.pickDelivery(i);}, border:a?'#F27141':'#dcd9d3', bg:a?'#fbf2ec':'#fff', color:a?'#40403E':'#5A5A57' }; });
+    var materialChips=this.MATERIALS.map(function(m,i){ var a=i===self.state.materialIdx; return { label:m, pick:function(){self.pickMaterial(i);}, border:a?'#40403E':'#dcd9d3', bg:a?'#40403E':'#fff', color:a?'#F2F2F2':'#5A5A57' }; });
 
-    const deliveryChips=this.DELIVERY.map((d,i)=>{ const a=i===this.state.deliveryIdx; return {
-      label:d.label, note:d.note, pick:()=>this.pickDelivery(i),
-      border:a?'#F27141':'#dcd9d3', bg:a?'#fbf2ec':'#fff', color:a?'#40403E':'#5A5A57'
-    }; });
-
-    const materialChips=this.MATERIALS.map((m,i)=>{ const a=i===this.state.materialIdx; return {
-      label:m, pick:()=>this.pickMaterial(i),
-      border:a?'#40403E':'#dcd9d3', bg:a?'#40403E':'#fff', color:a?'#F2F2F2':'#5A5A57'
-    }; });
-
-    // active media / stage view
-    const am=this.state.activeMedia;
-    const active=this.MEDIA[am]||this.MEDIA[0];
-    const isAr=active.kind==='ar';
-    const thumbs=this.MEDIA.map((m,i)=>{
-      const sel=i===am; const ar=m.kind==='ar';
+    var am=this.state.activeMedia;
+    var active=MEDIA[am]||MEDIA[0];
+    var isAr=active.kind==='ar';
+    var thumbs=MEDIA.map(function(m,i){
+      var sel=i===am, ar=m.kind==='ar';
       return {
-        select: m.kind==='video' ? ()=>this.openVideoLb(m) : ()=>this.selectMedia(i),
-        isAr:ar, isMedia:!ar,
-        isPhoto: m.kind==='photo',
+        select: m.kind==='video' ? function(){self.openVideoLb(m);} : function(){self.selectMedia(i);},
+        isAr:ar, isMedia:!ar, isPhoto:m.kind==='photo',
         img:m.img||'', pos:m.pos||'center', label:m.label,
-        imgRef:(el)=>{ if(el && m.img){ el.src=m.img; el.style.objectPosition=m.pos||'center'; } },
-        thumbVideoRef:(el)=>{ if(el && m.src && el.dataset.b!=='1'){ el.dataset.b='1'; el.src=m.src; el.addEventListener('loadeddata',()=>{ try{ el.currentTime=Math.min(0.6, (el.duration||1)/2); }catch(e){} }, {once:true}); } },
+        imgRef:function(el){ if(el && m.img){ el.src=m.img; el.style.objectPosition=m.pos||'center'; } },
+        thumbVideoRef:function(el){ if(el && m.src && el.dataset.b!=='1'){ el.dataset.b='1'; el.src=m.src; el.addEventListener('loadeddata',function(){ try{el.currentTime=Math.min(0.6,(el.duration||1)/2);}catch(e){} },{once:true}); } },
         isVideo:m.kind==='video', is360:m.kind==='360',
-        border: ar ? '#F27141' : (sel?'#F27141':'#E4E4E3'),
-        bg: ar ? '#FBEFE7' : '#fff',
-        shadow: ar ? '0 4px 14px rgba(242,113,65,.22)' : (sel?'0 2px 10px rgba(242,113,65,.18)':'none')
+        border: ar?'#F27141':(sel?'#F27141':'#E4E4E3'),
+        bg: ar?'#FBEFE7':'#fff',
+        shadow: ar?'0 4px 14px rgba(242,113,65,.22)':(sel?'0 2px 10px rgba(242,113,65,.18)':'none')
       };
     });
 
-    const stars=[1,2,3,4,5].map(n=>({fill:n<=5?'#F27141':'#E4E4E3'}));
+    var rating=p.rating||4.5;
+    var stars=[1,2,3,4,5].map(function(n){return{fill:n<=Math.round(rating)?'#F27141':'#E4E4E3'};});
+    var hasOld=p.old&&p.old>0;
 
-    const specs=[
-      {k:'Medida', v:'King · 200×215 cm'},
-      {k:'Material', v:this.MATERIALS[this.state.materialIdx]+' '+colorName.toLowerCase()},
-      {k:'Patas', v:'Acero dorado'},
-      {k:'Base', v:'Con guardado'},
-      {k:'Garantía', v:'7 años'},
-      {k:'Armado', v:'Incluido'}
-    ];
-
-    const lb=this.state.lb;
+    var specs=[ {k:'Dimensiones',v:p.dims||'—'}, {k:'Material',v:this.MATERIALS[this.state.materialIdx]+' '+colorName.toLowerCase()}, {k:'Peso',v:p.weight||'—'}, {k:'Ciudad',v:p.city||'—'}, {k:'Garantía',v:p.warranty||'—'}, {k:'Armado',v:'Incluido'} ];
+    var lb=this.state.lb;
 
     return {
-      noop:()=>{}, stop:(e)=>{ if(e&&e.stopPropagation)e.stopPropagation(); },
-      mainRef:(el)=>{ this._main=el; if(el) el.style.marginLeft=this.state.deco?'360px':'0'; },
-      buyBarRef:(el)=>{ this._buyBar=el; if(el) el.style.left=this.state.deco?'360px':'0'; },
-      cartCount:this.state.cart, hasCart:this.state.cart>0, cartBadgeRef:(el)=>{this._badge=el;},
+      noop:function(){}, stop:function(e){ if(e&&e.stopPropagation)e.stopPropagation(); },
+      mainRef:function(el){ self._main=el; if(el) el.style.marginLeft=self.state.deco?'360px':'0'; },
+      buyBarRef:function(el){ self._buyBar=el; if(el) el.style.left=self.state.deco?'360px':'0'; },
+      cartCount:this.state.cart, hasCart:this.state.cart>0, cartBadgeRef:function(el){self._badge=el;},
       payMethods:['QR Banco Unión','BNB','Bisa','Transferencia','Contra-entrega'],
+      productName:p.name, productCat:p.cat||'', ratingText:rating.toFixed(1)+' · '+(p.reviews||0)+' reseñas',
+      warrantyText:p.warranty||'—',
 
       arEmpty:isAr && this.state.ar==='empty', arPlaced:isAr && this.state.ar==='placed',
       vPhoto:active.kind==='photo', v360:active.kind==='360', vVideo:active.kind==='video', vAr:isAr,
-      showStageBadge: active.kind==='photo' && am===0,
+      showStageBadge: active.kind==='photo' && am===0 && !!p.badge,
       mainImg:active.img||'', mainFit:active.fit||'contain', mainPos:active.pos||'center',
-      mainImgRef:(el)=>{ if(el && active.img){ el.src=active.img; el.style.objectFit=active.fit||'contain'; el.style.objectPosition=active.pos||'center'; } },
-      stageTitle: isAr ? 'Mira este mueble en tu casa' : 'Cama Aurora',
+      mainImgRef:function(el){ if(el && active.img){ el.src=active.img; el.style.objectFit=active.fit||'contain'; el.style.objectPosition=active.pos||'center'; } },
+      stageTitle: isAr ? 'Mira este mueble en tu casa' : p.name,
       stageSub: isAr ? 'Visualización con IA · exclusivo de InCassa Deco' : ('Galería · '+active.label),
       eyebrowBg: isAr ? '#F27141' : '#E4E4E3',
-      thumbs,
-      placeBed:()=>this.placeBed(), resetAr:()=>this.resetAr(),
-      moveLeft:()=>this.moveLeft(), moveRight:()=>this.moveRight(),
-      scaleUp:()=>this.scaleUp(), scaleDown:()=>this.scaleDown(),
+      thumbs:thumbs,
+      placeBed:function(){self.placeBed();}, resetAr:function(){self.resetAr();},
+      moveLeft:function(){self.moveLeft();}, moveRight:function(){self.moveRight();},
+      scaleUp:function(){self.scaleUp();}, scaleDown:function(){self.scaleDown();},
       scalePct:this.state.bedScale+'%',
-      bedBoxRef:(el)=>{ this._bedBox=el; if(el){ el.style.transform=`translateX(calc(-50% + ${this.state.bedX}%))`; el.style.width=(58*this.state.bedScale/100)+'%'; } },
+      bedBoxRef:function(el){ self._bedBox=el; if(el){ el.style.transform='translateX(calc(-50% + '+self.state.bedX+'%))'; el.style.width=(58*self.state.bedScale/100)+'%'; } },
 
-      stars,
-      priceText:this.fmt(this.PRICE), oldText:this.fmt(this.OLD),
-      discount:'-'+Math.round((1-this.PRICE/this.OLD)*100)+'%',
-      cuota:this.fmt(Math.round(this.PRICE/12)),
-      colorName, swatches, deliveryChips, materialChips, specs,
+      stars:stars,
+      priceText:this.fmt(p.price), oldText:hasOld?this.fmt(p.old):'',
+      discount:hasOld?('-'+Math.round((1-p.price/p.old)*100)+'%'):'',
+      cuota:this.fmt(Math.round(p.price/12)),
+      colorName:colorName, swatches:swatches, deliveryChips:deliveryChips, materialChips:materialChips, specs:specs,
 
-      addCart:()=>this.addCart(), buyNow:()=>this.buyNow(),
+      addCart:function(){self.addCart();}, buyNow:function(){self.buyNow();},
 
       lbOpen:!!lb,
-      lbImg: lb?lb.img:'',
-      lbImgRef:(el)=>{ if(el && lb){ el.src=lb.img||''; el.style.objectFit=lb.zoom?'cover':'contain'; el.style.objectPosition=lb.pos||'center'; } },
+      lbImgRef:function(el){ if(el && lb){ el.src=lb.img||''; el.style.objectFit=lb.zoom?'cover':'contain'; el.style.objectPosition=lb.pos||'center'; } },
       lbIsImage: !!lb && lb.kind!=='video',
-      lbVideoRef:(el)=>{ if(!el || !lb || lb.kind!=='video') return; el.controls=true; el.playsInline=true; if(el.dataset.bound!=='1'){ el.dataset.bound='1'; el.src=lb.src; try{el.currentTime=0;}catch(e){} const p=el.play(); if(p&&p.catch)p.catch(()=>{}); } },
-      lbFit: lb&&lb.zoom?'cover':'contain',
-      lbPos: lb?lb.pos:'center',
+      lbVideoRef:function(el){ if(!el || !lb || lb.kind!=='video') return; el.controls=true; el.playsInline=true; if(el.dataset.bound!=='1'){ el.dataset.bound='1'; el.src=lb.src; try{el.currentTime=0;}catch(e){} var pr=el.play(); if(pr&&pr.catch)pr.catch(function(){}); } },
       lbIsVideo: lb&&lb.kind==='video',
       lbIs360: lb&&lb.kind==='360',
-      lbClose:()=>this.lbClose(),
+      lbClose:function(){self.lbClose();},
 
       toastOpen:!!this.state.toast, toastMsg:this.state.toast||'',
 
-      decoOpen:this.state.deco,
-      toggleDeco:()=>this.toggleDeco(), closeDeco:()=>this.closeDeco(),
-      decoPanelRef:(el)=>{ this._decoPanel=el; if(el) el.style.transform=this.state.deco?'translateX(0)':'translateX(-100%)'; },
-      decoMessages:this.state.decoMessages.map(m=>({
-        text:m.text, align:m.role==='bot'?'flex-start':'flex-end',
-        bg:m.role==='bot'?'#FFFFFF':'#F8C9AE',
-        border:m.role==='bot'?'1px solid #ECECEA':'none',
-        radius:m.role==='bot'?'4px 16px 16px 16px':'16px 16px 4px 16px'
-      })),
+      decoOpen:this.state.deco, decoLoading:!!this.state._decoLoading,
+      toggleDeco:function(){self.toggleDeco();}, closeDeco:function(){self.closeDeco();},
+      decoPanelRef:function(el){ self._decoPanel=el; if(el) el.style.transform=self.state.deco?'translateX(0)':'translateX(-100%)'; },
+      decoMessages:this.state.decoMessages.map(function(m){
+        return {
+          ref:function(el){ if(el){ el.innerHTML=self._fmtDeco(m.text); } },
+          align:m.role==='bot'?'flex-start':'flex-end',
+          bg:m.role==='bot'?'#FFFFFF':'#F8C9AE',
+          border:m.role==='bot'?'1px solid #ECECEA':'none',
+          radius:m.role==='bot'?'4px 16px 16px 16px':'16px 16px 4px 16px'
+        };
+      }),
       decoInputVal:this.state.decoInput,
-      setDecoInput:(e)=>this.setState({decoInput:e.target.value}),
-      sendDeco:()=>this.sendDeco(),
-      decoKey:(e)=>{ if(e.key==='Enter'){ e.preventDefault(); this.sendDeco(); } },
-      decoInputRef:(el)=>{ this._decoInput=el; },
+      setDecoInput:function(e){self.setState({decoInput:e.target.value});},
+      sendDeco:function(){self.sendDeco();},
+      decoKey:function(e){ if(e.key==='Enter'){ e.preventDefault(); self.sendDeco(); } },
+      decoInputRef:function(el){ self._decoInput=el; },
       decoSuggestions:[
-        { label:'¿Qué color va con mi cuarto?', go:()=>{ this.setState(s=>({decoMessages:[...s.decoMessages,{role:'user',text:'¿Qué color va con mi cuarto?'},{role:'bot',text:'Sube una foto y te sugiero el tapiz que mejor combina con tus paredes y piso.'}]})); } },
-        { label:'Ver en mi dormitorio', go:()=>{ this.placeBed(); this.closeDeco(); } }
+        { label:'Quiero registrarme', go:function(){ self.setState({decoInput:'Hola, me gustaría registrarme'}); setTimeout(function(){self.sendDeco();},100); } },
+        { label:'Ver catálogo', go:function(){ window.location.href='muebleBo.dc.html#catalogo'; } }
       ]
     };
   }
