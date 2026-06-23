@@ -538,6 +538,10 @@ app.delete('/api/admin/leads/:id', (req, res) => {
   res.json({ ok: true });
 });
 
+app.get('/', (req, res) => {
+  res.redirect('/muebleBo.dc.html');
+});
+
 const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => {
   console.log(`Servidor InCassa DECO corriendo en http://localhost:${PORT}`);
