@@ -597,7 +597,7 @@ class Component extends DCLogic {
     toast: null,
     deco: { open:false },
     decoInput: '',
-    decoMessages: [ { role:'bot', text:'¡Hola! Soy Deco IA ✨ ¿Buscas algo para un ambiente en particular, o quieres ver primero qué tenemos?' } ],
+    decoMessages: [ { role:'bot', text:'¡Hola! Bienvenido/a a InCassa DECO ✨ Soy Deco IA, tu asistente personal de muebles y decoración. Para brindarte una atención personalizada, ¿con quién tengo el gusto de conversar?' } ],
     _asesores: [],
     _asesorIdx: 0,
     _apiProducts: null
@@ -1083,7 +1083,7 @@ class Component extends DCLogic {
       decoKey: (e)=>{ if(e.key==='Enter'){ e.preventDefault(); this.sendDeco(); } },
       decoInputRef: (el)=>{ this._decoInput=el; },
       decoSuggestions: [
-        { label:'Ver ambientes', go:()=>this.scrollTo('#editorial') },
+        { label:'Quiero registrarme', go:()=>{ self.setState({decoInput:'Hola, me gustaría registrarme'}); setTimeout(function(){self.sendDeco();},100); } },
         { label:'Ver catálogo', go:()=>this.scrollTo('#catalogo') }
       ]
     };
