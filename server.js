@@ -5,7 +5,6 @@ const Anthropic = require('@anthropic-ai/sdk');
 const path = require('path');
 const fs = require('fs');
 const multer = require('multer');
-const { GoogleGenAI } = require('@google/genai');
 
 const app = express();
 app.use(cors());
@@ -17,9 +16,6 @@ const anthropic = new Anthropic.default({
   apiKey: process.env.ANTHROPIC_API_KEY,
 });
 
-const gemini = process.env.GEMINI_API_KEY
-  ? new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY })
-  : null;
 
 const DATA_FILE = path.join(__dirname, 'data.json');
 
@@ -420,76 +416,6 @@ app.delete('/api/admin/products/:id/images/:imgIdx', (req, res) => {
   res.json({ ok: true, images: data.products[idx].images });
 });
 
-// ── Admin: Generate AI images with Gemini ──
-
-app.post('/api/admin/products/:id/generate-images', async (req, res) => {
-  if (!gemini) return res.status(400).json({ error: 'GEMINI_API_KEY no configurada' });
-
-  data = loadData();
-  const product = data.products.find(x => x.id === req.params.id);
-  if (!product) return res.status(404).json({ error: 'Producto no encontrado' });
-  if (!product.images.length) return res.status(400).json({ error: 'El producto necesita al menos 1 imagen original' });
-
-  const originalPath = path.join(__dirname, product.images[0]);
-  if (!fs.existsSync(originalPath)) return res.status(400).json({ error: 'Imagen original no encontrada en disco' });
-
-  const imgData = fs.readFileSync(originalPath);
-  const base64 = imgData.toString('base64');
-  const ext = path.extname(originalPath).toLowerCase();
-  const mimeType = ext === '.png' ? 'image/png' : 'image/jpeg';
-
-  const angles = [
-    'Generate a photo of this exact same furniture piece from a side angle view. Keep identical style, colors, materials and design. Professional studio lighting, white/minimal background.',
-    'Generate a photo showing this exact same furniture piece in a beautifully decorated modern room setting. The furniture should be the focal point. Warm ambient lighting.',
-    'Generate a detailed close-up photo of this furniture piece focusing on the material texture, craftsmanship and finish details. Macro photography style.'
-  ];
-
-  const generated = [];
-
-  for (let i = 0; i < angles.length; i++) {
-    try {
-      const response = await gemini.models.generateContent({
-        model: 'gemini-2.0-flash',
-        contents: [{
-          role: 'user',
-          parts: [
-            { inlineData: { mimeType, data: base64 } },
-            { text: angles[i] }
-          ]
-        }],
-        generationConfig: {
-          responseModalities: ['TEXT', 'IMAGE']
-        }
-      });
-
-      const parts = response.candidates[0].content.parts;
-      for (const part of parts) {
-        if (part.inlineData) {
-          const outExt = part.inlineData.mimeType === 'image/png' ? '.png' : '.jpg';
-          const filename = `${product.id}-ai-${i + 1}-${Date.now()}${outExt}`;
-          const outPath = path.join(__dirname, 'uploads', 'productos', filename);
-          fs.writeFileSync(outPath, Buffer.from(part.inlineData.data, 'base64'));
-          const relPath = 'uploads/productos/' + filename;
-          generated.push(relPath);
-          break;
-        }
-      }
-    } catch (err) {
-      console.error(`Error generating image ${i + 1}:`, err.message);
-      generated.push(null);
-    }
-  }
-
-  const valid = generated.filter(Boolean);
-  if (valid.length) {
-    data = loadData();
-    const pIdx = data.products.findIndex(x => x.id === req.params.id);
-    data.products[pIdx].images.push(...valid);
-    saveData(data);
-  }
-
-  res.json({ generated: valid, total: product.images.length + valid.length });
-});
 
 // ── Admin: Asesores CRUD ──
 

@@ -185,11 +185,6 @@
           <input type="file" id="p-file" accept="image/*,video/*">
           <p style="color:#999;font-size:13px">Haz clic o arrastra una imagen o video aquí</p>
         </div>
-        <div style="margin-top:10px">
-          <button class="btn btn-ai" id="btn-generate-ai" onclick="generateAiImages()" style="display:none">
-            Generar 3 ángulos con IA
-          </button>
-        </div>
       </div>
     </div>
     <div class="actions">
@@ -315,7 +310,6 @@ function openProductModal(product) {
   document.getElementById('p-tone2').value = product ? product.tones[1] : '#D8BE8C';
 
   renderProductImages(product ? product.images : []);
-  document.getElementById('btn-generate-ai').style.display = (product && product.images && product.images.length) ? '' : 'none';
 
   document.getElementById('product-modal').classList.add('open');
 }
@@ -371,7 +365,6 @@ async function uploadFile(file) {
 
     editingProduct.images = data.images;
     renderProductImages(data.images);
-    document.getElementById('btn-generate-ai').style.display = data.images.length ? '' : 'none';
     toast('Imagen subida');
     loadProducts();
   } catch { toast('Error al subir imagen'); }
@@ -390,46 +383,11 @@ async function removeImage(idx) {
 
     editingProduct.images = data.images;
     renderProductImages(data.images);
-    document.getElementById('btn-generate-ai').style.display = data.images.length ? '' : 'none';
     toast('Imagen eliminada');
     loadProducts();
   } catch { toast('Error al eliminar imagen'); }
 }
 
-// ── Generate AI images ──
-async function generateAiImages() {
-  if (!editingProduct) return;
-
-  const btn = document.getElementById('btn-generate-ai');
-  btn.disabled = true;
-  btn.innerHTML = '<span class="spinner"></span>Generando con IA...';
-
-  try {
-    const res = await fetch(API + '/products/' + editingProduct.id + '/generate-images', { method: 'POST' });
-    const data = await res.json();
-
-    if (!res.ok) {
-      toast(data.error || 'Error al generar imágenes');
-      btn.disabled = false;
-      btn.textContent = 'Generar 3 ángulos con IA';
-      return;
-    }
-
-    const count = data.generated.length;
-    toast(count + ' imagen' + (count !== 1 ? 'es' : '') + ' generada' + (count !== 1 ? 's' : '') + ' con IA');
-
-    const prodRes = await fetch(API + '/products');
-    products = await prodRes.json();
-    editingProduct = products.find(p => p.id === editingProduct.id);
-    renderProductImages(editingProduct.images);
-    renderProducts();
-  } catch {
-    toast('Error de conexión al generar imágenes');
-  }
-
-  btn.disabled = false;
-  btn.textContent = 'Generar 3 ángulos con IA';
-}
 
 // ── Save product ──
 async function saveProduct() {
