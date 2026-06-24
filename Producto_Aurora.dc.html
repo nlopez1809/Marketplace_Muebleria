@@ -483,9 +483,9 @@ class Component extends DCLogic {
     var labels=['Ambiente','Producto','En Uso','Video'], angles=[135,60,200,310];
     var v=variant||0, a=angles[v]||135, lab=labels[v]||'';
     var rad=a*Math.PI/180, x2=(50+Math.cos(rad)*50).toFixed(1), y2=(50+Math.sin(rad)*50).toFixed(1);
-    var txt=lab?(“<text x='300' y='560' font-family='Inter,sans-serif' font-size='20' letter-spacing='3' fill='”+c1+”' opacity='0.5' text-anchor='middle'>”+lab.toUpperCase()+”</text>”):'';
-    var svg=”<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 600 600'><defs><linearGradient id='g' x1='0%' y1='0%' x2='”+x2+”%' y2='”+y2+”%'><stop offset='0' stop-color='”+c2+”'/><stop offset='1' stop-color='”+c1+”'/></linearGradient></defs><rect width='600' height='600' fill='url(#g)'/><g transform='translate(150 150) scale(3)' fill='none' stroke='”+c1+”' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round' opacity='0.42'><path d='”+icon+”'/></g>”+txt+”</svg>”;
-    return “data:image/svg+xml,”+encodeURIComponent(svg);
+    var txt=lab?("<text x='300' y='560' font-family='Inter,sans-serif' font-size='20' letter-spacing='3' fill='"+c1+"' opacity='0.5' text-anchor='middle'>"+lab.toUpperCase()+"</text>"):'';
+    var svg="<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 600 600'><defs><linearGradient id='g' x1='0%' y1='0%' x2='"+x2+"%' y2='"+y2+"%'><stop offset='0' stop-color='"+c2+"'/><stop offset='1' stop-color='"+c1+"'/></linearGradient></defs><rect width='600' height='600' fill='url(#g)'/><g transform='translate(150 150) scale(3)' fill='none' stroke='"+c1+"' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round' opacity='0.42'><path d='"+icon+"'/></g>"+txt+"</svg>";
+    return "data:image/svg+xml,"+encodeURIComponent(svg);
   }
 
   _genMedidas(p){
@@ -513,8 +513,8 @@ class Component extends DCLogic {
 
   _fmtDeco(text){
     var s=text.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-    s=s.replace(/\[([^\]]+)\]\(#producto-([a-zA-Z0-9_-]+)\)/g,'<a href=”Producto_Aurora.dc.html?id=$2” style=”color:#F27141;text-decoration:underline;font-weight:600”>$1</a>');
-    s=s.replace(/\[([^\]]+)\]\(((?:\/|https?:\/\/)[^\s)]+)\)/g,'<a href=”$2” target=”_blank” style=”color:#F27141;text-decoration:underline;font-weight:600”>$1</a>');
+    s=s.replace(/\[([^\]]+)\]\(#producto-([a-zA-Z0-9_-]+)\)/g,'<a href="Producto_Aurora.dc.html?id=$2" style="color:#F27141;text-decoration:underline;font-weight:600">$1</a>');
+    s=s.replace(/\[([^\]]+)\]\(((?:\/|https?:\/\/)[^\s)]+)\)/g,'<a href="$2" target="_blank" style="color:#F27141;text-decoration:underline;font-weight:600">$1</a>');
     s=s.replace(/\*\*([^*]+)\*\*/g,'<strong>$1</strong>');
     return s;
   }
@@ -554,7 +554,7 @@ class Component extends DCLogic {
   openLb(g){ this.setState({lb:g}); document.body.style.overflow='hidden'; }
   lbClose(){ this.setState({lb:null}); document.body.style.overflow=''; }
 
-  addCart(){ var p=this.getProduct(); var c=this.COLOR_LIST[this.state.colorIdx]; this.setState(function(s){return{cart:s.cart+1, toast:'”'+p.name+' · '+c+'” añadida al carrito'};}); this.bump(); clearTimeout(this._tt); this._tt=setTimeout(function(){this.setState({toast:null});}.bind(this),2400); }
+  addCart(){ var p=this.getProduct(); var c=this.COLOR_LIST[this.state.colorIdx]; this.setState(function(s){return{cart:s.cart+1, toast:'"'+p.name+' · '+c+'" añadida al carrito'};}); this.bump(); clearTimeout(this._tt); this._tt=setTimeout(function(){this.setState({toast:null});}.bind(this),2400); }
   buyNow(){ var p=this.getProduct(); this.setState({toast:'Procediendo al pago — '+p.name}); clearTimeout(this._tt); this._tt=setTimeout(function(){this.setState({toast:null});}.bind(this),2400); }
   bump(){ if(this._reduce)return; requestAnimationFrame(function(){ var el=this._badge; if(el){ el.style.animation='none'; void el.offsetWidth; el.style.animation='mbxBump .45s cubic-bezier(.2,1.4,.4,1)'; } }.bind(this)); }
 
@@ -589,9 +589,6 @@ class Component extends DCLogic {
   componentDidUpdate(){ this._applyDeco(); }
 
   renderVals(){
-    try { return this._renderValsInner(); } catch(e) { console.error('[DC renderVals ERROR]', e.message, e.stack); return {}; }
-  }
-  _renderValsInner(){
     var self=this;
     var p=this.getProduct();
     var colorName=this.COLOR_LIST[this.state.colorIdx];
