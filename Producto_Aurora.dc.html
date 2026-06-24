@@ -26,6 +26,7 @@
   @keyframes mbxFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-9px)}}
   @keyframes mbxReveal{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:none}}
   @keyframes mbxFade{from{opacity:0}to{opacity:1}}
+  @keyframes mbxSlideLeft{from{transform:translateX(100%)}to{transform:translateX(0)}}
   @keyframes mbxScan{0%{transform:translateY(-100%)}100%{transform:translateY(420px)}}
   @keyframes mbxSpin{to{transform:rotate(360deg)}}
   .mbx-drop:hover .mbx-dropicon{transform:translateY(-6px) scale(1.04)}
@@ -64,7 +65,7 @@
         <button onClick="{{ noop }}" style="background:none;border:none;cursor:pointer;display:flex;align-items:center" title="Favoritos">
           <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="#C9C9C7" stroke-width="1.7"><path d="M12 21s-7.5-4.6-10-9.3C.6 8.9 2 5.5 5.2 5.5c2 0 3.2 1.2 3.8 2.3C9.6 6.7 10.8 5.5 12.8 5.5 16 5.5 17.4 8.9 16 11.7 13.5 16.4 12 21 12 21z"></path></svg>
         </button>
-        <button onClick="{{ noop }}" style="background:none;border:none;cursor:pointer;position:relative;display:flex;align-items:center" title="Carrito">
+        <button onClick="{{ openCart }}" style="background:none;border:none;cursor:pointer;position:relative;display:flex;align-items:center" title="Carrito">
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#F2F2F2" stroke-width="1.7"><path d="M6 6h15l-1.5 9h-12z"></path><path d="M6 6L5 2H2"></path><circle cx="9" cy="20" r="1.4"></circle><circle cx="18" cy="20" r="1.4"></circle></svg>
           <sc-if value="{{ hasCart }}" hint-placeholder-val="{{ false }}"><span ref="{{ cartBadgeRef }}" style="position:absolute;top:-7px;right:-9px;background:#F27141;color:#40403E;font-size:10px;font-weight:700;border-radius:20px;min-width:18px;height:18px;display:flex;align-items:center;justify-content:center;padding:0 4px">{{ cartCount }}</span></sc-if>
         </button>
@@ -392,6 +393,64 @@
     </div>
   </sc-if>
 
+  <!-- cart drawer backdrop -->
+  <sc-if value="{{ cartOpen }}" hint-placeholder-val="{{ false }}">
+    <div onClick="{{ closeCart }}" style="position:fixed;inset:0;z-index:140;background:rgba(40,40,38,.5);backdrop-filter:blur(3px);animation:mbxFade .2s ease both"></div>
+  </sc-if>
+
+  <!-- cart drawer -->
+  <sc-if value="{{ cartOpen }}" hint-placeholder-val="{{ false }}">
+    <aside ref="{{ cartPanelRef }}" style="position:fixed;top:0;right:0;bottom:0;width:400px;max-width:92vw;z-index:150;background:#FFFFFF;box-shadow:-8px 0 40px rgba(0,0,0,.18);display:flex;flex-direction:column;animation:mbxSlideLeft .3s ease both">
+      <!-- header -->
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:22px 24px;border-bottom:1px solid #ECECEA">
+        <div style="display:flex;align-items:center;gap:10px">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#40403E" stroke-width="1.7"><path d="M6 6h15l-1.5 9h-12z"></path><path d="M6 6L5 2H2"></path><circle cx="9" cy="20" r="1.4"></circle><circle cx="18" cy="20" r="1.4"></circle></svg>
+          <span style="font-family:'Comfortaa',sans-serif;font-weight:700;font-size:16px;color:#40403E">Mi Carrito</span>
+          <span style="background:#F27141;color:#40403E;font-size:11px;font-weight:700;border-radius:20px;padding:2px 9px">{{ cartCountVal }}</span>
+        </div>
+        <button onClick="{{ closeCart }}" style="background:none;border:none;cursor:pointer;width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;transition:background .15s" style-hover="background:#F1ECE6">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#40403E" stroke-width="2"><path d="M6 6l12 12M18 6L6 18"></path></svg>
+        </button>
+      </div>
+
+      <!-- items -->
+      <div style="flex:1;overflow-y:auto;padding:16px 24px">
+        <sc-if value="{{ cartEmpty }}" hint-placeholder-val="{{ false }}">
+          <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;text-align:center;color:#9A9A98;gap:16px">
+            <svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="#E4E4E3" stroke-width="1.2"><path d="M6 6h15l-1.5 9h-12z"></path><path d="M6 6L5 2H2"></path><circle cx="9" cy="20" r="1.4"></circle><circle cx="18" cy="20" r="1.4"></circle></svg>
+            <p style="font-size:14px;margin:0">Tu carrito esta vacio</p>
+            <button onClick="{{ closeCart }}" style="background:#40403E;color:#F2F2F2;border:none;border-radius:2px;padding:12px 24px;font-size:12px;letter-spacing:.06em;font-weight:600;cursor:pointer;transition:background .15s" style-hover="background:#F27141;color:#40403E">Seguir comprando</button>
+          </div>
+        </sc-if>
+        <sc-for list="{{ cartList }}" as="ci" hint-placeholder-count="0">
+          <div style="display:flex;gap:14px;padding:16px 0;border-bottom:1px solid #F4F1EC">
+            <img ref="{{ ci.imgRef }}" style="width:80px;height:80px;object-fit:cover;border-radius:3px;background:#F4F1EC;flex:none" />
+            <div style="flex:1;min-width:0">
+              <p style="margin:0 0 4px;font-size:14px;font-weight:600;color:#40403E;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ ci.name }}</p>
+              <p style="margin:0 0 8px;font-size:12px;color:#9A9A98">{{ ci.color }} · Cant: {{ ci.qty }}</p>
+              <p style="margin:0;font-size:15px;font-weight:700;color:#40403E">Bs {{ ci.priceText }}</p>
+            </div>
+            <button onClick="{{ ci.remove }}" style="background:none;border:none;cursor:pointer;align-self:flex-start;padding:4px;color:#9A9A98;transition:color .15s" style-hover="color:#F27141" title="Quitar">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M8 6V4h8v2M19 6v14a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V6"></path></svg>
+            </button>
+          </div>
+        </sc-for>
+      </div>
+
+      <!-- footer -->
+      <sc-if value="{{ hasCartItems }}" hint-placeholder-val="{{ false }}">
+        <div style="padding:20px 24px;border-top:1px solid #ECECEA;background:#FAFAF9">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+            <span style="font-size:14px;color:#737373">Total</span>
+            <span style="font-size:20px;font-weight:700;color:#40403E">Bs {{ cartTotalText }}</span>
+          </div>
+          <button style="width:100%;background:#F27141;color:#40403E;border:none;border-radius:2px;padding:16px;font-size:13px;letter-spacing:.06em;text-transform:uppercase;font-weight:700;cursor:pointer;transition:background .15s;box-shadow:0 6px 18px rgba(242,113,65,.3)" style-hover="background:#ef6330">Proceder al pago</button>
+          <button onClick="{{ closeCart }}" style="width:100%;background:none;border:1px solid #E4E4E3;border-radius:2px;padding:12px;margin-top:8px;font-size:12px;color:#737373;cursor:pointer;transition:border-color .15s" style-hover="border-color:#40403E">Seguir comprando</button>
+        </div>
+      </sc-if>
+    </aside>
+  </sc-if>
+
   <!-- toast -->
   <sc-if value="{{ toastOpen }}" hint-placeholder-val="{{ false }}">
     <div style="position:fixed;bottom:96px;left:50%;transform:translateX(-50%);z-index:130;background:#40403E;color:#F2F2F2;border:1px solid rgba(242,113,65,.4);border-radius:3px;padding:14px 22px;display:flex;align-items:center;gap:12px;box-shadow:0 20px 50px rgba(0,0,0,.35)">
@@ -455,7 +514,8 @@ class Component extends DCLogic {
     colorIdx: 0,
     deliveryIdx: 0,
     materialIdx: 0,
-    cart: 0,
+    cartItems: [],
+    cartOpen: false,
     lb: null,
     toast: null,
     deco: false,
@@ -559,7 +619,41 @@ class Component extends DCLogic {
   openLb(g){ this.setState({lb:g}); document.body.style.overflow='hidden'; }
   lbClose(){ this.setState({lb:null}); document.body.style.overflow=''; }
 
-  addCart(){ var p=this.getProduct(); var c=this.COLOR_LIST[this.state.colorIdx]; this.setState(function(s){return{cart:s.cart+1, toast:'"'+p.name+' · '+c+'" añadida al carrito'};}); this.bump(); clearTimeout(this._tt); this._tt=setTimeout(function(){this.setState({toast:null});}.bind(this),2400); }
+  addCart(){
+    var p=this.getProduct(), c=this.COLOR_LIST[this.state.colorIdx], m=this.getMedia();
+    var img=''; for(var i=0;i<m.length;i++){if(m[i].kind==='photo'&&m[i].img){img=m[i].img;break;}}
+    if(!img) img=this._genImg(p,'front');
+    var self=this;
+    this.setState(function(s){
+      var items=[].concat(s.cartItems);
+      var found=-1;
+      for(var j=0;j<items.length;j++){if(items[j].id===p.id&&items[j].color===c){found=j;break;}}
+      if(found>=0){ items[found]=Object.assign({},items[found],{qty:items[found].qty+1}); }
+      else { items.push({id:p.id, name:p.name, color:c, price:p.price, img:img, qty:1}); }
+      return{cartItems:items, toast:'"'+p.name+' . '+c+'" agregada al carrito'};
+    });
+    this.bump();
+    clearTimeout(this._tt); this._tt=setTimeout(function(){self.setState({toast:null});},2400);
+  }
+  openCart(){ this.setState({cartOpen:true}); }
+  closeCart(){ this.setState({cartOpen:false}); }
+  removeCartItem(idx){
+    this.setState(function(s){
+      var items=[].concat(s.cartItems);
+      items.splice(idx,1);
+      return{cartItems:items};
+    });
+  }
+  cartTotal(){
+    var items=this.state.cartItems, t=0;
+    for(var i=0;i<items.length;i++) t+=items[i].price*items[i].qty;
+    return t;
+  }
+  cartCount(){
+    var items=this.state.cartItems, c=0;
+    for(var i=0;i<items.length;i++) c+=items[i].qty;
+    return c;
+  }
   buyNow(){ var p=this.getProduct(); this.setState({toast:'Procediendo al pago — '+p.name}); clearTimeout(this._tt); this._tt=setTimeout(function(){this.setState({toast:null});}.bind(this),2400); }
   bump(){ if(this._reduce)return; requestAnimationFrame(function(){ var el=this._badge; if(el){ el.style.animation='none'; void el.offsetWidth; el.style.animation='mbxBump .45s cubic-bezier(.2,1.4,.4,1)'; } }.bind(this)); }
 
@@ -587,7 +681,7 @@ class Component extends DCLogic {
     this.loadProduct();
     var sp=(this.props.arStartState)||'empty';
     if(sp==='placed') this.setState({activeMedia:1, ar:'placed'});
-    this._onKey=function(e){ if(e.key==='Escape'){ if(this.state.lb){this.lbClose();return;} if(this.state.deco){this.closeDeco();return;} } }.bind(this);
+    this._onKey=function(e){ if(e.key==='Escape'){ if(this.state.cartOpen){this.closeCart();return;} if(this.state.lb){this.lbClose();return;} if(this.state.deco){this.closeDeco();return;} } }.bind(this);
     window.addEventListener('keydown',this._onKey);
   }
   componentWillUnmount(){ window.removeEventListener('keydown',this._onKey); clearTimeout(this._tt); document.body.style.overflow=''; }
@@ -632,7 +726,19 @@ class Component extends DCLogic {
       noop:function(){}, stop:function(e){ if(e&&e.stopPropagation)e.stopPropagation(); },
       mainRef:function(el){ self._main=el; if(el) el.style.marginLeft=self.state.deco?'360px':'0'; },
       buyBarRef:function(el){ self._buyBar=el; if(el) el.style.left=self.state.deco?'360px':'0'; },
-      cartCount:this.state.cart, hasCart:this.state.cart>0, cartBadgeRef:function(el){self._badge=el;},
+      cartCount:self.cartCount(), hasCart:self.cartCount()>0, cartBadgeRef:function(el){self._badge=el;},
+      cartOpen:this.state.cartOpen, openCart:function(){self.openCart();}, closeCart:function(){self.closeCart();},
+      cartCountVal:self.cartCount(), cartEmpty:self.cartCount()===0, hasCartItems:self.cartCount()>0,
+      cartTotalText:self.fmt(self.cartTotal()),
+      cartPanelRef:function(el){self._cartPanel=el;},
+      cartList:this.state.cartItems.map(function(item,idx){
+        return {
+          name:item.name, color:item.color, qty:item.qty,
+          priceText:self.fmt(item.price*item.qty),
+          imgRef:function(el){if(el)el.src=item.img;},
+          remove:function(){self.removeCartItem(idx);}
+        };
+      }),
       payMethods:['QR Banco Unión','BNB','Bisa','Transferencia','Contra-entrega'],
       productName:p.name, productCat:p.cat||'', ratingText:rating.toFixed(1)+' · '+(p.reviews||0)+' reseñas',
       warrantyText:p.warranty||'—',
