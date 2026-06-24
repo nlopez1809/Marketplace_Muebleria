@@ -495,18 +495,21 @@ class Component extends DCLogic {
   }
 
   _imgSrc(imgs,i){ var s=imgs[i]; if(!s) return null; return s.indexOf('data:')===0?s:'/uploads/productos/'+s; }
+  _isVid(s){ return s&&(s.indexOf('data:video')===0||/\.(mp4|webm|mov)$/i.test(s)); }
   getMedia(){
     var p=this.getProduct(), imgs=p.images||[], media=[], fb=[];
     for(var j=0;j<4;j++) fb.push(this._genImg(p,j));
-    var img0=imgs.length>0?this._imgSrc(imgs,0):fb[0];
-    var img1=imgs.length>1?this._imgSrc(imgs,1):fb[1];
-    var img2=imgs.length>2?this._imgSrc(imgs,2):fb[2];
-    var img3=imgs.length>3?this._imgSrc(imgs,3):fb[3];
-    media.push({kind:'photo', label:'Ambiente', img:img0, pos:'center', fit:'cover', fb:fb[0]});
+    var photos=[], videoSrc='';
+    for(var i=0;i<imgs.length;i++){
+      var src=this._imgSrc(imgs,i);
+      if(this._isVid(imgs[i])){ videoSrc=src; }
+      else { photos.push(src); }
+    }
+    media.push({kind:'photo', label:'Ambiente', img:photos[0]||fb[0], pos:'center', fit:'cover', fb:fb[0]});
     media.push({kind:'ar', label:'Ver en tu casa'});
-    media.push({kind:'photo', label:'Producto', img:img1, pos:'center', fit:'contain', fb:fb[1]});
-    media.push({kind:'photo', label:'En Uso', img:img2, pos:'center', fit:'cover', fb:fb[2]});
-    media.push({kind:'video', label:'Video', src:'', img:img3, pos:'center', fb:fb[3]});
+    media.push({kind:'photo', label:'Producto', img:photos[1]||fb[1], pos:'center', fit:'contain', fb:fb[1]});
+    media.push({kind:'photo', label:'En Uso', img:photos[2]||fb[2], pos:'center', fit:'cover', fb:fb[2]});
+    media.push({kind:'video', label:'Video', src:videoSrc, img:photos[3]||fb[3], pos:'center', fb:fb[3]});
     media.push({kind:'photo', label:'Medidas', img:this._genMedidas(p), pos:'center', fit:'contain'});
     return media;
   }

@@ -295,7 +295,7 @@ const upload = multer({
       cb(null, name);
     }
   }),
-  limits: { fileSize: 10 * 1024 * 1024 }
+  limits: { fileSize: 50 * 1024 * 1024 }
 });
 
 app.get('/api/admin/products', (req, res) => {
@@ -378,7 +378,7 @@ app.delete('/api/admin/products/:id', (req, res) => {
 });
 
 app.post('/api/admin/products/:id/upload', upload.single('image'), (req, res) => {
-  if (!req.file) return res.status(400).json({ error: 'No se recibió imagen' });
+  if (!req.file) return res.status(400).json({ error: 'No se recibió archivo' });
 
   data = loadData();
   const idx = data.products.findIndex(x => x.id === req.params.id);
@@ -387,7 +387,8 @@ app.post('/api/admin/products/:id/upload', upload.single('image'), (req, res) =>
   const filePath = req.file.path;
   const fileBuffer = fs.readFileSync(filePath);
   const ext = path.extname(req.file.originalname).toLowerCase();
-  const mime = ext === '.png' ? 'image/png' : ext === '.webp' ? 'image/webp' : ext === '.gif' ? 'image/gif' : 'image/jpeg';
+  const mimeMap = {'.png':'image/png','.webp':'image/webp','.gif':'image/gif','.jpg':'image/jpeg','.jpeg':'image/jpeg','.mp4':'video/mp4','.webm':'video/webm','.mov':'video/quicktime'};
+  const mime = mimeMap[ext] || 'application/octet-stream';
   const dataUrl = 'data:' + mime + ';base64,' + fileBuffer.toString('base64');
 
   data.products[idx].images.push(dataUrl);
