@@ -589,6 +589,9 @@ class Component extends DCLogic {
   componentDidUpdate(){ this._applyDeco(); }
 
   renderVals(){
+    try { return this._renderValsInner(); } catch(e) { console.error('[DC renderVals ERROR]', e.message, e.stack); return {}; }
+  }
+  _renderValsInner(){
     var self=this;
     var p=this.getProduct();
     var colorName=this.COLOR_LIST[this.state.colorIdx];
