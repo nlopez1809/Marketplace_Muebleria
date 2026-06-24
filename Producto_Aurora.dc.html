@@ -494,13 +494,14 @@ class Component extends DCLogic {
     return "data:image/svg+xml,"+encodeURIComponent(svg);
   }
 
+  _imgSrc(imgs,i){ var s=imgs[i]; if(!s) return null; return s.indexOf('data:')===0?s:'/uploads/productos/'+s; }
   getMedia(){
     var p=this.getProduct(), imgs=p.images||[], media=[], fb=[];
     for(var j=0;j<4;j++) fb.push(this._genImg(p,j));
-    var img0=imgs.length>0?'/uploads/productos/'+imgs[0]:fb[0];
-    var img1=imgs.length>1?'/uploads/productos/'+imgs[1]:fb[1];
-    var img2=imgs.length>2?'/uploads/productos/'+imgs[2]:fb[2];
-    var img3=imgs.length>3?'/uploads/productos/'+imgs[3]:fb[3];
+    var img0=imgs.length>0?this._imgSrc(imgs,0):fb[0];
+    var img1=imgs.length>1?this._imgSrc(imgs,1):fb[1];
+    var img2=imgs.length>2?this._imgSrc(imgs,2):fb[2];
+    var img3=imgs.length>3?this._imgSrc(imgs,3):fb[3];
     media.push({kind:'photo', label:'Ambiente', img:img0, pos:'center', fit:'cover', fb:fb[0]});
     media.push({kind:'ar', label:'Ver en tu casa'});
     media.push({kind:'photo', label:'Producto', img:img1, pos:'center', fit:'contain', fb:fb[1]});

@@ -384,11 +384,18 @@ app.post('/api/admin/products/:id/upload', upload.single('image'), (req, res) =>
   const idx = data.products.findIndex(x => x.id === req.params.id);
   if (idx === -1) return res.status(404).json({ error: 'Producto no encontrado' });
 
-  const imgPath = 'uploads/productos/' + req.file.filename;
-  data.products[idx].images.push(imgPath);
+  const filePath = req.file.path;
+  const fileBuffer = fs.readFileSync(filePath);
+  const ext = path.extname(req.file.originalname).toLowerCase();
+  const mime = ext === '.png' ? 'image/png' : ext === '.webp' ? 'image/webp' : ext === '.gif' ? 'image/gif' : 'image/jpeg';
+  const dataUrl = 'data:' + mime + ';base64,' + fileBuffer.toString('base64');
+
+  data.products[idx].images.push(dataUrl);
   saveData(data);
 
-  res.json({ image: imgPath, images: data.products[idx].images });
+  try { fs.unlinkSync(filePath); } catch(e) {}
+
+  res.json({ image: dataUrl, images: data.products[idx].images });
 });
 
 app.delete('/api/admin/products/:id/images/:imgIdx', (req, res) => {
@@ -404,9 +411,9 @@ app.delete('/api/admin/products/:id/images/:imgIdx', (req, res) => {
   const removed = data.products[idx].images.splice(imgIdx, 1)[0];
   saveData(data);
 
-  const fullPath = path.join(__dirname, removed);
-  if (fs.existsSync(fullPath) && removed.startsWith('uploads/')) {
-    fs.unlinkSync(fullPath);
+  if (removed && !removed.startsWith('data:') && removed.startsWith('uploads/')) {
+    const fullPath = path.join(__dirname, removed);
+    if (fs.existsSync(fullPath)) fs.unlinkSync(fullPath);
   }
 
   res.json({ ok: true, images: data.products[idx].images });
