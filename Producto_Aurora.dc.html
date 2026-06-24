@@ -510,7 +510,7 @@ class Component extends DCLogic {
     media.push({kind:'photo', label:'Producto', img:photos[1]||fb[1], pos:'center', fit:'contain', fb:fb[1]});
     media.push({kind:'photo', label:'En Uso', img:photos[2]||fb[2], pos:'center', fit:'cover', fb:fb[2]});
     media.push({kind:'video', label:'Video', src:videoSrc, img:photos[3]||fb[3], pos:'center', fb:fb[3]});
-    media.push({kind:'photo', label:'Medidas', img:this._genMedidas(p), pos:'center', fit:'contain'});
+    media.push({kind:'photo', label:'Medidas', img:photos[4]||this._genMedidas(p), pos:'center', fit:'contain', fb:this._genMedidas(p)});
     return media;
   }
 
