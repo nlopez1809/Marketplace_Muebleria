@@ -495,16 +495,17 @@ class Component extends DCLogic {
   }
 
   getMedia(){
-    var p=this.getProduct(), imgs=p.images||[], media=[];
-    var img0=imgs.length>0?'/uploads/productos/'+imgs[0]:this._genImg(p,0);
-    var img1=imgs.length>1?'/uploads/productos/'+imgs[1]:this._genImg(p,1);
-    var img2=imgs.length>2?'/uploads/productos/'+imgs[2]:this._genImg(p,2);
-    var img3=imgs.length>3?'/uploads/productos/'+imgs[3]:this._genImg(p,3);
-    media.push({kind:'photo', label:'Ambiente', img:img0, pos:'center', fit:'cover'});
+    var p=this.getProduct(), imgs=p.images||[], media=[], fb=[];
+    for(var j=0;j<4;j++) fb.push(this._genImg(p,j));
+    var img0=imgs.length>0?'/uploads/productos/'+imgs[0]:fb[0];
+    var img1=imgs.length>1?'/uploads/productos/'+imgs[1]:fb[1];
+    var img2=imgs.length>2?'/uploads/productos/'+imgs[2]:fb[2];
+    var img3=imgs.length>3?'/uploads/productos/'+imgs[3]:fb[3];
+    media.push({kind:'photo', label:'Ambiente', img:img0, pos:'center', fit:'cover', fb:fb[0]});
     media.push({kind:'ar', label:'Ver en tu casa'});
-    media.push({kind:'photo', label:'Producto', img:img1, pos:'center', fit:'contain'});
-    media.push({kind:'photo', label:'En Uso', img:img2, pos:'center', fit:'cover'});
-    media.push({kind:'video', label:'Video', src:'', img:img3, pos:'center'});
+    media.push({kind:'photo', label:'Producto', img:img1, pos:'center', fit:'contain', fb:fb[1]});
+    media.push({kind:'photo', label:'En Uso', img:img2, pos:'center', fit:'cover', fb:fb[2]});
+    media.push({kind:'video', label:'Video', src:'', img:img3, pos:'center', fb:fb[3]});
     media.push({kind:'photo', label:'Medidas', img:this._genMedidas(p), pos:'center', fit:'contain'});
     return media;
   }
@@ -607,7 +608,7 @@ class Component extends DCLogic {
         select: (m.kind==='video'&&m.src) ? function(){self.openVideoLb(m);} : function(){self.selectMedia(i);},
         isAr:ar, isMedia:!ar, isPhoto:m.kind==='photo'||(m.kind==='video'&&!m.src),
         img:m.img||'', pos:m.pos||'center', label:m.label,
-        imgRef:function(el){ if(el && m.img){ el.src=m.img; el.style.objectPosition=m.pos||'center'; } },
+        imgRef:function(el){ if(el && m.img){ el.src=m.img; el.style.objectPosition=m.pos||'center'; if(m.fb) el.onerror=function(){el.onerror=null;el.src=m.fb;}; } },
         thumbVideoRef:function(el){ if(el && m.src && el.dataset.b!=='1'){ el.dataset.b='1'; el.src=m.src; el.addEventListener('loadeddata',function(){ try{el.currentTime=Math.min(0.6,(el.duration||1)/2);}catch(e){} },{once:true}); } },
         isVideo:m.kind==='video'&&!!m.src, is360:m.kind==='360',
         border: ar?'#F27141':(sel?'#F27141':'#E4E4E3'),
@@ -636,7 +637,7 @@ class Component extends DCLogic {
       vPhoto:active.kind==='photo', v360:active.kind==='360', vVideo:active.kind==='video', vAr:isAr,
       showStageBadge: active.kind==='photo' && am===0 && !!p.badge,
       mainImg:active.img||'', mainFit:active.fit||'contain', mainPos:active.pos||'center',
-      mainImgRef:function(el){ if(el && active.img){ el.src=active.img; el.style.objectFit=active.fit||'contain'; el.style.objectPosition=active.pos||'center'; } },
+      mainImgRef:function(el){ if(el && active.img){ el.src=active.img; el.style.objectFit=active.fit||'contain'; el.style.objectPosition=active.pos||'center'; if(active.fb) el.onerror=function(){el.onerror=null;el.src=active.fb;}; } },
       stageTitle: isAr ? 'Mira este mueble en tu casa' : p.name,
       stageSub: isAr ? 'Visualización con IA · exclusivo de InCassa Deco' : ('Galería · '+active.label),
       eyebrowBg: isAr ? '#F27141' : '#E4E4E3',
