@@ -475,6 +475,25 @@ class Component extends DCLogic {
 
   getProduct(){ return this.state._product || this.FALLBACK; }
 
+  ICONS = { sofa:'M12 50h76v22a4 4 0 0 1-4 4h-4v6h-8v-6H28v6h-8v-6h-4a4 4 0 0 1-4-4z M12 50v-8a6 6 0 0 1 6-6h64a6 6 0 0 1 6 6v8 M24 50v-6h52v6', chair:'M30 18h40v44H30z M30 62v20 M70 62v20 M30 44h40', table:'M12 40h76v6H12z M20 46v36 M82 46v36 M40 46v30 M62 46v30', bed:'M10 60h80v18H10z M10 60V46a6 6 0 0 1 6-6h22v20 M52 60V40h22a6 6 0 0 1 6 6v14 M14 78v6 M86 78v6', lamp:'M50 16l-13 26h26z M50 42v36 M36 84h28', cabinet:'M22 18h56v62H22z M50 18v62 M40 49h-5 M65 49h-5 M28 80v6 M72 80v6', outdoor:'M30 42h40v8H30z M34 50v30 M66 50v30 M30 42c0-11 8-18 20-18s20 7 20 18' };
+
+  _genImg(p, variant){
+    var t=p.tones||['#595957','#737373'], c1=t[0]||'#595957', c2=t[1]||'#737373';
+    var icon=this.ICONS[p.type]||this.ICONS.sofa;
+    var labels=['Ambiente','Producto','En Uso','Video'], angles=[135,60,200,310];
+    var v=variant||0, a=angles[v]||135, lab=labels[v]||'';
+    var rad=a*Math.PI/180, x2=(50+Math.cos(rad)*50).toFixed(1), y2=(50+Math.sin(rad)*50).toFixed(1);
+    var txt=lab?(“<text x='300' y='560' font-family='Inter,sans-serif' font-size='20' letter-spacing='3' fill='”+c1+”' opacity='0.5' text-anchor='middle'>”+lab.toUpperCase()+”</text>”):'';
+    var svg=”<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 600 600'><defs><linearGradient id='g' x1='0%' y1='0%' x2='”+x2+”%' y2='”+y2+”%'><stop offset='0' stop-color='”+c2+”'/><stop offset='1' stop-color='”+c1+”'/></linearGradient></defs><rect width='600' height='600' fill='url(#g)'/><g transform='translate(150 150) scale(3)' fill='none' stroke='”+c1+”' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round' opacity='0.42'><path d='”+icon+”'/></g>”+txt+”</svg>”;
+    return “data:image/svg+xml,”+encodeURIComponent(svg);
+  }
+
+  _genMedidas(p){
+    var dims=(p.dims||'200 x 100 cm').replace(/[×]/g,'x'), w=p.weight||'-';
+    var svg="<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 600 600'><rect width='600' height='600' fill='#F4F1EC'/><rect x='100' y='120' width='400' height='280' rx='8' fill='none' stroke='#40403E' stroke-width='2' stroke-dasharray='8 4'/><line x1='100' y1='440' x2='500' y2='440' stroke='#F27141' stroke-width='2'/><polygon points='100,435 106,440 100,445' fill='#F27141'/><polygon points='500,435 494,440 500,445' fill='#F27141'/><text x='300' y='465' font-family='Inter,sans-serif' font-size='18' fill='#40403E' text-anchor='middle'>"+dims+"</text><line x1='540' y1='120' x2='540' y2='400' stroke='#F27141' stroke-width='2'/><polygon points='535,120 540,114 545,120' fill='#F27141'/><polygon points='535,400 540,406 545,400' fill='#F27141'/><text x='300' y='560' font-family='Inter,sans-serif' font-size='16' fill='#737373' text-anchor='middle'>Peso: "+w+"</text><text x='300' y='80' font-family='Comfortaa,sans-serif' font-size='22' font-weight='700' fill='#40403E' text-anchor='middle'>MEDIDAS</text></svg>";
+    return "data:image/svg+xml,"+encodeURIComponent(svg);
+  }
+
   getMedia(){
     var p=this.getProduct(), imgs=p.images||[], media=[];
     var img0=imgs.length>0?'/uploads/productos/'+imgs[0]:this._genImg(p,0);
@@ -488,25 +507,6 @@ class Component extends DCLogic {
     media.push({kind:'video', label:'Video', src:'', img:img3, pos:'center'});
     media.push({kind:'photo', label:'Medidas', img:this._genMedidas(p), pos:'center', fit:'contain'});
     return media;
-  }
-
-  _genMedidas(p){
-    var dims=p.dims||'200 × 100 cm', w=p.weight||'—';
-    var svg="<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 600 600'><rect width='600' height='600' fill='#F4F1EC'/><rect x='100' y='120' width='400' height='280' rx='8' fill='none' stroke='#40403E' stroke-width='2' stroke-dasharray='8 4'/><line x1='100' y1='440' x2='500' y2='440' stroke='#F27141' stroke-width='2'/><polygon points='100,435 106,440 100,445' fill='#F27141'/><polygon points='500,435 494,440 500,445' fill='#F27141'/><text x='300' y='465' font-family='Inter,sans-serif' font-size='18' fill='#40403E' text-anchor='middle'>"+dims+"</text><line x1='540' y1='120' x2='540' y2='400' stroke='#F27141' stroke-width='2'/><polygon points='535,120 540,114 545,120' fill='#F27141'/><polygon points='535,400 540,406 545,400' fill='#F27141'/><text x='300' y='560' font-family='Inter,sans-serif' font-size='16' fill='#737373' text-anchor='middle'>Peso: "+w+"</text><text x='300' y='80' font-family='Comfortaa,sans-serif' font-size='22' font-weight='700' fill='#40403E' text-anchor='middle'>MEDIDAS</text></svg>";
-    return "data:image/svg+xml,"+encodeURIComponent(svg);
-  }
-
-  ICONS = { sofa:'M12 50h76v22a4 4 0 0 1-4 4h-4v6h-8v-6H28v6h-8v-6h-4a4 4 0 0 1-4-4z M12 50v-8a6 6 0 0 1 6-6h64a6 6 0 0 1 6 6v8 M24 50v-6h52v6', chair:'M30 18h40v44H30z M30 62v20 M70 62v20 M30 44h40', table:'M12 40h76v6H12z M20 46v36 M82 46v36 M40 46v30 M62 46v30', bed:'M10 60h80v18H10z M10 60V46a6 6 0 0 1 6-6h22v20 M52 60V40h22a6 6 0 0 1 6 6v14 M14 78v6 M86 78v6', lamp:'M50 16l-13 26h26z M50 42v36 M36 84h28', cabinet:'M22 18h56v62H22z M50 18v62 M40 49h-5 M65 49h-5 M28 80v6 M72 80v6', outdoor:'M30 42h40v8H30z M34 50v30 M66 50v30 M30 42c0-11 8-18 20-18s20 7 20 18' };
-
-  _genImg(p, variant){
-    var t=p.tones||['#595957','#737373'], c1=t[0]||'#595957', c2=t[1]||'#737373';
-    var icon=this.ICONS[p.type]||this.ICONS.sofa;
-    var labels=['Ambiente','Producto','En Uso','Video'], angles=[135,60,200,310];
-    var v=variant||0, a=angles[v]||135, lab=labels[v]||'';
-    var rad=a*Math.PI/180, x2=(50+Math.cos(rad)*50).toFixed(1), y2=(50+Math.sin(rad)*50).toFixed(1);
-    var txt=lab?(“<text x='300' y='560' font-family='Inter,sans-serif' font-size='20' letter-spacing='3' fill='”+c1+”' opacity='0.5' text-anchor='middle'>”+lab.toUpperCase()+”</text>”):'';
-    var svg=”<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 600 600'><defs><linearGradient id='g' x1='0%' y1='0%' x2='”+x2+”%' y2='”+y2+”%'><stop offset='0' stop-color='”+c2+”'/><stop offset='1' stop-color='”+c1+”'/></linearGradient></defs><rect width='600' height='600' fill='url(#g)'/><g transform='translate(150 150) scale(3)' fill='none' stroke='”+c1+”' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round' opacity='0.42'><path d='”+icon+”'/></g>”+txt+”</svg>”;
-    return “data:image/svg+xml,”+encodeURIComponent(svg);
   }
 
   fmt(n){ return 'Bs ' + n.toLocaleString('es-BO'); }
