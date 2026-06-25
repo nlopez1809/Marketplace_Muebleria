@@ -1,7 +1,7 @@
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
-const Anthropic = require('@anthropic-ai/sdk');
+const { GoogleGenerativeAI } = require('@google/generative-ai');
 const path = require('path');
 const fs = require('fs');
 const multer = require('multer');
@@ -12,9 +12,7 @@ app.use(express.json());
 app.use(express.static(path.join(__dirname)));
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
-const anthropic = new Anthropic.default({
-  apiKey: process.env.ANTHROPIC_API_KEY,
-});
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
 
 const DATA_FILE = path.join(__dirname, 'data.json');
@@ -201,14 +199,19 @@ app.post('/api/chat', async (req, res) => {
   const dynamicPrompt = SYSTEM_PROMPT + `\n\n## ASESOR DE TURNO\nEl asesor asignado a esta conversación es **${asesor.nombre}** (teléfono: ${asesor.telefono}). Usa estos datos cuando debas derivar al cliente.`;
 
   try {
-    const response = await anthropic.messages.create({
-      model: 'claude-haiku-4-5',
-      max_tokens: 1024,
-      system: dynamicPrompt,
-      messages: history,
+    const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' });
+
+    const geminiHistory = history.slice(0, -1).map(function(m) {
+      return { role: m.role === 'assistant' ? 'model' : 'user', parts: [{ text: m.content }] };
     });
 
-    let assistantMessage = response.content[0].text;
+    const chat = model.startChat({
+      history: geminiHistory,
+      systemInstruction: { parts: [{ text: dynamicPrompt }] },
+    });
+
+    const result = await chat.sendMessage(message);
+    let assistantMessage = result.response.text();
 
     const leadMatch = assistantMessage.match(/<!--LEAD:(.*?)-->/);
     if (leadMatch) {
@@ -240,7 +243,9 @@ app.post('/api/chat', async (req, res) => {
 
     history.push({ role: 'assistant', content: assistantMessage });
 
-    const sessionTokens = response.usage.input_tokens + response.usage.output_tokens;
+    const inputTokens = result.response.usageMetadata ? result.response.usageMetadata.promptTokenCount || 0 : 0;
+    const outputTokens = result.response.usageMetadata ? result.response.usageMetadata.candidatesTokenCount || 0 : 0;
+    const sessionTokens = inputTokens + outputTokens;
     tokenUsage.set(sessionId, used + sessionTokens);
 
     if (history.length > 40) {
@@ -249,7 +254,7 @@ app.post('/api/chat', async (req, res) => {
 
     res.json({ reply: assistantMessage, tokensUsed: used + sessionTokens, tokenLimit: TOKEN_LIMIT });
   } catch (error) {
-    console.error('Error calling Claude API:', error.message);
+    console.error('Error calling Gemini API:', error.message);
     res.status(500).json({ error: 'Error al procesar tu mensaje. Intenta de nuevo.' });
   }
 });
