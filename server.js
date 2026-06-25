@@ -199,7 +199,7 @@ app.post('/api/chat', async (req, res) => {
   const dynamicPrompt = SYSTEM_PROMPT + `\n\n## ASESOR DE TURNO\nEl asesor asignado a esta conversación es **${asesor.nombre}** (teléfono: ${asesor.telefono}). Usa estos datos cuando debas derivar al cliente.`;
 
   try {
-    const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' });
+    const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
 
     const geminiHistory = history.slice(0, -1).map(function(m) {
       return { role: m.role === 'assistant' ? 'model' : 'user', parts: [{ text: m.content }] };
