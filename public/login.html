@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>InCassa DECO — Admin Login</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Comfortaa:wght@400;600;700&family=Inter:wght@400;500;600;700&display=swap');
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { font-family:'Inter',sans-serif; background:#40403E; display:flex; align-items:center; justify-content:center; min-height:100vh; }
+  .login-card {
+    background:#fff; border-radius:8px; padding:48px 40px; width:100%; max-width:400px;
+    box-shadow:0 20px 60px rgba(0,0,0,.3); text-align:center;
+  }
+  .logo { font-family:'Comfortaa',sans-serif; font-size:24px; font-weight:700; color:#40403E; margin-bottom:4px; }
+  .logo span { color:#F27141; }
+  .subtitle { font-size:11px; letter-spacing:.12em; text-transform:uppercase; color:#9A9A98; margin-bottom:32px; }
+  .field { text-align:left; margin-bottom:18px; }
+  .field label { display:block; font-size:12px; font-weight:600; color:#737373; letter-spacing:.04em; margin-bottom:6px; }
+  .field input {
+    width:100%; height:46px; border:1.5px solid #E4E4E3; border-radius:4px; padding:0 14px;
+    font-family:'Inter',sans-serif; font-size:14px; color:#40403E; outline:none; transition:border-color .2s;
+  }
+  .field input:focus { border-color:#F27141; }
+  .btn {
+    width:100%; height:48px; background:#F27141; color:#fff; border:none; border-radius:4px;
+    font-family:'Inter',sans-serif; font-size:14px; font-weight:600; letter-spacing:.04em; cursor:pointer;
+    transition:background .2s; margin-top:8px;
+  }
+  .btn:hover { background:#ef6330; }
+  .btn:disabled { background:#ccc; cursor:not-allowed; }
+  .error {
+    margin-top:14px; padding:10px 14px; background:#FFF0F0; border:1px solid #FFCDD2; border-radius:4px;
+    color:#C62828; font-size:13px; display:none;
+  }
+  .back { margin-top:20px; }
+  .back a { font-size:13px; color:#9A9A98; text-decoration:none; transition:color .2s; }
+  .back a:hover { color:#F27141; }
+</style>
+</head>
+<body>
+<div class="login-card">
+  <div class="logo">InCassa <span>DECO</span></div>
+  <div class="subtitle">Panel de Administracion</div>
+
+  <form id="loginForm">
+    <div class="field">
+      <label for="user">Usuario</label>
+      <input type="text" id="user" name="user" autocomplete="username" required autofocus />
+    </div>
+    <div class="field">
+      <label for="password">Contrasena</label>
+      <input type="password" id="password" name="password" autocomplete="current-password" required />
+    </div>
+    <button type="submit" class="btn" id="loginBtn">Iniciar Sesion</button>
+  </form>
+
+  <div class="error" id="errorMsg"></div>
+
+  <div class="back">
+    <a href="/muebleBo.dc.html">&larr; Volver a la tienda</a>
+  </div>
+</div>
+
+<script>
+document.getElementById('loginForm').addEventListener('submit', async function(e) {
+  e.preventDefault();
+  var btn = document.getElementById('loginBtn');
+  var err = document.getElementById('errorMsg');
+  err.style.display = 'none';
+  btn.disabled = true;
+  btn.textContent = 'Ingresando...';
+
+  try {
+    var res = await fetch('/api/auth/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'same-origin',
+      body: JSON.stringify({
+        user: document.getElementById('user').value,
+        password: document.getElementById('password').value
+      })
+    });
+    var data = await res.json();
+    if (res.ok && data.ok) {
+      window.location.href = '/admin.html';
+    } else {
+      err.textContent = data.error || 'Error al iniciar sesion';
+      err.style.display = 'block';
+    }
+  } catch (ex) {
+    err.textContent = 'Error de conexion. Intenta de nuevo.';
+    err.style.display = 'block';
+  }
+  btn.disabled = false;
+  btn.textContent = 'Iniciar Sesion';
+});
+</script>
+</body>
+</html>
