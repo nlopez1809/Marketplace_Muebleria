@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const { chat } = require('../services/ai');
 const storage = require('../services/storage');
+const supabase = require('../services/supabase');
 const SYSTEM_PROMPT = require('../config/prompt');
 
 const TOKEN_LIMIT = 100000;
@@ -10,9 +11,10 @@ const tokenUsage = new Map();
 const sessionAdvisor = new Map();
 let asesorIndex = 0;
 
-function getAsesorDeTurno() {
-  const data = storage.load();
-  const asesor = data.asesores[asesorIndex % data.asesores.length];
+async function getAsesorDeTurno() {
+  const asesores = await storage.getAsesores();
+  if (!asesores.length) return { nombre: 'Asesor', telefono: '+591 70000000' };
+  const asesor = asesores[asesorIndex % asesores.length];
   asesorIndex++;
   return asesor;
 }
@@ -34,7 +36,7 @@ router.post('/', async (req, res) => {
   }
 
   if (!sessionAdvisor.has(sessionId)) {
-    sessionAdvisor.set(sessionId, getAsesorDeTurno());
+    sessionAdvisor.set(sessionId, await getAsesorDeTurno());
   }
   const asesor = sessionAdvisor.get(sessionId);
 
@@ -51,26 +53,27 @@ router.post('/', async (req, res) => {
     if (leadMatch) {
       try {
         const leadData = JSON.parse(leadMatch[1]);
-        const data = storage.load();
-        const existing = data.leads.find(l => l.sessionId === sessionId);
+        const { data: existing } = await supabase
+          .from('leads')
+          .select('*')
+          .eq('session_id', sessionId)
+          .single();
+
         if (existing) {
-          if (leadData.nombre) existing.nombre = leadData.nombre;
-          if (leadData.telefono) existing.telefono = leadData.telefono;
-          if (leadData.ci) existing.ci = leadData.ci;
-          existing.updatedAt = new Date().toISOString();
+          const updates = { updated_at: new Date().toISOString() };
+          if (leadData.nombre) updates.nombre = leadData.nombre;
+          if (leadData.telefono) updates.telefono = leadData.telefono;
+          if (leadData.ci) updates.ci = leadData.ci;
+          await supabase.from('leads').update(updates).eq('session_id', sessionId);
         } else {
-          data.leads.push({
-            id: Date.now(),
-            sessionId,
+          await storage.createLead({
+            session_id: sessionId,
             nombre: leadData.nombre || '',
             telefono: leadData.telefono || '',
             ci: leadData.ci || '',
-            productoInteres: '',
-            createdAt: new Date().toISOString(),
-            updatedAt: new Date().toISOString()
+            producto_interes: '',
           });
         }
-        storage.save(data);
       } catch (e) { console.error('Error parsing lead:', e.message); }
       assistantMessage = assistantMessage.replace(/<!--LEAD:.*?-->/g, '').trim();
     }

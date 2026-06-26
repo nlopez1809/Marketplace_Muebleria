@@ -2,7 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
-const session = require('express-session');
+const cookieParser = require('cookie-parser');
 const path = require('path');
 
 const { requireAuth, login, logout, checkSession } = require('./middleware/auth');
@@ -60,18 +60,8 @@ const loginLimiter = rateLimit({
 app.use(express.json({ limit: '10mb' }));
 app.use(sanitizeBody);
 
-// ── Sessions ──
-app.use(session({
-  secret: process.env.SESSION_SECRET || 'incassa-deco-secret-change-me',
-  resave: false,
-  saveUninitialized: false,
-  cookie: {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
-    maxAge: 4 * 60 * 60 * 1000,
-    sameSite: 'lax',
-  },
-}));
+// ── Cookie parsing ──
+app.use(cookieParser());
 
 // ── Static files ──
 app.use(express.static(path.join(__dirname, '..', 'public')));
@@ -94,10 +84,7 @@ app.use('/api/admin/leads', requireAuth, leadRoutes);
 app.use('/api/admin/asesores', requireAuth, asesoresRoutes);
 
 // ── Admin page (protected) ──
-app.get('/admin.html', (req, res, next) => {
-  if (req.session && req.session.admin) return next();
-  res.redirect('/login.html');
-});
+app.get('/admin.html', requireAuth);
 
 app.get('/', (req, res) => {
   res.redirect('/muebleBo.dc.html');

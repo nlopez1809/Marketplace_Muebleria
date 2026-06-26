@@ -2,43 +2,46 @@ const express = require('express');
 const router = express.Router();
 const storage = require('../services/storage');
 
-router.get('/', (req, res) => {
-  const data = storage.load();
-  res.json(data.asesores);
+router.get('/', async (req, res) => {
+  try {
+    const asesores = await storage.getAsesores();
+    res.json(asesores);
+  } catch (e) {
+    res.status(500).json({ error: 'Error al obtener asesores' });
+  }
 });
 
-router.post('/', (req, res) => {
-  const data = storage.load();
-  const { nombre, telefono } = req.body;
-  if (!nombre || !telefono) return res.status(400).json({ error: 'nombre y telefono son requeridos' });
-
-  const id = (data.asesores.length ? Math.max(...data.asesores.map(a => a.id)) : 0) + 1;
-  const asesor = { id, nombre, telefono };
-  data.asesores.push(asesor);
-  storage.save(data);
-  res.json(asesor);
+router.post('/', async (req, res) => {
+  try {
+    const { nombre, telefono } = req.body;
+    if (!nombre || !telefono) return res.status(400).json({ error: 'nombre y telefono son requeridos' });
+    const asesor = await storage.createAsesor({ nombre, telefono });
+    res.json(asesor);
+  } catch (e) {
+    res.status(500).json({ error: 'Error al crear asesor' });
+  }
 });
 
-router.put('/:id', (req, res) => {
-  const data = storage.load();
-  const idx = data.asesores.findIndex(a => a.id === parseInt(req.params.id));
-  if (idx === -1) return res.status(404).json({ error: 'Asesor no encontrado' });
-
-  const { nombre, telefono } = req.body;
-  if (nombre) data.asesores[idx].nombre = nombre;
-  if (telefono) data.asesores[idx].telefono = telefono;
-  storage.save(data);
-  res.json(data.asesores[idx]);
+router.put('/:id', async (req, res) => {
+  try {
+    const { nombre, telefono } = req.body;
+    const updates = {};
+    if (nombre) updates.nombre = nombre;
+    if (telefono) updates.telefono = telefono;
+    const asesor = await storage.updateAsesor(parseInt(req.params.id), updates);
+    res.json(asesor);
+  } catch (e) {
+    res.status(500).json({ error: 'Error al actualizar asesor' });
+  }
 });
 
-router.delete('/:id', (req, res) => {
-  const data = storage.load();
-  const idx = data.asesores.findIndex(a => a.id === parseInt(req.params.id));
-  if (idx === -1) return res.status(404).json({ error: 'Asesor no encontrado' });
-
-  data.asesores.splice(idx, 1);
-  storage.save(data);
-  res.json({ ok: true });
+router.delete('/:id', async (req, res) => {
+  try {
+    await storage.deleteAsesor(parseInt(req.params.id));
+    res.json({ ok: true });
+  } catch (e) {
+    res.status(500).json({ error: 'Error al eliminar asesor' });
+  }
 });
 
 module.exports = router;
