@@ -674,10 +674,15 @@ class Component extends DCLogic {
       .then(function(data){
         var reply=data.reply||'Lo siento, hubo un error. Intenta de nuevo.';
         if(self._decoHistory) self._decoHistory.push({role:'assistant',content:reply});
-        self.setState(function(s){return{decoMessages:[].concat(s.decoMessages,[{role:'bot',text:reply}]),_decoLoading:false};});
+        var delay=Math.min(800+reply.length*12,3000);
+        setTimeout(function(){
+          self.setState(function(s){return{decoMessages:[].concat(s.decoMessages,[{role:'bot',text:reply}]),_decoLoading:false};});
+        },delay);
       })
       .catch(function(){
-        self.setState(function(s){return{decoMessages:[].concat(s.decoMessages,[{role:'bot',text:'Error de conexión. Intenta de nuevo.'}]),_decoLoading:false};});
+        setTimeout(function(){
+          self.setState(function(s){return{decoMessages:[].concat(s.decoMessages,[{role:'bot',text:'Error de conexión. Intenta de nuevo.'}]),_decoLoading:false};});
+        },1000);
       });
   }
   _applyDeco(){ var open=this.state.deco; if(this._decoPanel) this._decoPanel.style.transform=open?'translateX(0)':'translateX(-100%)'; if(this._main) this._main.style.marginLeft=open?'360px':'0'; if(this._buyBar) this._buyBar.style.left=open?'360px':'0'; }

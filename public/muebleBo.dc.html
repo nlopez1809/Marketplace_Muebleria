@@ -814,10 +814,15 @@ class Component extends DCLogic {
       .then(function(data){
         var reply=data.reply||'Lo siento, hubo un error. Intenta de nuevo.';
         if(self._decoHistory) self._decoHistory.push({role:'assistant',content:reply});
-        self.setState(function(s){return{decoMessages:[].concat(s.decoMessages,[{role:'bot',text:reply}]),_decoLoading:false};});
+        var delay=Math.min(800+reply.length*12,3000);
+        setTimeout(function(){
+          self.setState(function(s){return{decoMessages:[].concat(s.decoMessages,[{role:'bot',text:reply}]),_decoLoading:false};});
+        },delay);
       })
       .catch(function(){
-        self.setState(function(s){return{decoMessages:[].concat(s.decoMessages,[{role:'bot',text:'Error de conexión. Intenta de nuevo.'}]),_decoLoading:false};});
+        setTimeout(function(){
+          self.setState(function(s){return{decoMessages:[].concat(s.decoMessages,[{role:'bot',text:'Error de conexión. Intenta de nuevo.'}]),_decoLoading:false};});
+        },1000);
       });
   }
   _applyDeco(){
