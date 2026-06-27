@@ -340,7 +340,7 @@ function renderProductImages(images) {
     return;
   }
   gallery.innerHTML = images.map((img, i) => {
-    const src = img.startsWith('data:') ? img : '/' + img;
+    const src = img.startsWith('data:') || img.startsWith('http') ? img : '/' + img;
     const isVid = img.startsWith('data:video') || /\.(mp4|webm|mov)$/i.test(img);
     const media = isVid
       ? `<video src="${src}" style="width:100%;height:100%;object-fit:cover" muted></video>`

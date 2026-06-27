@@ -554,7 +554,7 @@ class Component extends DCLogic {
     return "data:image/svg+xml,"+encodeURIComponent(svg);
   }
 
-  _imgSrc(imgs,i){ var s=imgs[i]; if(!s) return null; return s.indexOf('data:')===0?s:'/uploads/productos/'+s; }
+  _imgSrc(imgs,i){ var s=imgs[i]; if(!s) return null; return s.indexOf('data:')===0||s.indexOf('http')===0?s:'/uploads/productos/'+s; }
   _isVid(s){ return s&&(s.indexOf('data:video')===0||/\.(mp4|webm|mov)$/i.test(s)); }
   getMedia(){
     var p=this.getProduct(), imgs=p.images||[], media=[], fb=[];

@@ -868,7 +868,7 @@ class Component extends DCLogic {
     window.open('https://wa.me/'+a.telefono+'?text='+encodeURIComponent(msg),'_blank');
   }
 
-  _imgUrl(s){ return s.indexOf('data:')===0?'url("'+s+'")':'url("/uploads/productos/'+s+'")'; }
+  _imgUrl(s){ return s.indexOf('data:')===0||s.indexOf('http')===0?'url("'+s+'")':'url("/uploads/productos/'+s+'")'; }
   prodImgReal(p, variant){
     var imgs=p.images||[];
     var v=variant||0;
