@@ -53,8 +53,8 @@
 
 <div ref="{{ mainRef }}" style="background:#F2F2F2;min-height:100vh;overflow-x:hidden;transition:margin-left .42s cubic-bezier(.16,.84,.44,1)">
 
-  <!-- ============ NAVBAR + CATEGORY STRIP (sticky) ============ -->
-  <div style="position:sticky;top:0;z-index:60">
+  <!-- ============ NAVBAR + CATEGORY STRIP (fixed) ============ -->
+  <div style="position:fixed;top:0;left:0;right:0;z-index:60">
   <header style="background:#40403E;border-bottom:1px solid rgba(242,113,65,.22)">
     <div style="max-width:1320px;margin:0 auto;padding:0 28px;height:74px;display:flex;align-items:center;gap:34px">
       <a href="#top" style="display:flex;align-items:center;gap:11px;text-decoration:none;flex:none">
@@ -95,7 +95,8 @@
       </sc-for>
     </div>
   </div>
-  </div><!-- end sticky wrapper -->
+  </div><!-- end fixed wrapper -->
+  <div style="height:118px"></div><!-- spacer for fixed navbar -->
 
   <!-- ============ HERO (BENTO) ============ -->
   <section id="top" style="background:#F2F2F2;padding:18px 0 28px">
