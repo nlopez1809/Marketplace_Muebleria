@@ -667,10 +667,13 @@ class Component extends DCLogic {
     if(!this._decoSessionId) this._decoSessionId='deco-prod-'+Math.random().toString(36).slice(2,10);
     this.setState(function(s){return{ decoMessages:[].concat(s.decoMessages,[{role:'user',text:t}]), decoInput:'', _decoLoading:true };});
     var self=this;
-    fetch('/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:t,sessionId:this._decoSessionId})})
+    if(!this._decoHistory) this._decoHistory=[];
+    this._decoHistory.push({role:'user',content:t});
+    fetch('/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:t,sessionId:this._decoSessionId,history:this._decoHistory})})
       .then(function(r){return r.json();})
       .then(function(data){
         var reply=data.reply||'Lo siento, hubo un error. Intenta de nuevo.';
+        if(self._decoHistory) self._decoHistory.push({role:'assistant',content:reply});
         self.setState(function(s){return{decoMessages:[].concat(s.decoMessages,[{role:'bot',text:reply}]),_decoLoading:false};});
       })
       .catch(function(){

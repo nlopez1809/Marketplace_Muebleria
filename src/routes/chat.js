@@ -5,10 +5,6 @@ const storage = require('../services/storage');
 const supabase = require('../services/supabase');
 const SYSTEM_PROMPT = require('../config/prompt');
 
-const TOKEN_LIMIT = 100000;
-const conversations = new Map();
-const tokenUsage = new Map();
-const sessionAdvisor = new Map();
 let asesorIndex = 0;
 
 async function getAsesorDeTurno() {
@@ -20,33 +16,20 @@ async function getAsesorDeTurno() {
 }
 
 router.post('/', async (req, res) => {
-  const { message, sessionId } = req.body;
+  const { message, sessionId, history } = req.body;
 
   if (!message || !sessionId) {
     return res.status(400).json({ error: 'message y sessionId son requeridos' });
   }
 
-  const used = tokenUsage.get(sessionId) || 0;
-  if (used >= TOKEN_LIMIT) {
-    return res.json({ reply: 'Has alcanzado el límite de esta sesión. Por favor, contáctanos por WhatsApp al +591 70000000 para seguir conversando. ¡Será un gusto atenderte! 😊' });
-  }
+  const chatHistory = Array.isArray(history) ? history : [];
 
-  if (!conversations.has(sessionId)) {
-    conversations.set(sessionId, []);
-  }
-
-  if (!sessionAdvisor.has(sessionId)) {
-    sessionAdvisor.set(sessionId, await getAsesorDeTurno());
-  }
-  const asesor = sessionAdvisor.get(sessionId);
-
-  const history = conversations.get(sessionId);
-  history.push({ role: 'user', content: message });
+  const asesor = await getAsesorDeTurno();
 
   const dynamicPrompt = SYSTEM_PROMPT + `\n\n## ASESOR DE TURNO\nEl asesor asignado a esta conversación es **${asesor.nombre}** (teléfono: ${asesor.telefono}). Usa estos datos cuando debas derivar al cliente.`;
 
   try {
-    const result = await chat(message, history, dynamicPrompt);
+    const result = await chat(message, chatHistory, dynamicPrompt);
     let assistantMessage = result.text;
 
     const leadMatch = assistantMessage.match(/<!--LEAD:(.*?)-->/);
@@ -78,15 +61,7 @@ router.post('/', async (req, res) => {
       assistantMessage = assistantMessage.replace(/<!--LEAD:.*?-->/g, '').trim();
     }
 
-    history.push({ role: 'assistant', content: assistantMessage });
-
-    tokenUsage.set(sessionId, used + result.tokens);
-
-    if (history.length > 40) {
-      history.splice(0, 2);
-    }
-
-    res.json({ reply: assistantMessage, tokensUsed: used + result.tokens, tokenLimit: TOKEN_LIMIT });
+    res.json({ reply: assistantMessage, tokens: result.tokens });
   } catch (error) {
     console.error('Error calling AI:', error.message);
     res.status(500).json({ error: 'Error al procesar tu mensaje. Intenta de nuevo.' });
@@ -94,12 +69,6 @@ router.post('/', async (req, res) => {
 });
 
 router.post('/reset', (req, res) => {
-  const { sessionId } = req.body;
-  if (sessionId) {
-    conversations.delete(sessionId);
-    tokenUsage.delete(sessionId);
-    sessionAdvisor.delete(sessionId);
-  }
   res.json({ ok: true });
 });
 
