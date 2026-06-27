@@ -807,7 +807,7 @@ class Component extends DCLogic {
     if(!this._decoSessionId) this._decoSessionId = 'deco-dc-' + Math.random().toString(36).slice(2,10);
     this.setState(s=>({ decoMessages:[...s.decoMessages,{role:'user',text:t}], decoInput:'', _decoLoading:true }));
     const self=this;
-    if(!this._decoHistory) this._decoHistory=[];
+    if(!this._decoHistory) this._decoHistory=[{role:'assistant',content:'¡Hola! Bienvenido/a a InCassa DECO ✨ Soy Deco IA, tu asistente personal de muebles y decoración. Para brindarte una atención personalizada, ¿con quién tengo el gusto de conversar?'}];
     this._decoHistory.push({role:'user',content:t});
     fetch('/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:t,sessionId:this._decoSessionId,history:this._decoHistory})})
       .then(function(r){return r.json();})
