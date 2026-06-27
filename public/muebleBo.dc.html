@@ -53,8 +53,9 @@
 
 <div ref="{{ mainRef }}" style="background:#F2F2F2;min-height:100vh;overflow-x:hidden;transition:margin-left .42s cubic-bezier(.16,.84,.44,1)">
 
-  <!-- ============ NAVBAR ============ -->
-  <header style="position:sticky;top:0;z-index:60;background:#40403E;border-bottom:1px solid rgba(242,113,65,.22)">
+  <!-- ============ NAVBAR + CATEGORY STRIP (sticky) ============ -->
+  <div style="position:sticky;top:0;z-index:60">
+  <header style="background:#40403E;border-bottom:1px solid rgba(242,113,65,.22)">
     <div style="max-width:1320px;margin:0 auto;padding:0 28px;height:74px;display:flex;align-items:center;gap:34px">
       <a href="#top" style="display:flex;align-items:center;gap:11px;text-decoration:none;flex:none">
         <svg width="34" height="34" viewBox="0 0 100 100" fill="none" stroke="#F27141" stroke-width="8.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 51V80q0 8 8 8h40q8 0 8-8V51"></path><path d="M13 57 50 22l37 35"></path><path d="M34 42V28"></path></svg>
@@ -83,7 +84,7 @@
   </header>
 
   <!-- ============ CATEGORY STRIP ============ -->
-  <div style="position:sticky;top:74px;z-index:59;background:#FFFFFF;border-bottom:1px solid #E4E4E3">
+  <div style="background:#FFFFFF;border-bottom:1px solid #E4E4E3">
     <div class="mb-scroll-x mb-hide-scroll" style="max-width:1320px;margin:0 auto;padding:11px 28px;display:flex;gap:30px;align-items:center;overflow-x:auto;white-space:nowrap">
       <button onClick="{{ toggleDeco }}" title="Abrir Deco IA, tu asistente" style="flex:none;background:linear-gradient(118deg,#7E5BC4 0%,#9B6FC9 42%,#D8BE8C 100%);color:#FFFFFF;border:none;border-radius:999px;padding:9px 17px;font-family:'Comfortaa',sans-serif;font-weight:700;font-size:11px;letter-spacing:.14em;text-transform:uppercase;cursor:pointer;display:flex;align-items:center;gap:7px;box-shadow:0 1px 6px rgba(192,101,201,.25);transition:filter .2s,transform .15s" style-hover="filter:brightness(1.07)" style-active="transform:scale(.96)">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.4a8 8 0 0 1-11.5 7.2L4 20l1.4-4.8A8 8 0 1 1 21 11.4z"></path><path d="M12.4 6.6l1.05 3.05 3.05 1.05-3.05 1.05-1.05 3.05-1.05-3.05-3.05-1.05 3.05-1.05z" fill="#FFFFFF" stroke="#FFFFFF" stroke-width="0.5"></path></svg>
@@ -94,6 +95,7 @@
       </sc-for>
     </div>
   </div>
+  </div><!-- end sticky wrapper -->
 
   <!-- ============ HERO (BENTO) ============ -->
   <section id="top" style="background:#F2F2F2;padding:18px 0 28px">
@@ -338,7 +340,7 @@
         <h2 style="font-family:'DM Serif Display',serif;font-size:46px;letter-spacing:-.7px;color:#40403E">Todo el <span style="font-style:italic;color:#F27141">mobiliario</span></h2>
       </div>
       <div style="display:grid;grid-template-columns:248px 1fr;gap:40px;align-items:start">
-        <aside style="position:sticky;top:96px">
+        <aside style="position:sticky;top:120px">
           <div style="background:#fff;border-radius:3px;padding:24px;box-shadow:0 1px 3px rgba(64,64,62,.06)">
             <div style="font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:#40403E;font-weight:700;margin-bottom:16px;display:flex;justify-content:space-between;align-items:center">Filtros <button onClick="{{ resetFilters }}" style="background:none;border:none;color:#F27141;font-size:10px;letter-spacing:.06em;cursor:pointer;text-transform:uppercase">Limpiar</button></div>
 
