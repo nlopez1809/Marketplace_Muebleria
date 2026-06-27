@@ -1,9 +1,9 @@
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
-const ADMIN_USER = process.env.ADMIN_USER || 'admin';
-const ADMIN_HASH = process.env.ADMIN_HASH || bcrypt.hashSync('incassa2024', 10);
-const JWT_SECRET = process.env.SESSION_SECRET || 'incassa-deco-secret-change-me';
+function getAdminUser() { return process.env.ADMIN_USER || 'admin'; }
+function getAdminHash() { return process.env.ADMIN_HASH || bcrypt.hashSync('incassa2024', 10); }
+function getJwtSecret() { return process.env.SESSION_SECRET || 'incassa-deco-secret-change-me'; }
 
 function requireAuth(req, res, next) {
   const token = req.cookies && req.cookies.token;
@@ -14,7 +14,7 @@ function requireAuth(req, res, next) {
     return res.status(401).json({ error: 'No autorizado. Inicia sesión.' });
   }
   try {
-    const payload = jwt.verify(token, JWT_SECRET);
+    const payload = jwt.verify(token, getJwtSecret());
     req.admin = payload;
     next();
   } catch (e) {
@@ -31,10 +31,10 @@ function login(req, res) {
   if (!user || !password) {
     return res.status(400).json({ error: 'Usuario y contraseña son requeridos' });
   }
-  if (user !== ADMIN_USER || !bcrypt.compareSync(password, ADMIN_HASH)) {
+  if (user !== getAdminUser() || !bcrypt.compareSync(password, getAdminHash())) {
     return res.status(401).json({ error: 'Credenciales incorrectas' });
   }
-  const token = jwt.sign({ user, admin: true }, JWT_SECRET, { expiresIn: '4h' });
+  const token = jwt.sign({ user, admin: true }, getJwtSecret(), { expiresIn: '4h' });
   res.cookie('token', token, {
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
@@ -53,7 +53,7 @@ function checkSession(req, res) {
   const token = req.cookies && req.cookies.token;
   if (!token) return res.json({ authenticated: false });
   try {
-    jwt.verify(token, JWT_SECRET);
+    jwt.verify(token, getJwtSecret());
     res.json({ authenticated: true });
   } catch (e) {
     res.clearCookie('token');
