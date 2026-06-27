@@ -89,17 +89,6 @@ app.use('/api/admin/asesores', requireAuth, asesoresRoutes);
 // ── Admin page (protected) ──
 app.get('/admin.html', requireAuth);
 
-// TODO: remove after debugging
-app.get('/api/debug-env', (req, res) => {
-  res.json({
-    hasAdminUser: !!process.env.ADMIN_USER,
-    adminUser: process.env.ADMIN_USER,
-    hasAdminHash: !!process.env.ADMIN_HASH,
-    hashStart: process.env.ADMIN_HASH ? process.env.ADMIN_HASH.substring(0, 10) : 'NOT SET',
-    hasSessionSecret: !!process.env.SESSION_SECRET,
-  });
-});
-
 app.get('/', (req, res) => {
   res.redirect('/muebleBo.dc.html');
 });
