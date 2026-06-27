@@ -276,7 +276,7 @@ function renderProducts() {
 
   tbody.innerHTML = filtered.map(p => {
     const raw = p.images && p.images.length ? p.images[0] : '';
-    const imgSrc = raw.startsWith('data:') ? raw : (raw ? '/' + raw : '');
+    const imgSrc = raw.startsWith('data:') || raw.startsWith('http') ? raw : (raw ? '/' + raw : '');
     const thumbHtml = imgSrc
       ? `<img class="thumb" src="${imgSrc}" alt="">`
       : `<div class="thumb" style="background:linear-gradient(135deg,${p.tones[0]},${p.tones[1]})"></div>`;
