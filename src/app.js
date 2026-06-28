@@ -80,7 +80,7 @@ app.get('/api/auth/check', checkSession);
 app.use('/api/chat', chatLimiter, chatRoutes);
 app.use('/api/products', apiLimiter, productsRoutes);
 app.use('/api/asesor', apiLimiter, asesoresRoutes);
-app.use('/api/visualize', apiLimiter, visualizeRoutes);
+app.use('/api/visualize', visualizeRoutes);
 
 // ── Admin API (protected) ──
 app.use('/api/admin/products', requireAuth, productsRoutes);
