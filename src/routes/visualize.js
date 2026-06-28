@@ -45,8 +45,8 @@ router.post('/', async (req, res) => {
     const data = await response.json();
 
     if (!response.ok || data.status === 'failed') {
-      console.error('Replicate error:', response.status, JSON.stringify(data.error || data).slice(0, 500));
-      return res.status(502).json({ error: 'Error al generar visualización', detail: data.error || 'Unknown error' });
+      console.error('Replicate error:', response.status, JSON.stringify(data).slice(0, 1000));
+      return res.status(502).json({ error: 'Error al generar visualización', detail: data.detail || data.error || data.title || JSON.stringify(data) });
     }
 
     const outputUrl = Array.isArray(data.output) ? data.output[0] : data.output;
