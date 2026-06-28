@@ -1,40 +1,25 @@
 const express = require('express');
-const https = require('https');
 const router = express.Router();
 
 function getHfToken() {
   return process.env.HF_API_TOKEN || '';
 }
 
-function callHuggingFace(imageBuffer, token) {
-  return new Promise(function(resolve, reject) {
-    var options = {
-      hostname: 'api-inference.huggingface.co',
-      path: '/models/timbrooks/instruct-pix2pix',
-      method: 'POST',
-      headers: {
-        'Authorization': 'Bearer ' + token,
-        'Content-Length': imageBuffer.length,
-      },
-      timeout: 55000,
-    };
+router.get('/test', async (req, res) => {
+  var token = getHfToken();
+  if (!token) return res.json({ status: 'no token configured' });
 
-    var req = https.request(options, function(res) {
-      var chunks = [];
-      res.on('data', function(chunk) { chunks.push(chunk); });
-      res.on('end', function() {
-        var body = Buffer.concat(chunks);
-        var ct = res.headers['content-type'] || '';
-        resolve({ status: res.statusCode, contentType: ct, body: body });
-      });
+  try {
+    var r = await fetch('https://api-inference.huggingface.co/models/timbrooks/instruct-pix2pix', {
+      method: 'GET',
+      headers: { 'Authorization': 'Bearer ' + token },
     });
-
-    req.on('error', function(err) { reject(err); });
-    req.on('timeout', function() { req.destroy(); reject(new Error('Request timeout')); });
-    req.write(imageBuffer);
-    req.end();
-  });
-}
+    var data = await r.json();
+    res.json({ status: r.status, model: data });
+  } catch (err) {
+    res.json({ status: 'error', detail: err.message || String(err) });
+  }
+});
 
 router.post('/', async (req, res) => {
   try {
@@ -53,33 +38,42 @@ router.post('/', async (req, res) => {
     var base64Data = roomImage.replace(/^data:image\/[^;]+;base64,/, '');
     var imageBuffer = Buffer.from(base64Data, 'base64');
 
-    console.log('Sending to HF, buffer size:', imageBuffer.length, 'bytes');
+    console.log('Image buffer size:', imageBuffer.length, 'bytes');
 
-    var result = await callHuggingFace(imageBuffer, token);
+    var response = await fetch('https://api-inference.huggingface.co/models/timbrooks/instruct-pix2pix', {
+      method: 'POST',
+      headers: {
+        'Authorization': 'Bearer ' + token,
+        'Content-Type': 'application/octet-stream',
+      },
+      body: imageBuffer,
+    });
 
-    console.log('HF response:', result.status, result.contentType, 'body size:', result.body.length);
+    console.log('HF status:', response.status, 'content-type:', response.headers.get('content-type'));
 
-    if (result.status !== 200) {
-      var errText = result.body.toString('utf-8');
-      console.error('HF error:', result.status, errText);
+    var contentType = response.headers.get('content-type') || '';
+
+    if (!response.ok) {
+      var errText = await response.text();
+      console.error('HF error:', response.status, errText);
       return res.status(502).json({ error: 'Error al generar visualización', detail: errText });
     }
 
-    if (result.contentType.includes('image')) {
-      var b64 = result.body.toString('base64');
-      var ext = result.contentType.includes('jpeg') ? 'jpeg' : 'png';
+    if (contentType.includes('image')) {
+      var buf = Buffer.from(await response.arrayBuffer());
+      var b64 = buf.toString('base64');
+      var ext = contentType.includes('jpeg') ? 'jpeg' : 'png';
       return res.json({ image: 'data:image/' + ext + ';base64,' + b64 });
     }
 
     var data = {};
-    try { data = JSON.parse(result.body.toString('utf-8')); } catch(e) {}
+    try { data = await response.json(); } catch(e) {}
 
     if (data.error) {
-      console.error('HF API error:', data.error);
       return res.status(502).json({ error: 'Error al generar visualización', detail: data.error });
     }
 
-    return res.status(502).json({ error: 'Respuesta inesperada', detail: result.contentType });
+    return res.status(502).json({ error: 'Respuesta inesperada', detail: contentType });
   } catch (err) {
     var msg = err ? (err.message || String(err)) : 'unknown';
     console.error('Visualize catch:', msg);
