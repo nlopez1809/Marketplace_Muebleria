@@ -639,9 +639,11 @@ class Component extends DCLogic {
         if(data.image){
           self.setState({ar:'placed',_aiResult:data.image, bedX:0, bedScale:100});
         } else {
+          console.error('Visualize API error:', data.error, data.detail);
           self.setState({ar:'placed',_aiResult:null, bedX:0, bedScale:100});
         }
-      }).catch(function(){
+      }).catch(function(err){
+        console.error('Visualize fetch error:', err);
         self.setState({ar:'placed',_aiResult:null, bedX:0, bedScale:100});
       });
     };

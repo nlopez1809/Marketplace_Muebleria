@@ -40,17 +40,23 @@ router.post('/', async (req, res) => {
         seed: -1,
         img_width: 768,
         img_height: 768,
+        base64: true,
       }),
     });
 
     if (!response.ok) {
       const errorText = await response.text();
       console.error('Segmind error:', response.status, errorText);
-      return res.status(502).json({ error: 'Error al generar visualización' });
+      return res.status(502).json({ error: 'Error al generar visualización', detail: errorText });
     }
 
-    const buffer = await response.arrayBuffer();
-    const resultBase64 = Buffer.from(buffer).toString('base64');
+    const data = await response.json();
+    const resultBase64 = data.image || data.output || data.data;
+
+    if (!resultBase64) {
+      console.error('Segmind: no image in response', JSON.stringify(data).slice(0, 500));
+      return res.status(502).json({ error: 'No se recibió imagen de la IA' });
+    }
 
     res.json({
       image: 'data:image/png;base64,' + resultBase64,
