@@ -20,7 +20,7 @@ router.post('/', async (req, res) => {
 
     const base64Data = roomImage.replace(/^data:image\/\w+;base64,/, '');
 
-    const prompt = `A realistic interior design photo showing a ${productName || 'elegant furniture piece'} placed naturally in this room. ${productDescription || 'Premium quality furniture'}. The furniture blends perfectly with the room's lighting, shadows, and perspective. Photorealistic, interior design magazine quality.`;
+    const prompt = `Ultra-realistic interior design photograph. Place a ${productName || 'elegant furniture piece'} (${productDescription || 'premium quality furniture'}) into this exact room, perfectly proportional to the real dimensions of the space. The furniture must match the room's perspective, vanishing points, lighting direction, shadow angles and color temperature. Add subtle decorative details that complement the existing style: a textured throw blanket, decorative cushions, a small plant or vase nearby, and a soft area rug if appropriate. Everything must look like a single real photograph taken by an interior design magazine photographer. 8K, photorealistic, natural lighting, no artifacts, no floating objects.`;
 
     const response = await fetch('https://api.segmind.com/v1/sd1.5-img2img', {
       method: 'POST',
@@ -31,7 +31,7 @@ router.post('/', async (req, res) => {
       body: JSON.stringify({
         image: base64Data,
         prompt: prompt,
-        negative_prompt: 'blurry, distorted, low quality, cartoon, drawing, painting, watermark, text, logo, unrealistic, floating furniture',
+        negative_prompt: 'blurry, distorted, low quality, cartoon, drawing, painting, watermark, text, logo, unrealistic, floating furniture, disproportionate, oversized, undersized, wrong perspective, duplicate furniture, extra limbs, deformed, disfigured, bad anatomy, out of frame',
         samples: 1,
         scheduler: 'DDIM',
         num_inference_steps: 30,
