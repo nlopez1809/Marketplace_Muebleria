@@ -821,7 +821,7 @@ class Component extends DCLogic {
       triggerUpload:function(){self.triggerUpload();},
       onFileSelected:function(e){self.onFileSelected(e);},
       hasAiResult:!!self.state._aiResult, noAiResult:!self.state._aiResult,
-      aiResultRef:function(el){ if(el && self.state._aiResult) el.src=self.state._aiResult; },
+      aiResultRef:function(el){ if(el && self.state._aiResult){ el.src=self.state._aiResult; el.onerror=function(){el.onerror=null;self.setState({_aiResult:null});}; } },
       roomImgRef:function(el){ if(el){ var src=self.state._roomSrc; if(src) el.src=src; else el.src=''; } },
       productOverlayRef:function(el){ if(el){ var p=self.getProduct(); var m=self.getMedia(); var img=''; var prodView=m[2]; if(prodView&&prodView.img) img=prodView.img; if(!img){ for(var i=0;i<m.length;i++){if(m[i].kind==='photo'&&m[i].img){img=m[i].img;break;}} } if(!img) img=self._genImg(p,'front'); el.src=img; el.style.background='transparent'; } },
       placeBed:function(){self.placeBed();}, resetAr:function(){self.resetAr();},
