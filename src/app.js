@@ -58,7 +58,7 @@ const loginLimiter = rateLimit({
 });
 
 // ── Body parsing + sanitization ──
-app.use(express.json({ limit: '10mb' }));
+app.use(express.json({ limit: '20mb' }));
 app.use((req, res, next) => {
   if (req.path === '/api/auth/login') return next();
   sanitizeBody(req, res, next);
