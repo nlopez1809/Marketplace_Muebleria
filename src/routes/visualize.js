@@ -1,4 +1,5 @@
 const express = require('express');
+const { HfInference } = require('@huggingface/inference');
 const router = express.Router();
 
 function getHfToken() {
@@ -7,24 +8,14 @@ function getHfToken() {
 
 router.get('/test', async (req, res) => {
   var token = getHfToken();
-  if (!token) return res.json({ status: 'no token configured' });
-
-  try {
-    var r = await fetch('https://api-inference.huggingface.co/models/timbrooks/instruct-pix2pix', {
-      method: 'GET',
-      headers: { 'Authorization': 'Bearer ' + token },
-    });
-    var data = await r.json();
-    res.json({ status: r.status, model: data });
-  } catch (err) {
-    res.json({ status: 'error', detail: err.message || String(err) });
-  }
+  res.json({ hasToken: !!token, tokenLength: token.length });
 });
 
 router.post('/', async (req, res) => {
   try {
     var roomImage = req.body.roomImage;
     var productName = req.body.productName;
+    var productDescription = req.body.productDescription || '';
 
     if (!roomImage) {
       return res.status(400).json({ error: 'Se requiere imagen del ambiente' });
@@ -37,47 +28,33 @@ router.post('/', async (req, res) => {
 
     var base64Data = roomImage.replace(/^data:image\/[^;]+;base64,/, '');
     var imageBuffer = Buffer.from(base64Data, 'base64');
+    var imageBlob = new Blob([imageBuffer], { type: 'image/jpeg' });
 
-    console.log('Image buffer size:', imageBuffer.length, 'bytes');
+    console.log('Image size:', imageBuffer.length, 'bytes');
 
-    var response = await fetch('https://api-inference.huggingface.co/models/timbrooks/instruct-pix2pix', {
-      method: 'POST',
-      headers: {
-        'Authorization': 'Bearer ' + token,
-        'Content-Type': 'application/octet-stream',
+    var hf = new HfInference(token);
+
+    var prompt = 'Place a ' + (productName || 'furniture') + ' in this room. Match perspective, lighting, and shadows. Photorealistic interior design, 8K quality.';
+
+    var result = await hf.imageToImage({
+      model: 'timbrooks/instruct-pix2pix',
+      inputs: imageBlob,
+      parameters: {
+        prompt: prompt,
+        guidance_scale: 7.5,
+        image_guidance_scale: 1.5,
+        num_inference_steps: 25,
       },
-      body: imageBuffer,
     });
 
-    console.log('HF status:', response.status, 'content-type:', response.headers.get('content-type'));
+    var arrayBuf = await result.arrayBuffer();
+    var b64 = Buffer.from(arrayBuf).toString('base64');
 
-    var contentType = response.headers.get('content-type') || '';
-
-    if (!response.ok) {
-      var errText = await response.text();
-      console.error('HF error:', response.status, errText);
-      return res.status(502).json({ error: 'Error al generar visualización', detail: errText });
-    }
-
-    if (contentType.includes('image')) {
-      var buf = Buffer.from(await response.arrayBuffer());
-      var b64 = buf.toString('base64');
-      var ext = contentType.includes('jpeg') ? 'jpeg' : 'png';
-      return res.json({ image: 'data:image/' + ext + ';base64,' + b64 });
-    }
-
-    var data = {};
-    try { data = await response.json(); } catch(e) {}
-
-    if (data.error) {
-      return res.status(502).json({ error: 'Error al generar visualización', detail: data.error });
-    }
-
-    return res.status(502).json({ error: 'Respuesta inesperada', detail: contentType });
+    res.json({ image: 'data:image/jpeg;base64,' + b64 });
   } catch (err) {
     var msg = err ? (err.message || String(err)) : 'unknown';
-    console.error('Visualize catch:', msg);
-    res.status(500).json({ error: 'Error interno al procesar la imagen', detail: msg });
+    console.error('Visualize error:', msg);
+    res.status(500).json({ error: 'Error al generar visualización', detail: msg });
   }
 });
 
