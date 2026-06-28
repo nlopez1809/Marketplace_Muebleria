@@ -620,31 +620,44 @@ class Component extends DCLogic {
 
   selectMedia(i){ this.setState({activeMedia:i}); }
   triggerUpload(){ if(this._fileInput) this._fileInput.click(); }
+  _resizeImage(dataUrl, maxW, maxH, quality, cb){
+    var img=new Image();
+    img.onload=function(){
+      var w=img.width, h=img.height;
+      if(w>maxW||h>maxH){ var r=Math.min(maxW/w,maxH/h); w=Math.round(w*r); h=Math.round(h*r); }
+      var c=document.createElement('canvas'); c.width=w; c.height=h;
+      var ctx=c.getContext('2d'); ctx.drawImage(img,0,0,w,h);
+      cb(c.toDataURL('image/jpeg',quality||0.7));
+    };
+    img.src=dataUrl;
+  }
   onFileSelected(e){
     var file=e.target&&e.target.files&&e.target.files[0]; if(!file) return;
     var self=this; var reader=new FileReader();
     reader.onload=function(ev){
-      var roomBase64=ev.target.result;
-      self.setState({_roomSrc:roomBase64, ar:'loading', _aiResult:null});
-      var p=self.getProduct();
-      fetch('/api/visualize',{
-        method:'POST',
-        headers:{'Content-Type':'application/json'},
-        body:JSON.stringify({
-          roomImage:roomBase64,
-          productName:p.name,
-          productDescription:(p.cat||'')+' '+p.name+'. '+(p.dims||'')
-        })
-      }).then(function(r){return r.json();}).then(function(data){
-        if(data.image){
-          self.setState({ar:'placed',_aiResult:data.image, bedX:0, bedScale:100});
-        } else {
-          console.error('Visualize API error:', data.error, data.detail);
+      var originalSrc=ev.target.result;
+      self.setState({_roomSrc:originalSrc, ar:'loading', _aiResult:null});
+      self._resizeImage(originalSrc, 768, 768, 0.7, function(resized){
+        var p=self.getProduct();
+        fetch('/api/visualize',{
+          method:'POST',
+          headers:{'Content-Type':'application/json'},
+          body:JSON.stringify({
+            roomImage:resized,
+            productName:p.name,
+            productDescription:(p.cat||'')+' '+p.name+'. '+(p.dims||'')
+          })
+        }).then(function(r){return r.json();}).then(function(data){
+          if(data.image){
+            self.setState({ar:'placed',_aiResult:data.image, bedX:0, bedScale:100});
+          } else {
+            console.error('Visualize API error:', data.error, data.detail);
+            self.setState({ar:'placed',_aiResult:null, bedX:0, bedScale:100});
+          }
+        }).catch(function(err){
+          console.error('Visualize fetch error:', err);
           self.setState({ar:'placed',_aiResult:null, bedX:0, bedScale:100});
-        }
-      }).catch(function(err){
-        console.error('Visualize fetch error:', err);
-        self.setState({ar:'placed',_aiResult:null, bedX:0, bedScale:100});
+        });
       });
     };
     reader.readAsDataURL(file);
@@ -812,10 +825,12 @@ class Component extends DCLogic {
         el.addEventListener('dragover',function(e){e.preventDefault();e.stopPropagation();el.style.borderColor='#F27141';el.style.background='#fbf2ec';});
         el.addEventListener('dragleave',function(e){e.preventDefault();e.stopPropagation();el.style.borderColor='#cdbfa9';el.style.background='#F4F1EC';});
         el.addEventListener('drop',function(e){e.preventDefault();e.stopPropagation();el.style.borderColor='#cdbfa9';el.style.background='#F4F1EC';var f=e.dataTransfer&&e.dataTransfer.files&&e.dataTransfer.files[0];if(f&&f.type.indexOf('image')===0){var r=new FileReader();r.onload=function(ev){
-          var roomBase64=ev.target.result;
-          self.setState({_roomSrc:roomBase64,ar:'loading',_aiResult:null});
-          var p=self.getProduct();
-          fetch('/api/visualize',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({roomImage:roomBase64,productName:p.name,productDescription:(p.cat||'')+' '+p.name})}).then(function(r){return r.json();}).then(function(data){if(data.image){self.setState({ar:'placed',_aiResult:data.image,bedX:0,bedScale:100});}else{self.setState({ar:'placed',_aiResult:null,bedX:0,bedScale:100});}}).catch(function(){self.setState({ar:'placed',_aiResult:null,bedX:0,bedScale:100});});
+          var originalSrc=ev.target.result;
+          self.setState({_roomSrc:originalSrc,ar:'loading',_aiResult:null});
+          self._resizeImage(originalSrc,768,768,0.7,function(resized){
+            var p=self.getProduct();
+            fetch('/api/visualize',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({roomImage:resized,productName:p.name,productDescription:(p.cat||'')+' '+p.name})}).then(function(r){return r.json();}).then(function(data){if(data.image){self.setState({ar:'placed',_aiResult:data.image,bedX:0,bedScale:100});}else{self.setState({ar:'placed',_aiResult:null,bedX:0,bedScale:100});}}).catch(function(){self.setState({ar:'placed',_aiResult:null,bedX:0,bedScale:100});});
+          });
         };r.readAsDataURL(f);}});
       },
       triggerUpload:function(){self.triggerUpload();},
