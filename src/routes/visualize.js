@@ -22,7 +22,7 @@ router.post('/', async (req, res) => {
 
     const negativePrompt = 'blurry, distorted, low quality, cartoon, drawing, painting, watermark, text, logo, unrealistic, floating furniture, disproportionate, oversized, undersized, wrong perspective, duplicate furniture, deformed, disfigured, out of frame';
 
-    const response = await fetch('https://api.replicate.com/v1/predictions', {
+    const response = await fetch('https://api.replicate.com/v1/models/stability-ai/stable-diffusion-img2img/predictions', {
       method: 'POST',
       headers: {
         'Authorization': 'Bearer ' + token,
@@ -30,14 +30,13 @@ router.post('/', async (req, res) => {
         'Prefer': 'wait',
       },
       body: JSON.stringify({
-        version: 'a4a8bafd6089e1716b06057c42b19378250d008b80fe87caa5cd36d40c1edd90',
         input: {
           image: roomImage,
           prompt: prompt,
           negative_prompt: negativePrompt,
-          strength: 0.45,
-          guidance_scale: 7.5,
+          prompt_strength: 0.45,
           num_inference_steps: 30,
+          guidance_scale: 7.5,
           scheduler: 'K_EULER',
         },
       }),
