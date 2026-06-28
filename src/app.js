@@ -12,6 +12,7 @@ const productsRoutes = require('./routes/products');
 const uploadRoutes = require('./routes/upload');
 const leadRoutes = require('./routes/leads');
 const asesoresRoutes = require('./routes/asesores');
+const visualizeRoutes = require('./routes/visualize');
 
 const app = express();
 
@@ -79,6 +80,7 @@ app.get('/api/auth/check', checkSession);
 app.use('/api/chat', chatLimiter, chatRoutes);
 app.use('/api/products', apiLimiter, productsRoutes);
 app.use('/api/asesor', apiLimiter, asesoresRoutes);
+app.use('/api/visualize', apiLimiter, visualizeRoutes);
 
 // ── Admin API (protected) ──
 app.use('/api/admin/products', requireAuth, productsRoutes);

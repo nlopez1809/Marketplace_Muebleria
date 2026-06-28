@@ -166,27 +166,44 @@
           </div>
         </sc-if>
 
+        <!-- LOADING STATE -->
+        <sc-if value="{{ arLoading }}" hint-placeholder-val="{{ false }}">
+          <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;background:#F4F1EC;animation:mbxFade .4s ease both">
+            <div style="position:relative;width:80px;height:80px;margin-bottom:24px">
+              <div style="position:absolute;inset:0;border:3px solid #E4E4E3;border-top-color:#F27141;border-radius:50%;animation:mbxSpin 1s linear infinite"></div>
+              <div style="position:absolute;inset:8px;border:3px solid #E4E4E3;border-bottom-color:#7E5BC4;border-radius:50%;animation:mbxSpin 1.5s linear infinite reverse"></div>
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#F27141" stroke-width="1.8" style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%)"><path d="M12.4 4l1.4 4 4 1.4-4 1.4-1.4 4-1.4-4-4-1.4 4-1.4z"></path></svg>
+            </div>
+            <p style="font-family:'Comfortaa',sans-serif;font-weight:700;font-size:16px;color:#40403E;margin-bottom:8px">Nuestra IA está trabajando</p>
+            <p style="font-size:13px;color:#6f6f6c;max-width:320px;line-height:1.5">Colocando <b>{{ productName }}</b> en tu ambiente. Esto puede tomar 10-20 segundos…</p>
+          </div>
+        </sc-if>
+
         <!-- PLACED STATE (user photo + product overlay) -->
         <sc-if value="{{ arPlaced }}" hint-placeholder-val="{{ false }}">
           <div style="position:absolute;inset:0;animation:mbxFade .5s ease both">
-            <!-- user uploaded room photo -->
-            <img ref="{{ roomImgRef }}" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center 60%" />
-            <div style="position:absolute;inset:0;background:linear-gradient(180deg,rgba(64,64,62,.16) 0%,rgba(64,64,62,0) 26%)"></div>
 
-            <!-- placed product with bounding box -->
-            <div ref="{{ bedBoxRef }}" style="position:absolute;left:50%;bottom:8%;width:58%;transform:translateX(-50%);transition:transform .18s ease,width .18s ease">
-              <img ref="{{ productOverlayRef }}" style="display:block;width:100%;height:auto;filter:drop-shadow(0 22px 26px rgba(40,30,20,.42)) drop-shadow(0 4px 8px rgba(0,0,0,.18))" />
-              <!-- selection frame -->
-              <div style="position:absolute;inset:-3% -2% -1% -2%;border:1.6px dashed #F27141;border-radius:3px;pointer-events:none"></div>
-              <span style="position:absolute;top:-3%;left:-2%;width:11px;height:11px;background:#fff;border:2px solid #F27141;border-radius:2px;transform:translate(-50%,-50%)"></span>
-              <span style="position:absolute;top:-3%;right:-2%;width:11px;height:11px;background:#fff;border:2px solid #F27141;border-radius:2px;transform:translate(50%,-50%)"></span>
-              <span style="position:absolute;bottom:-1%;left:-2%;width:11px;height:11px;background:#fff;border:2px solid #F27141;border-radius:2px;transform:translate(-50%,50%)"></span>
-              <span style="position:absolute;bottom:-1%;right:-2%;width:11px;height:11px;background:#fff;border:2px solid #F27141;border-radius:2px;transform:translate(50%,50%)"></span>
-              <!-- tag -->
-              <div style="position:absolute;top:-3%;left:50%;transform:translate(-50%,-150%);background:#40403E;color:#F2F2F2;font-size:10.5px;letter-spacing:.06em;padding:5px 11px;border-radius:30px;white-space:nowrap;display:flex;align-items:center;gap:6px;box-shadow:0 6px 16px rgba(0,0,0,.25)">
-                <span style="width:6px;height:6px;border-radius:50%;background:#F27141"></span>{{ productName }} · {{ colorName }}
+            <!-- AI GENERATED RESULT -->
+            <sc-if value="{{ hasAiResult }}" hint-placeholder-val="{{ false }}">
+              <img ref="{{ aiResultRef }}" style="position:absolute;inset:0;width:100%;height:100%;object-fit:contain;object-position:center;background:#1a1a1a" />
+            </sc-if>
+
+            <!-- FALLBACK: manual overlay when AI fails -->
+            <sc-if value="{{ noAiResult }}" hint-placeholder-val="{{ false }}">
+              <img ref="{{ roomImgRef }}" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center 60%" />
+              <div style="position:absolute;inset:0;background:linear-gradient(180deg,rgba(64,64,62,.16) 0%,rgba(64,64,62,0) 26%)"></div>
+              <div ref="{{ bedBoxRef }}" style="position:absolute;left:50%;bottom:8%;width:58%;transform:translateX(-50%);transition:transform .18s ease,width .18s ease">
+                <img ref="{{ productOverlayRef }}" style="display:block;width:100%;height:auto;filter:drop-shadow(0 22px 26px rgba(40,30,20,.42)) drop-shadow(0 4px 8px rgba(0,0,0,.18))" />
+                <div style="position:absolute;inset:-3% -2% -1% -2%;border:1.6px dashed #F27141;border-radius:3px;pointer-events:none"></div>
+                <span style="position:absolute;top:-3%;left:-2%;width:11px;height:11px;background:#fff;border:2px solid #F27141;border-radius:2px;transform:translate(-50%,-50%)"></span>
+                <span style="position:absolute;top:-3%;right:-2%;width:11px;height:11px;background:#fff;border:2px solid #F27141;border-radius:2px;transform:translate(50%,-50%)"></span>
+                <span style="position:absolute;bottom:-1%;left:-2%;width:11px;height:11px;background:#fff;border:2px solid #F27141;border-radius:2px;transform:translate(-50%,50%)"></span>
+                <span style="position:absolute;bottom:-1%;right:-2%;width:11px;height:11px;background:#fff;border:2px solid #F27141;border-radius:2px;transform:translate(50%,50%)"></span>
+                <div style="position:absolute;top:-3%;left:50%;transform:translate(-50%,-150%);background:#40403E;color:#F2F2F2;font-size:10.5px;letter-spacing:.06em;padding:5px 11px;border-radius:30px;white-space:nowrap;display:flex;align-items:center;gap:6px;box-shadow:0 6px 16px rgba(0,0,0,.25)">
+                  <span style="width:6px;height:6px;border-radius:50%;background:#F27141"></span>{{ productName }} · {{ colorName }}
+                </div>
               </div>
-            </div>
+            </sc-if>
 
             <!-- AI badge -->
             <div style="position:absolute;top:14px;left:14px;background:rgba(64,64,62,.78);backdrop-filter:blur(5px);color:#F2F2F2;font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;padding:7px 12px;border-radius:30px;display:flex;align-items:center;gap:7px">
@@ -196,13 +213,15 @@
 
             <!-- floating control toolbar -->
             <div style="position:absolute;bottom:16px;left:50%;transform:translateX(-50%);display:flex;align-items:center;gap:4px;background:rgba(255,255,255,.94);backdrop-filter:blur(8px);border-radius:34px;padding:6px;box-shadow:0 10px 30px rgba(40,40,38,.22)">
-              <button onClick="{{ moveLeft }}" title="Mover" style="width:38px;height:38px;border-radius:50%;border:none;background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#40403E;transition:background .15s" style-hover="background:#F1ECE6"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5l-7 7 7 7"></path><path d="M4 12h16"></path></svg></button>
-              <button onClick="{{ moveRight }}" title="Mover" style="width:38px;height:38px;border-radius:50%;border:none;background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#40403E;transition:background .15s" style-hover="background:#F1ECE6"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M13 5l7 7-7 7"></path><path d="M20 12H4"></path></svg></button>
-              <span style="width:1px;height:22px;background:#E4E4E3;margin:0 3px"></span>
-              <button onClick="{{ scaleDown }}" title="Reducir" style="width:38px;height:38px;border-radius:50%;border:none;background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#40403E;transition:background .15s" style-hover="background:#F1ECE6"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 12h14"></path></svg></button>
-              <div style="font-size:12px;font-weight:600;color:#737373;min-width:42px;text-align:center;letter-spacing:.02em">{{ scalePct }}</div>
-              <button onClick="{{ scaleUp }}" title="Ampliar" style="width:38px;height:38px;border-radius:50%;border:none;background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#40403E;transition:background .15s" style-hover="background:#F1ECE6"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"></path></svg></button>
-              <span style="width:1px;height:22px;background:#E4E4E3;margin:0 3px"></span>
+              <sc-if value="{{ noAiResult }}" hint-placeholder-val="{{ false }}">
+                <button onClick="{{ moveLeft }}" title="Mover" style="width:38px;height:38px;border-radius:50%;border:none;background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#40403E;transition:background .15s" style-hover="background:#F1ECE6"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5l-7 7 7 7"></path><path d="M4 12h16"></path></svg></button>
+                <button onClick="{{ moveRight }}" title="Mover" style="width:38px;height:38px;border-radius:50%;border:none;background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#40403E;transition:background .15s" style-hover="background:#F1ECE6"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M13 5l7 7-7 7"></path><path d="M20 12H4"></path></svg></button>
+                <span style="width:1px;height:22px;background:#E4E4E3;margin:0 3px"></span>
+                <button onClick="{{ scaleDown }}" title="Reducir" style="width:38px;height:38px;border-radius:50%;border:none;background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#40403E;transition:background .15s" style-hover="background:#F1ECE6"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 12h14"></path></svg></button>
+                <div style="font-size:12px;font-weight:600;color:#737373;min-width:42px;text-align:center;letter-spacing:.02em">{{ scalePct }}</div>
+                <button onClick="{{ scaleUp }}" title="Ampliar" style="width:38px;height:38px;border-radius:50%;border:none;background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#40403E;transition:background .15s" style-hover="background:#F1ECE6"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"></path></svg></button>
+                <span style="width:1px;height:22px;background:#E4E4E3;margin:0 3px"></span>
+              </sc-if>
               <button onClick="{{ resetAr }}" title="Probar con otra foto" style="height:38px;border-radius:30px;border:none;background:#40403E;color:#F2F2F2;cursor:pointer;display:flex;align-items:center;gap:7px;padding:0 15px;font-size:11.5px;font-weight:600;letter-spacing:.03em;transition:background .15s" style-hover="background:#F27141;color:#40403E"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"></path><path d="M3 3v5h5"></path></svg>Otra foto</button>
             </div>
           </div>
@@ -526,7 +545,8 @@ class Component extends DCLogic {
     _decoLoading: false,
     decoMessages: [ { role:'bot', text:'¡Hola! Bienvenido/a a InCassa DECO ✨ Soy Deco IA, tu asistente personal de muebles y decoración. Para brindarte una atención personalizada, ¿con quién tengo el gusto de conversar?' } ],
     _product: null,
-    _roomSrc: null
+    _roomSrc: null,
+    _aiResult: null
   };
 
   FALLBACK = { id:'aurora', name:'Cama Aurora', cat:'Dormitorio', type:'bed', price:6900, old:8200, badge:'Más vendido', material:'Terciopelo', city:'La Paz', rating:4.8, reviews:126, tones:['#6b5236','#4f3c27'], city2:'4-6 días', dims:'200 × 215 cm', weight:'72 kg', warranty:'7 años', desc:'Cabecera tapizada con estructura premium y base con guardado.', images:[] };
@@ -603,11 +623,32 @@ class Component extends DCLogic {
   onFileSelected(e){
     var file=e.target&&e.target.files&&e.target.files[0]; if(!file) return;
     var self=this; var reader=new FileReader();
-    reader.onload=function(ev){ self.setState({_roomSrc:ev.target.result, ar:'placed', bedX:0, bedScale:100}); };
+    reader.onload=function(ev){
+      var roomBase64=ev.target.result;
+      self.setState({_roomSrc:roomBase64, ar:'loading', _aiResult:null});
+      var p=self.getProduct();
+      fetch('/api/visualize',{
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({
+          roomImage:roomBase64,
+          productName:p.name,
+          productDescription:(p.cat||'')+' '+p.name+'. '+(p.dims||'')
+        })
+      }).then(function(r){return r.json();}).then(function(data){
+        if(data.image){
+          self.setState({ar:'placed',_aiResult:data.image, bedX:0, bedScale:100});
+        } else {
+          self.setState({ar:'placed',_aiResult:null, bedX:0, bedScale:100});
+        }
+      }).catch(function(){
+        self.setState({ar:'placed',_aiResult:null, bedX:0, bedScale:100});
+      });
+    };
     reader.readAsDataURL(file);
   }
   placeBed(){ this.setState({ar:'placed', bedX:0, bedScale:100}); }
-  resetAr(){ this.setState({ar:'empty', _roomSrc:null}); }
+  resetAr(){ this.setState({ar:'empty', _roomSrc:null, _aiResult:null}); }
   moveLeft(){ this.setState(function(s){return{bedX:Math.max(s.bedX-5,-45)};}, function(){this._applyBed();}.bind(this)); }
   moveRight(){ this.setState(function(s){return{bedX:Math.min(s.bedX+5,45)};}, function(){this._applyBed();}.bind(this)); }
   scaleUp(){ this.setState(function(s){return{bedScale:Math.min(s.bedScale+6,160)};}, function(){this._applyBed();}.bind(this)); }
@@ -754,7 +795,7 @@ class Component extends DCLogic {
       productName:p.name, productCat:p.cat||'', ratingText:rating.toFixed(1)+' · '+(p.reviews||0)+' reseñas',
       warrantyText:p.warranty||'—',
 
-      arEmpty:isAr && this.state.ar==='empty', arPlaced:isAr && this.state.ar==='placed',
+      arEmpty:isAr && this.state.ar==='empty', arPlaced:isAr && this.state.ar==='placed', arLoading:isAr && this.state.ar==='loading',
       vPhoto:active.kind==='photo', v360:active.kind==='360', vVideo:active.kind==='video', vAr:isAr,
       showStageBadge: active.kind==='photo' && am===0 && !!p.badge,
       mainImg:active.img||'', mainFit:active.fit||'contain', mainPos:active.pos||'center',
@@ -768,10 +809,17 @@ class Component extends DCLogic {
         if(!el||el.dataset.dz==='1') return; el.dataset.dz='1';
         el.addEventListener('dragover',function(e){e.preventDefault();e.stopPropagation();el.style.borderColor='#F27141';el.style.background='#fbf2ec';});
         el.addEventListener('dragleave',function(e){e.preventDefault();e.stopPropagation();el.style.borderColor='#cdbfa9';el.style.background='#F4F1EC';});
-        el.addEventListener('drop',function(e){e.preventDefault();e.stopPropagation();el.style.borderColor='#cdbfa9';el.style.background='#F4F1EC';var f=e.dataTransfer&&e.dataTransfer.files&&e.dataTransfer.files[0];if(f&&f.type.indexOf('image')===0){var r=new FileReader();r.onload=function(ev){self.setState({_roomSrc:ev.target.result,ar:'placed',bedX:0,bedScale:100});};r.readAsDataURL(f);}});
+        el.addEventListener('drop',function(e){e.preventDefault();e.stopPropagation();el.style.borderColor='#cdbfa9';el.style.background='#F4F1EC';var f=e.dataTransfer&&e.dataTransfer.files&&e.dataTransfer.files[0];if(f&&f.type.indexOf('image')===0){var r=new FileReader();r.onload=function(ev){
+          var roomBase64=ev.target.result;
+          self.setState({_roomSrc:roomBase64,ar:'loading',_aiResult:null});
+          var p=self.getProduct();
+          fetch('/api/visualize',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({roomImage:roomBase64,productName:p.name,productDescription:(p.cat||'')+' '+p.name})}).then(function(r){return r.json();}).then(function(data){if(data.image){self.setState({ar:'placed',_aiResult:data.image,bedX:0,bedScale:100});}else{self.setState({ar:'placed',_aiResult:null,bedX:0,bedScale:100});}}).catch(function(){self.setState({ar:'placed',_aiResult:null,bedX:0,bedScale:100});});
+        };r.readAsDataURL(f);}});
       },
       triggerUpload:function(){self.triggerUpload();},
       onFileSelected:function(e){self.onFileSelected(e);},
+      hasAiResult:!!self.state._aiResult, noAiResult:!self.state._aiResult,
+      aiResultRef:function(el){ if(el && self.state._aiResult) el.src=self.state._aiResult; },
       roomImgRef:function(el){ if(el){ var src=self.state._roomSrc; if(src) el.src=src; else el.src=''; } },
       productOverlayRef:function(el){ if(el){ var p=self.getProduct(); var m=self.getMedia(); var img=''; var prodView=m[2]; if(prodView&&prodView.img) img=prodView.img; if(!img){ for(var i=0;i<m.length;i++){if(m[i].kind==='photo'&&m[i].img){img=m[i].img;break;}} } if(!img) img=self._genImg(p,'front'); el.src=img; el.style.background='transparent'; } },
       placeBed:function(){self.placeBed();}, resetAr:function(){self.resetAr();},
