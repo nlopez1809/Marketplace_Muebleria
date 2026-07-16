@@ -121,6 +121,27 @@ router.post('/', async (req, res) => {
       try {
         const v = JSON.parse(visitaMatch[1]);
         visitaPayload = buildVisitaLinks(v, asesor);
+
+        // Guardar fecha_visita y productos en el lead
+        const fechaVisita = (v.fecha || '') + (v.hora ? ' ' + v.hora : '');
+        const productosStr = (v.productos || []).map(p => p.nombre + (p.precio ? ' Bs ' + p.precio : '')).join(', ');
+        const { data: existingLead } = await supabase.from('leads').select('id').eq('session_id', sessionId).single();
+        if (existingLead) {
+          await supabase.from('leads').update({
+            fecha_visita: fechaVisita,
+            producto_interes: productosStr,
+            updated_at: new Date().toISOString()
+          }).eq('session_id', sessionId);
+        } else {
+          await storage.createLead({
+            session_id: sessionId,
+            nombre: v.nombre || '',
+            telefono: v.telefono || '',
+            ci: '',
+            producto_interes: productosStr,
+            fecha_visita: fechaVisita,
+          });
+        }
       } catch (e) { console.error('Error parsing visita:', e.message); }
       assistantMessage = assistantMessage.replace(/<!--VISITA:.*?-->/gs, '').trim();
     }
