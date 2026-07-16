@@ -4,109 +4,200 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>InCassa DECO — Panel Admin</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Comfortaa:wght@700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Comfortaa:wght@600;700&display=swap" rel="stylesheet">
 <style>
   * { margin:0; padding:0; box-sizing:border-box; }
-  body { font-family:'Inter',system-ui,sans-serif; background:#f5f3f0; color:#40403E; }
+  body { font-family:'Inter',system-ui,sans-serif; background:#F2F2F2; color:#40403E; }
 
-  .topbar { background:linear-gradient(118deg,#7E5BC4 0%,#9B6FC9 42%,#D8BE8C 100%); padding:16px 32px; display:flex; align-items:center; justify-content:space-between; }
-  .topbar h1 { font-family:'Comfortaa',sans-serif; color:#fff; font-size:20px; letter-spacing:.02em; }
-  .topbar a { color:rgba(255,255,255,.85); text-decoration:none; font-size:13px; }
-  .topbar a:hover { color:#fff; }
+  /* ── TOPBAR ── */
+  .topbar {
+    background:#40403E;
+    padding:0 32px;
+    height:66px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    position:sticky;
+    top:0;
+    z-index:50;
+    box-shadow:0 2px 12px rgba(0,0,0,.18);
+  }
+  .topbar-brand { display:flex; align-items:center; gap:10px; }
+  .topbar-logo { font-family:'Comfortaa',sans-serif; font-size:20px; color:#F2F2F2; letter-spacing:.02em; }
+  .topbar-logo span { color:#F27141; }
+  .topbar-badge {
+    background:#F27141;
+    color:#40403E;
+    font-size:9px;
+    font-weight:700;
+    letter-spacing:.12em;
+    text-transform:uppercase;
+    padding:3px 8px;
+    border-radius:2px;
+  }
+  .topbar-right { display:flex; gap:12px; align-items:center; }
+  .topbar-link { color:#C9C9C7; text-decoration:none; font-size:13px; font-weight:500; transition:color .15s; display:flex; align-items:center; gap:5px; }
+  .topbar-link:hover { color:#F27141; }
+  .topbar-link svg { opacity:.7; }
+  .btn-logout { background:transparent; color:#C9C9C7; border:1px solid #5a5a57; padding:7px 14px; border-radius:3px; font-size:12px; font-weight:600; cursor:pointer; font-family:inherit; transition:all .15s; letter-spacing:.04em; }
+  .btn-logout:hover { background:#F27141; color:#40403E; border-color:#F27141; }
 
-  .tabs { display:flex; gap:0; background:#fff; border-bottom:2px solid #eee; padding:0 32px; }
-  .tab { padding:14px 24px; cursor:pointer; font-size:14px; font-weight:500; color:#888; border-bottom:2px solid transparent; margin-bottom:-2px; transition:all .15s; }
-  .tab:hover { color:#7E5BC4; }
-  .tab.active { color:#7E5BC4; border-bottom-color:#7E5BC4; }
+  /* ── TABS ── */
+  .tabs { background:#fff; border-bottom:1px solid #E4E4E3; padding:0 32px; display:flex; gap:0; }
+  .tab {
+    padding:16px 22px;
+    cursor:pointer;
+    font-size:13px;
+    font-weight:600;
+    color:#9A9A98;
+    border-bottom:2px solid transparent;
+    margin-bottom:-1px;
+    transition:all .15s;
+    letter-spacing:.03em;
+    display:flex;
+    align-items:center;
+    gap:7px;
+  }
+  .tab:hover { color:#40403E; }
+  .tab.active { color:#F27141; border-bottom-color:#F27141; }
+  .tab svg { opacity:.6; }
+  .tab.active svg { opacity:1; }
 
-  .content { max-width:1100px; margin:24px auto; padding:0 24px; }
+  /* ── LAYOUT ── */
+  .content { max-width:1140px; margin:28px auto; padding:0 28px; }
 
-  .card { background:#fff; border-radius:12px; padding:24px; margin-bottom:20px; box-shadow:0 1px 4px rgba(0,0,0,.06); }
-  .card h2 { font-size:16px; margin-bottom:16px; color:#7E5BC4; }
+  /* ── SECTION HEADER ── */
+  .section-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:20px; }
+  .section-title { font-family:'Comfortaa',sans-serif; font-size:18px; color:#40403E; font-weight:700; }
+  .section-sub { font-size:12px; color:#9A9A98; margin-top:3px; letter-spacing:.02em; }
 
-  .btn { padding:8px 18px; border:none; border-radius:8px; font-size:13px; font-weight:600; cursor:pointer; transition:all .15s; font-family:inherit; }
-  .btn-primary { background:#7E5BC4; color:#fff; }
-  .btn-primary:hover { background:#6a4aaf; }
-  .btn-danger { background:#e74c3c; color:#fff; }
-  .btn-danger:hover { background:#c0392b; }
-  .btn-secondary { background:#f0eef5; color:#7E5BC4; }
-  .btn-secondary:hover { background:#e4dff0; }
-  .btn-ai { background:linear-gradient(118deg,#7E5BC4,#D8BE8C); color:#fff; }
-  .btn-ai:hover { opacity:.9; }
-  .btn:disabled { opacity:.5; cursor:default; }
+  /* ── CARDS ── */
+  .card { background:#fff; border-radius:4px; padding:24px; margin-bottom:20px; box-shadow:0 1px 4px rgba(0,0,0,.05); border:1px solid #E4E4E3; }
+  .card h2 { font-size:15px; margin-bottom:14px; color:#40403E; font-weight:700; display:flex; align-items:center; gap:8px; }
+  .card h2::before { content:''; display:block; width:3px; height:16px; background:#F27141; border-radius:2px; }
 
-  table { width:100%; border-collapse:collapse; font-size:13px; }
-  th { text-align:left; padding:10px 12px; background:#f9f8fc; color:#7E5BC4; font-weight:600; border-bottom:2px solid #eee; }
-  td { padding:10px 12px; border-bottom:1px solid #f0f0f0; vertical-align:middle; }
-  tr:hover td { background:#faf9fd; }
+  /* ── BUTTONS ── */
+  .btn { padding:9px 18px; border:none; border-radius:3px; font-size:13px; font-weight:600; cursor:pointer; transition:all .15s; font-family:inherit; letter-spacing:.02em; display:inline-flex; align-items:center; gap:6px; }
+  .btn-primary { background:#F27141; color:#40403E; }
+  .btn-primary:hover { background:#ef6330; }
+  .btn-danger { background:#fff; color:#e53935; border:1px solid #ffcdd2; }
+  .btn-danger:hover { background:#ffebee; }
+  .btn-secondary { background:#F2F2F2; color:#40403E; border:1px solid #E4E4E3; }
+  .btn-secondary:hover { background:#E4E4E3; }
+  .btn:disabled { opacity:.45; cursor:default; }
 
-  .thumb { width:48px; height:48px; border-radius:6px; object-fit:cover; background:#eee; }
-  .badge { display:inline-block; padding:2px 8px; border-radius:10px; font-size:11px; font-weight:600; }
-  .badge-green { background:#e8f5e9; color:#2e7d32; }
-  .badge-orange { background:#fff3e0; color:#e65100; }
+  /* ── TABLE ── */
+  .table-wrap { border-radius:4px; overflow:hidden; border:1px solid #E4E4E3; }
+  table { width:100%; border-collapse:collapse; font-size:13px; background:#fff; }
+  thead tr { background:#40403E; }
+  th { text-align:left; padding:11px 14px; color:#C9C9C7; font-weight:600; font-size:11px; letter-spacing:.1em; text-transform:uppercase; }
+  td { padding:13px 14px; border-bottom:1px solid #F2F2F2; vertical-align:middle; color:#40403E; }
+  tbody tr:last-child td { border-bottom:none; }
+  tbody tr:hover td { background:#fafaf9; }
 
-  input, select, textarea { font-family:inherit; font-size:13px; padding:9px 12px; border:1px solid #ddd; border-radius:8px; outline:none; width:100%; transition:border-color .15s; }
-  input:focus, select:focus, textarea:focus { border-color:#9B6FC9; }
+  .thumb { width:46px; height:46px; border-radius:3px; object-fit:cover; background:#E4E4E3; display:block; }
+  .pill { display:inline-block; padding:3px 9px; border-radius:20px; font-size:11px; font-weight:600; }
+  .pill-green { background:#e8f5e9; color:#2e7d32; }
+  .pill-orange { background:#fff3e0; color:#e65100; }
+
+  /* ── FORMS ── */
+  input, select, textarea { font-family:inherit; font-size:13px; padding:9px 12px; border:1px solid #E4E4E3; border-radius:3px; outline:none; width:100%; transition:border-color .15s; background:#fff; color:#40403E; }
+  input:focus, select:focus, textarea:focus { border-color:#F27141; box-shadow:0 0 0 3px rgba(242,113,65,.08); }
   textarea { resize:vertical; min-height:60px; }
-  label { display:block; font-size:12px; font-weight:600; color:#666; margin-bottom:4px; }
-
+  label { display:block; font-size:11px; font-weight:700; color:#9A9A98; margin-bottom:5px; letter-spacing:.06em; text-transform:uppercase; }
   .form-grid { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
   .form-full { grid-column:1/-1; }
 
-  .modal-overlay { position:fixed; inset:0; background:rgba(0,0,0,.4); z-index:100; display:none; align-items:center; justify-content:center; }
-  .modal-overlay.open { display:flex; }
-  .modal { background:#fff; border-radius:14px; padding:28px; width:680px; max-width:95vw; max-height:90vh; overflow-y:auto; }
-  .modal h3 { font-size:18px; margin-bottom:18px; color:#7E5BC4; }
+  /* ── SEARCH BAR ── */
+  .toolbar { display:flex; gap:10px; margin-bottom:18px; align-items:center; }
+  .toolbar input { max-width:280px; }
+  .toolbar-right { margin-left:auto; }
 
+  /* ── MODAL ── */
+  .modal-overlay { position:fixed; inset:0; background:rgba(40,40,38,.6); backdrop-filter:blur(4px); z-index:100; display:none; align-items:center; justify-content:center; padding:20px; }
+  .modal-overlay.open { display:flex; }
+  .modal { background:#fff; border-radius:6px; padding:0; width:700px; max-width:95vw; max-height:90vh; overflow-y:auto; box-shadow:0 24px 64px rgba(0,0,0,.2); }
+  .modal-header { background:#40403E; padding:20px 28px; display:flex; align-items:center; justify-content:space-between; border-radius:6px 6px 0 0; }
+  .modal-header h3 { font-family:'Comfortaa',sans-serif; font-size:17px; color:#F2F2F2; font-weight:700; }
+  .modal-close { background:none; border:none; color:#9A9A98; font-size:22px; cursor:pointer; line-height:1; padding:0 4px; }
+  .modal-close:hover { color:#F27141; }
+  .modal-body { padding:28px; }
+
+  /* ── IMAGE GALLERY ── */
   .img-gallery { display:flex; gap:10px; flex-wrap:wrap; margin-top:10px; }
   .img-gallery-item { position:relative; }
-  .img-gallery-item img { width:100px; height:100px; object-fit:cover; border-radius:8px; border:2px solid #eee; }
-  .img-gallery-item .del-img { position:absolute; top:-6px; right:-6px; width:22px; height:22px; background:#e74c3c; color:#fff; border:none; border-radius:50%; font-size:12px; cursor:pointer; display:flex; align-items:center; justify-content:center; }
-  .img-gallery-item .badge-ai { position:absolute; bottom:4px; left:4px; background:rgba(126,91,196,.85); color:#fff; font-size:9px; padding:1px 5px; border-radius:4px; }
+  .img-gallery-item img, .img-gallery-item video { width:96px; height:96px; object-fit:cover; border-radius:4px; border:2px solid #E4E4E3; display:block; }
+  .img-gallery-item .del-img { position:absolute; top:-6px; right:-6px; width:22px; height:22px; background:#e53935; color:#fff; border:none; border-radius:50%; font-size:13px; cursor:pointer; display:flex; align-items:center; justify-content:center; line-height:1; }
 
-  .actions { display:flex; gap:8px; justify-content:flex-end; margin-top:18px; }
+  .img-upload-area { border:2px dashed #E4E4E3; border-radius:4px; padding:20px; text-align:center; cursor:pointer; transition:all .15s; margin-top:10px; }
+  .img-upload-area:hover { border-color:#F27141; background:#fdf6f2; }
+  .img-upload-area input { display:none; }
+  .img-upload-area p { color:#9A9A98; font-size:13px; }
 
-  .toast { position:fixed; bottom:24px; right:24px; background:#333; color:#fff; padding:12px 20px; border-radius:10px; font-size:13px; z-index:200; opacity:0; transition:opacity .3s; pointer-events:none; }
+  .actions { display:flex; gap:8px; justify-content:flex-end; margin-top:24px; padding-top:20px; border-top:1px solid #F2F2F2; }
+
+  /* ── TOAST ── */
+  .toast { position:fixed; bottom:28px; right:28px; background:#40403E; color:#F2F2F2; padding:12px 20px; border-radius:4px; font-size:13px; z-index:200; opacity:0; transition:opacity .3s; pointer-events:none; display:flex; align-items:center; gap:8px; box-shadow:0 8px 24px rgba(0,0,0,.2); }
+  .toast::before { content:''; width:3px; height:16px; background:#F27141; border-radius:2px; display:block; }
   .toast.show { opacity:1; }
 
-  .empty-state { text-align:center; padding:40px; color:#aaa; }
-  .empty-state p { font-size:14px; }
+  .empty-state { text-align:center; padding:48px 20px; color:#C9C9C7; }
+  .empty-state svg { margin-bottom:12px; opacity:.4; }
+  .empty-state p { font-size:13px; }
 
-  .search-bar { display:flex; gap:10px; margin-bottom:16px; align-items:center; }
-  .search-bar input { max-width:300px; }
-
-  .img-upload-area { border:2px dashed #ddd; border-radius:10px; padding:20px; text-align:center; cursor:pointer; transition:border-color .15s; }
-  .img-upload-area:hover { border-color:#9B6FC9; }
-  .img-upload-area input { display:none; }
-
-  .spinner { display:inline-block; width:16px; height:16px; border:2px solid rgba(255,255,255,.3); border-top-color:#fff; border-radius:50%; animation:spin .6s linear infinite; vertical-align:middle; margin-right:6px; }
+  .spinner { display:inline-block; width:14px; height:14px; border:2px solid rgba(64,64,62,.2); border-top-color:#40403E; border-radius:50%; animation:spin .6s linear infinite; vertical-align:middle; margin-right:6px; }
   @keyframes spin { to { transform:rotate(360deg); } }
+
+  /* ── LEADS CARD ── */
+  .leads-intro { background:#40403E; border-radius:4px; padding:20px 24px; margin-bottom:18px; display:flex; align-items:center; gap:16px; }
+  .leads-intro-icon { width:40px; height:40px; background:#F27141; border-radius:50%; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+  .leads-intro h2 { font-family:'Comfortaa',sans-serif; font-size:15px; color:#F2F2F2; margin-bottom:3px; }
+  .leads-intro p { font-size:12px; color:#9A9A98; }
 </style>
 </head>
 <body>
 
+<!-- ══ TOPBAR ══ -->
 <div class="topbar">
-  <h1>InCassa DECO — Admin</h1>
-  <div style="display:flex;gap:16px;align-items:center">
-    <a href="/muebleBo.dc.html">Ver tienda &rarr;</a>
-    <button onclick="doLogout()" style="background:#e53935;color:#fff;border:none;padding:8px 16px;border-radius:4px;cursor:pointer;font-size:12px;font-weight:600">Cerrar sesion</button>
+  <div class="topbar-brand">
+    <div class="topbar-logo">InCassa <span>DECO</span></div>
+    <div class="topbar-badge">Admin</div>
+  </div>
+  <div class="topbar-right">
+    <a href="/muebleBo.dc.html" class="topbar-link">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path></svg>
+      Ver tienda
+    </a>
+    <button onclick="doLogout()" class="btn-logout">Cerrar sesión</button>
   </div>
 </div>
 
+<!-- ══ TABS ══ -->
 <div class="tabs">
-  <div class="tab active" data-tab="products">Productos</div>
-  <div class="tab" data-tab="asesores">Asesores</div>
-  <div class="tab" data-tab="leads">Leads / Clientes</div>
+  <div class="tab active" data-tab="products">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"></rect><path d="M8 21h8M12 17v4"></path></svg>
+    Productos
+  </div>
+  <div class="tab" data-tab="asesores">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+    Asesores
+  </div>
+  <div class="tab" data-tab="leads">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+    Leads / Clientes
+  </div>
 </div>
 
 <div class="content">
   <!-- ═══ PRODUCTS TAB ═══ -->
   <div id="tab-products">
-    <div class="search-bar">
+    <div class="toolbar">
       <input type="text" id="search-prod" placeholder="Buscar producto...">
-      <button class="btn btn-primary" onclick="openProductModal()">+ Nuevo producto</button>
+      <div class="toolbar-right">
+        <button class="btn btn-primary" onclick="openProductModal()">+ Nuevo producto</button>
+      </div>
     </div>
-    <div class="card" style="padding:0;overflow:hidden;">
+    <div class="table-wrap">
       <table>
         <thead>
           <tr><th></th><th>Nombre</th><th>Categoría</th><th>Precio</th><th>Imágenes</th><th>Acciones</th></tr>
@@ -118,10 +209,12 @@
 
   <!-- ═══ ASESORES TAB ═══ -->
   <div id="tab-asesores" style="display:none">
-    <div class="search-bar">
-      <button class="btn btn-primary" onclick="openAsesorModal()">+ Nuevo asesor</button>
+    <div class="toolbar">
+      <div class="toolbar-right">
+        <button class="btn btn-primary" onclick="openAsesorModal()">+ Nuevo asesor</button>
+      </div>
     </div>
-    <div class="card" style="padding:0;overflow:hidden;">
+    <div class="table-wrap">
       <table>
         <thead>
           <tr><th>Nombre</th><th>Teléfono</th><th>Acciones</th></tr>
@@ -133,11 +226,16 @@
 
   <!-- ═══ LEADS TAB ═══ -->
   <div id="tab-leads" style="display:none">
-    <div class="card">
-      <h2>Leads capturados por Deco IA</h2>
-      <p style="color:#999;font-size:13px;margin-bottom:16px">Datos de clientes recopilados durante conversaciones con el chatbot</p>
+    <div class="leads-intro">
+      <div class="leads-intro-icon">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+      </div>
+      <div>
+        <h2>Leads capturados por Deco IA</h2>
+        <p>Datos de clientes recopilados durante conversaciones con el chatbot</p>
+      </div>
     </div>
-    <div class="card" style="padding:0;overflow:hidden;">
+    <div class="table-wrap">
       <table>
         <thead>
           <tr><th>Nombre</th><th>Teléfono</th><th>CI</th><th>Fecha</th><th>Acciones</th></tr>
@@ -151,48 +249,53 @@
 <!-- ═══ PRODUCT MODAL ═══ -->
 <div class="modal-overlay" id="product-modal">
   <div class="modal">
-    <h3 id="prod-modal-title">Nuevo Producto</h3>
-    <div class="form-grid">
-      <div><label>ID (único, sin espacios)</label><input id="p-id" placeholder="ej: altiplano"></div>
-      <div><label>Nombre</label><input id="p-name" placeholder="Sofá Modular Altiplano"></div>
-      <div><label>Categoría</label>
-        <select id="p-cat">
-          <option>Sofás</option><option>Sillas</option><option>Mesas</option><option>Camas</option>
-          <option>Iluminación</option><option>Almacenamiento</option><option>Exterior</option>
-        </select>
-      </div>
-      <div><label>Tipo</label>
-        <select id="p-type">
-          <option value="sofa">Sofá</option><option value="chair">Silla</option><option value="table">Mesa</option>
-          <option value="bed">Cama</option><option value="lamp">Lámpara</option><option value="cabinet">Gabinete</option>
-          <option value="outdoor">Exterior</option>
-        </select>
-      </div>
-      <div><label>Precio (Bs)</label><input id="p-price" type="number"></div>
-      <div><label>Precio anterior (Bs)</label><input id="p-old" type="number" placeholder="Dejar vacío si no hay"></div>
-      <div><label>Badge</label><input id="p-badge" placeholder="Nuevo, -22%, etc."></div>
-      <div><label>Material</label><input id="p-material" placeholder="Terciopelo, Roble, etc."></div>
-      <div><label>Ciudad</label><input id="p-city" placeholder="La Paz"></div>
-      <div><label>Entrega</label><input id="p-city2" placeholder="2-4 días"></div>
-      <div><label>Dimensiones</label><input id="p-dims" placeholder="320 × 95 × 78 cm"></div>
-      <div><label>Peso</label><input id="p-weight" placeholder="68 kg"></div>
-      <div><label>Garantía</label><input id="p-warranty" placeholder="5 años"></div>
-      <div><label>Rating</label><input id="p-rating" type="number" step="0.1" min="0" max="5" value="4.5"></div>
-      <div class="form-full"><label>Descripción</label><textarea id="p-desc" rows="3"></textarea></div>
-      <div><label>Color tono 1</label><input id="p-tone1" type="color" value="#7E5BC4"></div>
-      <div><label>Color tono 2</label><input id="p-tone2" type="color" value="#D8BE8C"></div>
-      <div class="form-full">
-        <label>Imágenes del producto</label>
-        <div class="img-gallery" id="p-images"></div>
-        <div class="img-upload-area" id="p-upload-area" style="margin-top:10px">
-          <input type="file" id="p-file" accept="image/*,video/*">
-          <p style="color:#999;font-size:13px">Haz clic o arrastra una imagen o video aquí</p>
+    <div class="modal-header">
+      <h3 id="prod-modal-title">Nuevo Producto</h3>
+      <button class="modal-close" onclick="closeProductModal()">&times;</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-grid">
+        <div><label>ID (único, sin espacios)</label><input id="p-id" placeholder="ej: altiplano"></div>
+        <div><label>Nombre</label><input id="p-name" placeholder="Sofá Modular Altiplano"></div>
+        <div><label>Categoría</label>
+          <select id="p-cat">
+            <option>Sofás</option><option>Sillas</option><option>Mesas</option><option>Camas</option>
+            <option>Iluminación</option><option>Almacenamiento</option><option>Exterior</option>
+          </select>
+        </div>
+        <div><label>Tipo</label>
+          <select id="p-type">
+            <option value="sofa">Sofá</option><option value="chair">Silla</option><option value="table">Mesa</option>
+            <option value="bed">Cama</option><option value="lamp">Lámpara</option><option value="cabinet">Gabinete</option>
+            <option value="outdoor">Exterior</option>
+          </select>
+        </div>
+        <div><label>Precio (Bs)</label><input id="p-price" type="number"></div>
+        <div><label>Precio anterior (Bs)</label><input id="p-old" type="number" placeholder="Dejar vacío si no hay"></div>
+        <div><label>Badge</label><input id="p-badge" placeholder="Nuevo, -22%, etc."></div>
+        <div><label>Material</label><input id="p-material" placeholder="Terciopelo, Roble, etc."></div>
+        <div><label>Ciudad</label><input id="p-city" placeholder="La Paz"></div>
+        <div><label>Entrega</label><input id="p-city2" placeholder="2-4 días"></div>
+        <div><label>Dimensiones</label><input id="p-dims" placeholder="320 × 95 × 78 cm"></div>
+        <div><label>Peso</label><input id="p-weight" placeholder="68 kg"></div>
+        <div><label>Garantía</label><input id="p-warranty" placeholder="5 años"></div>
+        <div><label>Rating</label><input id="p-rating" type="number" step="0.1" min="0" max="5" value="4.5"></div>
+        <div class="form-full"><label>Descripción</label><textarea id="p-desc" rows="3"></textarea></div>
+        <div><label>Color tono 1</label><input id="p-tone1" type="color" value="#40403E"></div>
+        <div><label>Color tono 2</label><input id="p-tone2" type="color" value="#D8BE8C"></div>
+        <div class="form-full">
+          <label>Imágenes del producto</label>
+          <div class="img-gallery" id="p-images"></div>
+          <div class="img-upload-area" id="p-upload-area" style="margin-top:10px">
+            <input type="file" id="p-file" accept="image/*,video/*">
+            <p>Haz clic o arrastra una imagen o video aquí</p>
+          </div>
         </div>
       </div>
-    </div>
-    <div class="actions">
-      <button class="btn btn-secondary" onclick="closeProductModal()">Cancelar</button>
-      <button class="btn btn-primary" id="btn-save-prod" onclick="saveProduct()">Guardar</button>
+      <div class="actions">
+        <button class="btn btn-secondary" onclick="closeProductModal()">Cancelar</button>
+        <button class="btn btn-primary" id="btn-save-prod" onclick="saveProduct()">Guardar</button>
+      </div>
     </div>
   </div>
 </div>
@@ -200,14 +303,19 @@
 <!-- ═══ ASESOR MODAL ═══ -->
 <div class="modal-overlay" id="asesor-modal">
   <div class="modal" style="width:420px">
-    <h3 id="asesor-modal-title">Nuevo Asesor</h3>
-    <div style="display:flex;flex-direction:column;gap:14px">
-      <div><label>Nombre completo</label><input id="a-nombre" placeholder="Juan Pérez"></div>
-      <div><label>Teléfono (con código país)</label><input id="a-telefono" placeholder="59170000000"></div>
+    <div class="modal-header">
+      <h3 id="asesor-modal-title">Nuevo Asesor</h3>
+      <button class="modal-close" onclick="closeAsesorModal()">&times;</button>
     </div>
-    <div class="actions">
-      <button class="btn btn-secondary" onclick="closeAsesorModal()">Cancelar</button>
-      <button class="btn btn-primary" onclick="saveAsesor()">Guardar</button>
+    <div class="modal-body">
+      <div style="display:flex;flex-direction:column;gap:14px">
+        <div><label>Nombre completo</label><input id="a-nombre" placeholder="Juan Pérez"></div>
+        <div><label>Teléfono (con código país)</label><input id="a-telefono" placeholder="59170000000"></div>
+      </div>
+      <div class="actions">
+        <button class="btn btn-secondary" onclick="closeAsesorModal()">Cancelar</button>
+        <button class="btn btn-primary" onclick="saveAsesor()">Guardar</button>
+      </div>
     </div>
   </div>
 </div>
@@ -354,8 +462,8 @@ const uploadArea = document.getElementById('p-upload-area');
 const fileInput = document.getElementById('p-file');
 
 uploadArea.addEventListener('click', () => fileInput.click());
-uploadArea.addEventListener('dragover', e => { e.preventDefault(); uploadArea.style.borderColor = '#9B6FC9'; });
-uploadArea.addEventListener('dragleave', () => { uploadArea.style.borderColor = '#ddd'; });
+uploadArea.addEventListener('dragover', e => { e.preventDefault(); uploadArea.style.borderColor = '#F27141'; });
+uploadArea.addEventListener('dragleave', () => { uploadArea.style.borderColor = '#E4E4E3'; });
 uploadArea.addEventListener('drop', e => {
   e.preventDefault();
   uploadArea.style.borderColor = '#ddd';
