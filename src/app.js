@@ -13,6 +13,7 @@ const uploadRoutes = require('./routes/upload');
 const leadRoutes = require('./routes/leads');
 const asesoresRoutes = require('./routes/asesores');
 const visualizeRoutes = require('./routes/visualize');
+const storage = require('./services/storage');
 
 const app = express();
 
@@ -83,6 +84,26 @@ app.use('/api/asesor', apiLimiter, asesoresRoutes);
 app.use('/api/visualize', visualizeRoutes);
 
 // ── Admin API (protected) ──
+app.get('/api/admin/dashboard', requireAuth, async (req, res) => {
+  try { res.json(await storage.getDashboard()); }
+  catch (e) { res.status(500).json({ error: 'Error al obtener dashboard' }); }
+});
+
+app.get('/api/admin/leads/export', requireAuth, async (req, res) => {
+  try {
+    const leads = await storage.getLeads();
+    const rows = [['ID','Nombre','Teléfono','CI','Fecha']];
+    leads.forEach(l => {
+      const date = new Date(l.created_at).toLocaleString('es-BO');
+      rows.push([l.id, l.nombre || '', l.telefono || '', l.ci || '', date]);
+    });
+    const csv = rows.map(r => r.map(v => `"${String(v).replace(/"/g,'""')}"`).join(',')).join('\r\n');
+    res.setHeader('Content-Type', 'text/csv; charset=utf-8');
+    res.setHeader('Content-Disposition', 'attachment; filename="leads.csv"');
+    res.send('﻿' + csv);
+  } catch (e) { res.status(500).json({ error: 'Error al exportar' }); }
+});
+
 app.use('/api/admin/products', requireAuth, productsRoutes);
 app.use('/api/admin/products', requireAuth, uploadRoutes);
 app.use('/api/admin/leads', requireAuth, leadRoutes);

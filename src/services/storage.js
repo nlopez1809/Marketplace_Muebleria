@@ -1,12 +1,32 @@
 const supabase = require('./supabase');
 
-async function getProducts() {
-  const { data, error } = await supabase
-    .from('products')
-    .select('*')
-    .order('created_at', { ascending: false });
+async function getProducts({ includeInactive = true } = {}) {
+  let query = supabase.from('products').select('*').order('created_at', { ascending: false });
+  if (!includeInactive) query = query.neq('active', false);
+  const { data, error } = await query;
   if (error) throw error;
   return data;
+}
+
+async function getDashboard() {
+  const [products, leads, asesores] = await Promise.all([
+    supabase.from('products').select('id, active, images'),
+    supabase.from('leads').select('id, created_at'),
+    supabase.from('asesores').select('id'),
+  ]);
+  const now = new Date();
+  const monthStart = new Date(now.getFullYear(), now.getMonth(), 1).toISOString();
+  const leadsThisMonth = (leads.data || []).filter(l => l.created_at >= monthStart).length;
+  const activeProducts = (products.data || []).filter(p => p.active !== false).length;
+  const withPhotos = (products.data || []).filter(p => p.images && p.images.length > 0).length;
+  return {
+    totalProducts: (products.data || []).length,
+    activeProducts,
+    withPhotos,
+    totalLeads: (leads.data || []).length,
+    leadsThisMonth,
+    totalAsesores: (asesores.data || []).length,
+  };
 }
 
 async function getProduct(id) {
@@ -114,7 +134,7 @@ async function deleteLead(id) {
 }
 
 module.exports = {
-  getProducts, getProduct, createProduct, updateProduct, deleteProduct,
+  getProducts, getProduct, getDashboard, createProduct, updateProduct, deleteProduct,
   getAsesores, createAsesor, updateAsesor, deleteAsesor,
   getLeads, createLead, deleteLead,
 };

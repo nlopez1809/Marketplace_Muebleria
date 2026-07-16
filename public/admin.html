@@ -153,6 +153,25 @@
   .leads-intro-icon { width:40px; height:40px; background:#F27141; border-radius:50%; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
   .leads-intro h2 { font-family:'Comfortaa',sans-serif; font-size:15px; color:#F2F2F2; margin-bottom:3px; }
   .leads-intro p { font-size:12px; color:#9A9A98; }
+
+  /* ── DASHBOARD ── */
+  .metric-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(160px,1fr)); gap:14px; margin-bottom:24px; }
+  .metric-card { background:#fff; border:1px solid #E4E4E3; border-radius:4px; padding:20px; box-shadow:0 1px 4px rgba(0,0,0,.05); }
+  .metric-card .metric-val { font-family:'Comfortaa',sans-serif; font-size:32px; font-weight:700; color:#40403E; line-height:1; }
+  .metric-card .metric-label { font-size:11px; color:#9A9A98; margin-top:6px; letter-spacing:.06em; text-transform:uppercase; font-weight:600; }
+  .metric-card .metric-accent { color:#F27141; }
+
+  /* ── TOGGLE ACTIVE ── */
+  .toggle { position:relative; display:inline-block; width:36px; height:20px; flex-shrink:0; }
+  .toggle input { opacity:0; width:0; height:0; }
+  .toggle-slider { position:absolute; inset:0; background:#E4E4E3; border-radius:20px; cursor:pointer; transition:.2s; }
+  .toggle-slider:before { content:''; position:absolute; height:14px; width:14px; left:3px; bottom:3px; background:#fff; border-radius:50%; transition:.2s; }
+  .toggle input:checked + .toggle-slider { background:#F27141; }
+  .toggle input:checked + .toggle-slider:before { transform:translateX(16px); }
+
+  /* ── FILTER BAR ── */
+  .filter-select { font-family:inherit; font-size:12px; padding:8px 10px; border:1px solid #E4E4E3; border-radius:3px; background:#fff; color:#40403E; cursor:pointer; }
+  .filter-select:focus { outline:none; border-color:#F27141; }
 </style>
 </head>
 <body>
@@ -174,7 +193,11 @@
 
 <!-- ══ TABS ══ -->
 <div class="tabs">
-  <div class="tab active" data-tab="products">
+  <div class="tab active" data-tab="dashboard">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
+    Dashboard
+  </div>
+  <div class="tab" data-tab="products">
     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"></rect><path d="M8 21h8M12 17v4"></path></svg>
     Productos
   </div>
@@ -189,10 +212,54 @@
 </div>
 
 <div class="content">
+  <!-- ═══ DASHBOARD TAB ═══ -->
+  <div id="tab-dashboard">
+    <div class="section-header" style="margin-bottom:20px">
+      <div>
+        <div class="section-title">Panel general</div>
+        <div class="section-sub">Resumen de actividad de la tienda</div>
+      </div>
+    </div>
+    <div class="metric-grid" id="metric-grid">
+      <div class="metric-card"><div class="metric-val" id="m-products">—</div><div class="metric-label">Productos totales</div></div>
+      <div class="metric-card"><div class="metric-val metric-accent" id="m-active">—</div><div class="metric-label">Productos activos</div></div>
+      <div class="metric-card"><div class="metric-val" id="m-photos">—</div><div class="metric-label">Con fotos</div></div>
+      <div class="metric-card"><div class="metric-val metric-accent" id="m-leads-month">—</div><div class="metric-label">Leads este mes</div></div>
+      <div class="metric-card"><div class="metric-val" id="m-leads-total">—</div><div class="metric-label">Leads totales</div></div>
+      <div class="metric-card"><div class="metric-val" id="m-asesores">—</div><div class="metric-label">Asesores</div></div>
+    </div>
+    <div class="card">
+      <h2>Accesos rápidos</h2>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:4px">
+        <button class="btn btn-primary" onclick="switchTab('products');openProductModal()">+ Nuevo producto</button>
+        <button class="btn btn-secondary" onclick="switchTab('leads')">Ver leads</button>
+        <button class="btn btn-secondary" onclick="switchTab('asesores');openAsesorModal()">+ Nuevo asesor</button>
+        <a class="btn btn-secondary" href="/muebleBo.dc.html" target="_blank" style="text-decoration:none">Ver tienda</a>
+      </div>
+    </div>
+  </div>
+
   <!-- ═══ PRODUCTS TAB ═══ -->
-  <div id="tab-products">
+  <div id="tab-products" style="display:none">
     <div class="toolbar">
       <input type="text" id="search-prod" placeholder="Buscar producto...">
+      <select class="filter-select" id="filter-cat" onchange="renderProducts()">
+        <option value="">Todas las categorías</option>
+        <option>Sofás</option><option>Sillas</option><option>Mesas</option><option>Camas</option>
+        <option>Iluminación</option><option>Almacenamiento</option><option>Exterior</option>
+      </select>
+      <select class="filter-select" id="filter-status" onchange="renderProducts()">
+        <option value="">Todos</option>
+        <option value="active">Activos</option>
+        <option value="inactive">Inactivos</option>
+      </select>
+      <select class="filter-select" id="sort-prod" onchange="renderProducts()">
+        <option value="">Ordenar por</option>
+        <option value="price-asc">Precio ↑</option>
+        <option value="price-desc">Precio ↓</option>
+        <option value="name-asc">Nombre A–Z</option>
+        <option value="photos">Con fotos primero</option>
+      </select>
       <div class="toolbar-right">
         <button class="btn btn-primary" onclick="openProductModal()">+ Nuevo producto</button>
       </div>
@@ -200,7 +267,7 @@
     <div class="table-wrap">
       <table>
         <thead>
-          <tr><th></th><th>Nombre</th><th>Categoría</th><th>Precio</th><th>Imágenes</th><th>Acciones</th></tr>
+          <tr><th></th><th>Nombre</th><th>Categoría</th><th>Precio</th><th>Imágenes</th><th>Activo</th><th>Acciones</th></tr>
         </thead>
         <tbody id="prod-table"></tbody>
       </table>
@@ -230,10 +297,14 @@
       <div class="leads-intro-icon">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
       </div>
-      <div>
+      <div style="flex:1">
         <h2>Leads capturados por Deco IA</h2>
         <p>Datos de clientes recopilados durante conversaciones con el chatbot</p>
       </div>
+      <a href="/api/admin/leads/export" class="btn btn-primary" style="text-decoration:none;flex-shrink:0">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+        Exportar CSV
+      </a>
     </div>
     <div class="table-wrap">
       <table>
@@ -341,15 +412,22 @@ let editingProduct = null;
 let editingAsesor = null;
 
 // ── Tabs ──
-document.querySelectorAll('.tab').forEach(t => {
-  t.addEventListener('click', () => {
-    document.querySelectorAll('.tab').forEach(x => x.classList.remove('active'));
-    t.classList.add('active');
-    document.getElementById('tab-products').style.display = t.dataset.tab === 'products' ? '' : 'none';
-    document.getElementById('tab-asesores').style.display = t.dataset.tab === 'asesores' ? '' : 'none';
-    document.getElementById('tab-leads').style.display = t.dataset.tab === 'leads' ? '' : 'none';
-    if (t.dataset.tab === 'leads') loadLeads();
+const TABS = ['dashboard','products','asesores','leads'];
+
+function switchTab(name) {
+  document.querySelectorAll('.tab').forEach(x => {
+    x.classList.toggle('active', x.dataset.tab === name);
   });
+  TABS.forEach(t => {
+    const el = document.getElementById('tab-' + t);
+    if (el) el.style.display = t === name ? '' : 'none';
+  });
+  if (name === 'leads') loadLeads();
+  if (name === 'dashboard') loadDashboard();
+}
+
+document.querySelectorAll('.tab').forEach(t => {
+  t.addEventListener('click', () => switchTab(t.dataset.tab));
 });
 
 // ── Toast ──
@@ -358,6 +436,19 @@ function toast(msg) {
   el.textContent = msg;
   el.classList.add('show');
   setTimeout(() => el.classList.remove('show'), 2500);
+}
+
+// ── Dashboard ──
+async function loadDashboard() {
+  try {
+    const d = await (await fetch(API + '/dashboard')).json();
+    document.getElementById('m-products').textContent = d.totalProducts;
+    document.getElementById('m-active').textContent = d.activeProducts;
+    document.getElementById('m-photos').textContent = d.withPhotos;
+    document.getElementById('m-leads-month').textContent = d.leadsThisMonth;
+    document.getElementById('m-leads-total').textContent = d.totalLeads;
+    document.getElementById('m-asesores').textContent = d.totalAsesores;
+  } catch {}
 }
 
 // ── Load data ──
@@ -373,32 +464,55 @@ async function loadAsesores() {
 
 // ── Render products ──
 function renderProducts() {
-  const q = document.getElementById('search-prod').value.toLowerCase();
-  const filtered = q ? products.filter(p => p.name.toLowerCase().includes(q) || p.cat.toLowerCase().includes(q)) : products;
+  const q = (document.getElementById('search-prod').value || '').toLowerCase();
+  const cat = document.getElementById('filter-cat').value;
+  const status = document.getElementById('filter-status').value;
+  const sort = document.getElementById('sort-prod').value;
+
+  let list = products.slice();
+  if (q) list = list.filter(p => p.name.toLowerCase().includes(q) || (p.cat||'').toLowerCase().includes(q));
+  if (cat) list = list.filter(p => p.cat === cat);
+  if (status === 'active') list = list.filter(p => p.active !== false);
+  if (status === 'inactive') list = list.filter(p => p.active === false);
+  if (sort === 'price-asc') list.sort((a,b) => a.price - b.price);
+  if (sort === 'price-desc') list.sort((a,b) => b.price - a.price);
+  if (sort === 'name-asc') list.sort((a,b) => a.name.localeCompare(b.name));
+  if (sort === 'photos') list.sort((a,b) => (b.images||[]).length - (a.images||[]).length);
+
   const tbody = document.getElementById('prod-table');
 
-  if (!filtered.length) {
-    tbody.innerHTML = '<tr><td colspan="6"><div class="empty-state"><p>No hay productos</p></div></td></tr>';
+  if (!list.length) {
+    tbody.innerHTML = '<tr><td colspan="7"><div class="empty-state"><p>No hay productos</p></div></td></tr>';
     return;
   }
 
-  tbody.innerHTML = filtered.map(p => {
+  tbody.innerHTML = list.map(p => {
     const raw = p.images && p.images.length ? p.images[0] : '';
-    const imgSrc = raw.startsWith('data:') || raw.startsWith('http') ? raw : (raw ? '/' + raw : '');
+    const imgSrc = raw && (raw.startsWith('data:') || raw.startsWith('http')) ? raw : (raw ? '/' + raw : '');
     const thumbHtml = imgSrc
       ? `<img class="thumb" src="${imgSrc}" alt="">`
-      : `<div class="thumb" style="background:linear-gradient(135deg,${p.tones[0]},${p.tones[1]})"></div>`;
+      : `<div class="thumb" style="background:linear-gradient(135deg,${(p.tones||['#ccc','#eee'])[0]},${(p.tones||['#ccc','#eee'])[1]})"></div>`;
     const imgCount = (p.images || []).length;
     const imgBadge = imgCount
-      ? `<span class="badge badge-green">${imgCount} foto${imgCount > 1 ? 's' : ''}</span>`
-      : `<span class="badge badge-orange">Sin fotos</span>`;
-    return `<tr>
+      ? `<span class="pill pill-green">${imgCount} foto${imgCount > 1 ? 's' : ''}</span>`
+      : `<span class="pill pill-orange">Sin fotos</span>`;
+    const isActive = p.active !== false;
+    return `<tr style="${isActive ? '' : 'opacity:.55'}">
       <td>${thumbHtml}</td>
       <td><strong>${p.name}</strong><br><span style="color:#999;font-size:11px">${p.id}</span></td>
       <td>${p.cat}</td>
       <td>Bs ${p.price.toLocaleString('es-BO')}${p.old ? '<br><s style="color:#999;font-size:11px">Bs ' + p.old.toLocaleString('es-BO') + '</s>' : ''}</td>
       <td>${imgBadge}</td>
       <td>
+        <label class="toggle" title="${isActive ? 'Desactivar' : 'Activar'}">
+          <input type="checkbox" ${isActive ? 'checked' : ''} onchange="toggleActive('${p.id}', this.checked)">
+          <span class="toggle-slider"></span>
+        </label>
+      </td>
+      <td style="white-space:nowrap">
+        <a class="btn btn-secondary" href="/Producto_${p.id}.dc.html" target="_blank" style="text-decoration:none;margin-right:4px" title="Ver en tienda">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+        </a>
         <button class="btn btn-secondary" onclick="editProduct('${p.id}')" style="margin-right:4px">Editar</button>
         <button class="btn btn-danger" onclick="deleteProduct('${p.id}')">Eliminar</button>
       </td>
@@ -407,6 +521,20 @@ function renderProducts() {
 }
 
 document.getElementById('search-prod').addEventListener('input', renderProducts);
+
+async function toggleActive(id, active) {
+  try {
+    await fetch(API + '/products/' + id, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ active })
+    });
+    const p = products.find(x => x.id === id);
+    if (p) p.active = active;
+    renderProducts();
+    toast(active ? 'Producto activado' : 'Producto desactivado');
+  } catch { toast('Error al cambiar estado'); }
+}
 
 // ── Product modal ──
 function openProductModal(product) {
@@ -693,6 +821,7 @@ async function deleteLead(id) {
 }
 
 // ── Init ──
+loadDashboard();
 loadProducts();
 loadAsesores();
 </script>
