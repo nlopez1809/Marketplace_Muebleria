@@ -123,6 +123,7 @@ router.post('/', async (req, res) => {
           if (leadData.telefono) updates.telefono = leadData.telefono;
           if (leadData.ci) updates.ci = leadData.ci;
           if (leadData.productos_interes) updates.producto_interes = leadData.productos_interes;
+          if (leadData.fecha_visita) updates.fecha_visita = leadData.fecha_visita;
           await supabase.from('leads').update(updates).eq('session_id', sessionId);
         } else {
           await storage.createLead({
@@ -145,7 +146,7 @@ router.post('/', async (req, res) => {
         visitaPayload = buildVisitaLinks(v, asesor);
 
         // Guardar fecha_visita y productos en el lead
-        const fechaVisita = (v.fecha || '') + (v.hora ? ' ' + v.hora : '');
+        const fechaVisita = [v.fecha, v.hora].filter(Boolean).join(' ') || 'Por confirmar';
         const productosStr = (v.productos || []).map(p => p.nombre + (p.precio ? ' Bs ' + p.precio : '')).join(', ');
         const { data: existingLead } = await supabase.from('leads').select('id').eq('session_id', sessionId).single();
         if (existingLead) {
