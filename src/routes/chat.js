@@ -42,19 +42,31 @@ function buildVisitaLinks(v, asesor) {
   const calLocation = encodeURIComponent('InCassa DECO — Tienda');
   const calUrl = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${calTitle}&dates=${fmt(startDate)}/${fmt(endDate)}&details=${calDetails}&location=${calLocation}`;
 
-  const waMsg = encodeURIComponent(
-    `¡Hola! 👋 Te recordamos tu visita a InCassa DECO.\n\n📅 *Fecha:* ${v.fecha || startDate.toLocaleDateString('es-BO')} a las ${v.hora || startDate.toLocaleTimeString('es-BO', {hour:'2-digit',minute:'2-digit'})}\n📍 *Tienda:* InCassa DECO\n\n🛋️ *Productos que te interesan:*\n${productosList}\n\n¡Te esperamos! Cualquier consulta escribinos 😊`
+  const fechaStr = v.fecha || startDate.toLocaleDateString('es-BO');
+  const horaStr = v.hora || startDate.toLocaleTimeString('es-BO', {hour:'2-digit',minute:'2-digit'});
+
+  // Mensaje al CLIENTE
+  const waMsgCliente = encodeURIComponent(
+    `¡Hola ${v.nombre || ''}! 👋 Te confirmamos tu visita a InCassa DECO.\n\n📅 *Fecha:* ${fechaStr} a las ${horaStr}\n📍 *Tienda:* InCassa DECO\n\n🛋️ *Productos que te interesan:*\n${productosList}\n\n¡Te esperamos! Cualquier consulta respondemos aquí 😊`
   );
-  const waUrl = `https://wa.me/${(v.telefono || '').replace(/\D/g,'')}?text=${waMsg}`;
+  const waUrlCliente = `https://wa.me/${(v.telefono || '').replace(/\D/g,'')}?text=${waMsgCliente}`;
+
+  // Mensaje al ASESOR
+  const waMsgAsesor = encodeURIComponent(
+    `📋 *Nuevo lead agendado — Deco IA*\n\n👤 *Cliente:* ${v.nombre || '—'}\n📱 *WhatsApp:* ${v.telefono || '—'}\n📅 *Visita:* ${fechaStr} a las ${horaStr}\n\n🛋️ *Productos de interés:*\n${productosList}\n\n_Agendado por Deco IA_`
+  );
+  const waUrlAsesor = `https://wa.me/${(asesor.telefono || '').replace(/\D/g,'')}?text=${waMsgAsesor}`;
 
   return {
     nombre: v.nombre,
     telefono: v.telefono,
-    fecha: v.fecha || startDate.toLocaleDateString('es-BO'),
-    hora: v.hora || startDate.toLocaleTimeString('es-BO', {hour:'2-digit',minute:'2-digit'}),
+    fecha: fechaStr,
+    hora: horaStr,
     productos,
+    asesorNombre: asesor.nombre,
     calendarUrl: calUrl,
-    whatsappUrl: waUrl,
+    whatsappClienteUrl: waUrlCliente,
+    whatsappAsesorUrl: waUrlAsesor,
   };
 }
 
