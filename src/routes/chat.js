@@ -83,8 +83,15 @@ router.post('/', async (req, res) => {
     const result = await chat(message, chatHistory, dynamicPrompt);
     let assistantMessage = result.text;
 
+    // ── Limpiar etiquetas siempre (aunque fallen los parseos) ──
+    assistantMessage = assistantMessage.replace(/<!--LEAD:[\s\S]*?-->/g, '').trim();
+    assistantMessage = assistantMessage.replace(/<!--VISITA:[\s\S]*?-->/g, '').trim();
+
+    // Reprocesar sobre el texto original para extraer datos
+    const rawMessage = result.text;
+
     // ── Procesar LEAD ──
-    const leadMatch = assistantMessage.match(/<!--LEAD:(.*?)-->/);
+    const leadMatch = rawMessage.match(/<!--LEAD:([\s\S]*?)-->/);
     if (leadMatch) {
       try {
         const leadData = JSON.parse(leadMatch[1]);
@@ -111,12 +118,11 @@ router.post('/', async (req, res) => {
           });
         }
       } catch (e) { console.error('Error parsing lead:', e.message); }
-      assistantMessage = assistantMessage.replace(/<!--LEAD:.*?-->/gs, '').trim();
     }
 
     // ── Procesar VISITA ──
     let visitaPayload = null;
-    const visitaMatch = assistantMessage.match(/<!--VISITA:(.*?)-->/s);
+    const visitaMatch = rawMessage.match(/<!--VISITA:([\s\S]*?)-->/);
     if (visitaMatch) {
       try {
         const v = JSON.parse(visitaMatch[1]);
@@ -143,7 +149,6 @@ router.post('/', async (req, res) => {
           });
         }
       } catch (e) { console.error('Error parsing visita:', e.message); }
-      assistantMessage = assistantMessage.replace(/<!--VISITA:.*?-->/gs, '').trim();
     }
 
     res.json({ reply: assistantMessage, tokens: result.tokens, visita: visitaPayload });
