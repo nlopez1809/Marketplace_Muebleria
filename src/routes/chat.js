@@ -83,12 +83,16 @@ router.post('/', async (req, res) => {
     const result = await chat(message, chatHistory, dynamicPrompt);
     let assistantMessage = result.text;
 
-    // ── Limpiar etiquetas siempre (aunque fallen los parseos) ──
-    assistantMessage = assistantMessage.replace(/<!--LEAD:[\s\S]*?-->/g, '').trim();
-    assistantMessage = assistantMessage.replace(/<!--VISITA:[\s\S]*?-->/g, '').trim();
-
-    // Reprocesar sobre el texto original para extraer datos
+    // Guardar raw antes de limpiar
     const rawMessage = result.text;
+
+    // ── Limpiar etiquetas siempre — varios formatos posibles ──
+    assistantMessage = assistantMessage.replace(/<!--LEAD:[\s\S]*?-->/g, '');
+    assistantMessage = assistantMessage.replace(/<!--VISITA:[\s\S]*?-->/g, '');
+    // Por si el modelo escribe sin los comentarios HTML
+    assistantMessage = assistantMessage.replace(/VISITA:\s*\{[\s\S]*?\}(\s*→)?/g, '');
+    assistantMessage = assistantMessage.replace(/LEAD:\s*\{[\s\S]*?\}/g, '');
+    assistantMessage = assistantMessage.trim();
 
     // ── Procesar LEAD ──
     const leadMatch = rawMessage.match(/<!--LEAD:([\s\S]*?)-->/);
