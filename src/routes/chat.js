@@ -118,9 +118,13 @@ router.post('/', async (req, res) => {
 
     // ── Procesar LEAD ──
     const leadMatch = rawMessage.match(/<!--LEAD:([\s\S]*?)-->/);
+    console.log('[LEAD match]', !!leadMatch);
+    console.log('[VISITA match]', !!rawMessage.match(/<!--VISITA:([\s\S]*?)-->/));
+    console.log('[RAW snippet]', rawMessage.slice(-300));
     if (leadMatch) {
       try {
         const leadData = JSON.parse(leadMatch[1]);
+        console.log('[LEAD data]', leadData);
         const { data: existing } = await supabase
           .from('leads')
           .select('*')
@@ -156,6 +160,7 @@ router.post('/', async (req, res) => {
     if (visitaMatch) {
       try {
         const v = JSON.parse(visitaMatch[1]);
+        console.log('[VISITA data]', v);
         visitaPayload = buildVisitaLinks(v, asesor);
 
         // Guardar fecha_visita y productos en el lead
