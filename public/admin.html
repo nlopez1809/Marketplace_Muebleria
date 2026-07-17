@@ -798,8 +798,18 @@ function renderLeads() {
   }
   tbody.innerHTML = leads.map(l => {
     const date = new Date(l.created_at).toLocaleDateString('es-BO', { day:'2-digit', month:'short', year:'numeric' });
+    let visitaTexto = '—';
+    if (l.fecha_visita) {
+      const d = new Date(l.fecha_visita);
+      if (!isNaN(d)) {
+        visitaTexto = d.toLocaleDateString('es-BO', { weekday:'short', day:'2-digit', month:'short', year:'numeric' })
+          + ' ' + d.toLocaleTimeString('es-BO', { hour:'2-digit', minute:'2-digit' });
+      } else {
+        visitaTexto = l.fecha_visita;
+      }
+    }
     const visitaBadge = l.fecha_visita
-      ? `<span class="pill pill-green">📅 ${l.fecha_visita}</span>`
+      ? `<span class="pill pill-green">📅 ${visitaTexto}</span>`
       : `<span style="color:#ccc">—</span>`;
     return `<tr>
       <td><strong>${l.nombre || '<span style="color:#ccc">Sin nombre</span>'}</strong></td>

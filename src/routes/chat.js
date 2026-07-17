@@ -4,6 +4,16 @@ const { chat } = require('../services/ai');
 const storage = require('../services/storage');
 const supabase = require('../services/supabase');
 const SYSTEM_PROMPT = require('../config/prompt');
+const chrono = require('chrono-node');
+
+function parseFechaVisita(texto) {
+  if (!texto) return null;
+  try {
+    const parsed = chrono.es.parseDate(texto, new Date());
+    if (parsed) return parsed.toISOString();
+  } catch (e) {}
+  return null;
+}
 
 let asesorIndex = 0;
 
@@ -123,7 +133,10 @@ router.post('/', async (req, res) => {
           if (leadData.telefono) updates.telefono = leadData.telefono;
           if (leadData.ci) updates.ci = leadData.ci;
           if (leadData.productos_interes) updates.producto_interes = leadData.productos_interes;
-          if (leadData.fecha_visita) updates.fecha_visita = leadData.fecha_visita;
+          if (leadData.fecha_visita) {
+            const iso = parseFechaVisita(leadData.fecha_visita);
+            updates.fecha_visita = iso || leadData.fecha_visita;
+          }
           await supabase.from('leads').update(updates).eq('session_id', sessionId);
         } else {
           await storage.createLead({
@@ -146,7 +159,8 @@ router.post('/', async (req, res) => {
         visitaPayload = buildVisitaLinks(v, asesor);
 
         // Guardar fecha_visita y productos en el lead
-        const fechaVisita = [v.fecha, v.hora].filter(Boolean).join(' ') || 'Por confirmar';
+        const textoFecha = [v.fecha, v.hora].filter(Boolean).join(' ');
+        const fechaVisita = parseFechaVisita(textoFecha) || textoFecha || 'Por confirmar';
         const productosStr = (v.productos || []).map(p => p.nombre + (p.precio ? ' Bs ' + p.precio : '')).join(', ');
         const { data: existingLead } = await supabase.from('leads').select('id').eq('session_id', sessionId).single();
         if (existingLead) {
