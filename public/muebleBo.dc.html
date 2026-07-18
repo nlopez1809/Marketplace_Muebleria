@@ -894,7 +894,18 @@ class Component extends DCLogic {
 
   // ---- lightbox ----
   openLb(id){
-    window.location.href='Producto_Aurora.dc.html?id='+id;
+    document.body.style.overflow='hidden';
+    this.setState(s=>({lb:{...s.lb,open:true,pid:id,idx:0,loading:true,progress:0,zoom:false}}));
+    this.runLoad();
+  }
+  openLbBySlug(slug){
+    const prods=this.getProducts();
+    const s=slug.toLowerCase();
+    const match=prods.find(p=>p.name&&p.name.toLowerCase().includes(s));
+    if(match){ this.openLb(match.id); return; }
+    // fallback: scroll to catalog and highlight
+    const el=document.getElementById('catalogo');
+    if(el) el.scrollIntoView({behavior:'smooth'});
   }
   runLoad(){
     clearInterval(this._loadT);
@@ -952,7 +963,7 @@ class Component extends DCLogic {
     this.loadAsesores();
     this.loadProductsFromAPI();
     var self=this;
-    window.__decoOpenProduct=function(pid){ self.openLb(pid); };
+    window.__decoOpenProduct=function(pid){ self.openLbBySlug(pid); };
     // reveal observer
     this._io = new IntersectionObserver((ents)=>{
       ents.forEach(en=>{ if(en.isIntersecting){ en.target.classList.add('mb-in'); this._io.unobserve(en.target); } });
@@ -1160,7 +1171,7 @@ class Component extends DCLogic {
       lbAttrs: lp ? [ {k:'Material',v:lp.material}, {k:'Dimensiones',v:lp.dims}, {k:'Peso',v:lp.weight}, {k:'Garantía',v:lp.warranty} ] : [],
       lbDesc: lp ? lp.desc : '',
       lbAdd: (e)=>{ if(lp) this.addToCart(lp.id,e); },
-      lbViewDetail: ()=>{ if(lp) window.location.href='Producto_Aurora.dc.html?id='+lp.id; },
+      lbViewDetail: ()=>{ if(lp) window.open('Producto_Aurora.dc.html?id='+lp.id,'_blank'); },
       lbWhatsApp: ()=>{ if(lp) self.openWhatsApp(lp.name); },
       openWhatsAppGeneral: ()=>self.openWhatsApp(),
 
