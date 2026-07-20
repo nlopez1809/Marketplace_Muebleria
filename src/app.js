@@ -68,15 +68,14 @@ app.use((req, res, next) => {
 // ── Cookie parsing ──
 app.use(cookieParser());
 
-// ── Static files (assets/uploads only, NOT html directly) ──
-app.use('/uploads', express.static(path.join(__dirname, '..', 'uploads')));
-// Serve static assets (css, js, images) but block direct .html access
-app.use(express.static(path.join(__dirname, '..', 'public'), { index: false, extensions: [] }));
-
-// ── Block direct .html file access ──
-app.get('*.html', (req, res) => {
+// ── Block direct .html file access (must be before static middleware) ──
+app.get(/\.html$/, (req, res) => {
   res.status(404).send('Not found');
 });
+
+// ── Static files (assets/uploads only, NOT html directly) ──
+app.use('/uploads', express.static(path.join(__dirname, '..', 'uploads')));
+app.use(express.static(path.join(__dirname, '..', 'public'), { index: false, extensions: [] }));
 
 // ── Auth routes ──
 app.post('/api/auth/login', loginLimiter, login);
