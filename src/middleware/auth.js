@@ -9,7 +9,7 @@ function requireAuth(req, res, next) {
   const token = req.cookies && req.cookies.token;
   if (!token) {
     if (req.headers.accept && req.headers.accept.includes('text/html')) {
-      return res.redirect('/login.html');
+      return res.redirect('/login');
     }
     return res.status(401).json({ error: 'No autorizado. Inicia sesión.' });
   }
@@ -20,7 +20,7 @@ function requireAuth(req, res, next) {
   } catch (e) {
     res.clearCookie('token');
     if (req.headers.accept && req.headers.accept.includes('text/html')) {
-      return res.redirect('/login.html');
+      return res.redirect('/login');
     }
     res.status(401).json({ error: 'Sesión expirada. Inicia sesión de nuevo.' });
   }

@@ -1074,7 +1074,7 @@ class Component extends DCLogic {
       slotSofas: 'assets/cat-sofas.png',
       goMelamina: ()=>this.goToCategory('Almacenamiento'),
       goComedor: ()=>this.goToCategory('Mesas'),
-      goCamas: ()=>{ window.location.href='Camas.dc.html'; },
+      goCamas: ()=>this.goToCategory('Camas'),
       goSofas: ()=>this.goToCategory('Sofás'),
 
       stripCats: ['Sofás','Seccionales','Sillas & Butacas','Mesas de comedor','Mesas de centro','Camas','Cómodas','Iluminación','Estanterías','Exterior','Alfombras','Decoración'],
@@ -1171,7 +1171,7 @@ class Component extends DCLogic {
       lbAttrs: lp ? [ {k:'Material',v:lp.material}, {k:'Dimensiones',v:lp.dims}, {k:'Peso',v:lp.weight}, {k:'Garantía',v:lp.warranty} ] : [],
       lbDesc: lp ? lp.desc : '',
       lbAdd: (e)=>{ if(lp) this.addToCart(lp.id,e); },
-      lbViewDetail: ()=>{ if(lp) window.open('Producto_Aurora.dc.html?id='+lp.id,'_blank'); },
+      lbViewDetail: ()=>{ if(lp) window.open('/producto/'+lp.id,'_blank'); },
       lbWhatsApp: ()=>{ if(lp) self.openWhatsApp(lp.name); },
       openWhatsAppGeneral: ()=>self.openWhatsApp(),
 

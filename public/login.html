@@ -83,7 +83,7 @@ document.getElementById('loginForm').addEventListener('submit', async function(e
     });
     var data = await res.json();
     if (res.ok && data.ok) {
-      window.location.href = '/admin.html';
+      window.location.href = '/admin';
     } else {
       err.textContent = data.error || 'Error al iniciar sesion';
       err.style.display = 'block';

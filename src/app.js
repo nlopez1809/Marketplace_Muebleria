@@ -68,9 +68,15 @@ app.use((req, res, next) => {
 // ── Cookie parsing ──
 app.use(cookieParser());
 
-// ── Static files ──
-app.use(express.static(path.join(__dirname, '..', 'public')));
+// ── Static files (assets/uploads only, NOT html directly) ──
 app.use('/uploads', express.static(path.join(__dirname, '..', 'uploads')));
+// Serve static assets (css, js, images) but block direct .html access
+app.use(express.static(path.join(__dirname, '..', 'public'), { index: false, extensions: [] }));
+
+// ── Block direct .html file access ──
+app.get('*.html', (req, res) => {
+  res.status(404).send('Not found');
+});
 
 // ── Auth routes ──
 app.post('/api/auth/login', loginLimiter, login);
@@ -109,11 +115,21 @@ app.use('/api/admin/products', requireAuth, uploadRoutes);
 app.use('/api/admin/leads', requireAuth, leadRoutes);
 app.use('/api/admin/asesores', requireAuth, asesoresRoutes);
 
-// ── Admin page (protected) ──
-app.get('/admin.html', requireAuth);
+// ── Clean URL routes ──
+app.get('/admin', requireAuth, (req, res) => {
+  res.sendFile(path.join(__dirname, '..', 'public', 'admin.html'));
+});
+
+app.get('/login', (req, res) => {
+  res.sendFile(path.join(__dirname, '..', 'public', 'login.html'));
+});
+
+app.get('/producto/:id', (req, res) => {
+  res.sendFile(path.join(__dirname, '..', 'public', 'Producto_Aurora.dc.html'));
+});
 
 app.get('/', (req, res) => {
-  res.redirect('/muebleBo.dc.html');
+  res.sendFile(path.join(__dirname, '..', 'public', 'muebleBo.dc.html'));
 });
 
 module.exports = app;
