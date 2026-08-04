@@ -14,6 +14,15 @@ const leadRoutes = require('./routes/leads');
 const asesoresRoutes = require('./routes/asesores');
 const visualizeRoutes = require('./routes/visualize');
 const storage = require('./services/storage');
+const supabase = require('./services/supabase');
+
+// ── SSE: notify admin on new lead ──
+const sseClients = new Set();
+function notifyNewLead(lead) {
+  const msg = `data: ${JSON.stringify({ type: 'new_lead', lead })}\n\n`;
+  sseClients.forEach(c => { try { c.write(msg); } catch(e) { sseClients.delete(c); } });
+}
+module.exports.notifyNewLead = notifyNewLead;
 
 const app = express();
 
@@ -113,6 +122,65 @@ app.use('/api/admin/products', requireAuth, productsRoutes);
 app.use('/api/admin/products', requireAuth, uploadRoutes);
 app.use('/api/admin/leads', requireAuth, leadRoutes);
 app.use('/api/admin/asesores', requireAuth, asesoresRoutes);
+
+// ── SSE endpoint for real-time notifications ──
+app.get('/api/admin/events', requireAuth, (req, res) => {
+  res.setHeader('Content-Type', 'text/event-stream');
+  res.setHeader('Cache-Control', 'no-cache');
+  res.setHeader('Connection', 'keep-alive');
+  res.flushHeaders();
+  res.write('data: {"type":"connected"}\n\n');
+  sseClients.add(res);
+  req.on('close', () => sseClients.delete(res));
+});
+
+// ── Analytics ──
+app.get('/api/admin/analytics', requireAuth, async (req, res) => {
+  try {
+    const { data: leads } = await supabase.from('leads').select('*').order('created_at', { ascending: true });
+    const all = leads || [];
+    // Leads por día (últimos 30 días)
+    const now = new Date();
+    const days = [];
+    for (let i = 29; i >= 0; i--) {
+      const d = new Date(now); d.setDate(d.getDate() - i);
+      const key = d.toISOString().slice(0, 10);
+      days.push({ date: key, count: 0 });
+    }
+    all.forEach(l => {
+      const key = l.created_at ? l.created_at.slice(0, 10) : null;
+      const day = days.find(d => d.date === key);
+      if (day) day.count++;
+    });
+    // Pipeline breakdown
+    const stages = { nuevo: 0, contactado: 0, visita_agendada: 0, cerrado: 0, perdido: 0 };
+    all.forEach(l => { const s = l.pipeline_stage || 'nuevo'; if (stages[s] !== undefined) stages[s]++; else stages.nuevo++; });
+    // Productos más consultados
+    const prodCount = {};
+    all.forEach(l => {
+      if (l.producto_interes) {
+        l.producto_interes.split(',').forEach(p => {
+          const name = p.trim().split(' Bs ')[0].trim();
+          if (name) prodCount[name] = (prodCount[name] || 0) + 1;
+        });
+      }
+    });
+    const topProducts = Object.entries(prodCount).sort((a,b) => b[1]-a[1]).slice(0,5).map(([name,count]) => ({name,count}));
+    // Conversión
+    const totalLeads = all.length;
+    const withVisit = all.filter(l => l.fecha_visita).length;
+    const withPhone = all.filter(l => l.telefono).length;
+    res.json({ days, stages, topProducts, totalLeads, withVisit, withPhone });
+  } catch(e) { res.status(500).json({ error: 'Error al obtener analytics' }); }
+});
+
+// ── Visitas (calendario) ──
+app.get('/api/admin/visitas', requireAuth, async (req, res) => {
+  try {
+    const { data } = await supabase.from('leads').select('id,nombre,telefono,producto_interes,fecha_visita,pipeline_stage').not('fecha_visita', 'is', null).order('fecha_visita');
+    res.json(data || []);
+  } catch(e) { res.status(500).json({ error: 'Error al obtener visitas' }); }
+});
 
 // ── Clean URL routes ──
 app.get('/admin', requireAuth, (req, res) => {

@@ -49,7 +49,7 @@ router.put('/:id', async (req, res) => {
   try {
     const p = req.body;
     const updates = {};
-    for (const key of ['name','cat','type','material','city','city2','dims','weight','warranty','desc','tones','images','badge','active']) {
+    for (const key of ['name','cat','type','material','city','city2','dims','weight','warranty','desc','tones','images','badge','active','stock']) {
       if (p[key] !== undefined) updates[key] = p[key];
     }
     for (const key of ['price','old','rating','reviews']) {

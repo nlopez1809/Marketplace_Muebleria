@@ -6,6 +6,9 @@ const supabase = require('../services/supabase');
 const SYSTEM_PROMPT = require('../config/prompt');
 const chrono = require('chrono-node');
 
+// In-memory conversation store (per session) for saving to DB
+const sessionConversations = {};
+
 function parseFechaVisita(texto) {
   if (!texto) return null;
   try {
@@ -116,23 +119,23 @@ router.post('/', async (req, res) => {
     assistantMessage = assistantMessage.replace(/LEAD:\s*\{[\s\S]*?\}/g, '');
     assistantMessage = assistantMessage.trim();
 
+    // ── Guardar conversación en memoria ──
+    if (!sessionConversations[sessionId]) sessionConversations[sessionId] = [];
+    sessionConversations[sessionId].push({ role: 'user', content: message, ts: new Date().toISOString() });
+    sessionConversations[sessionId].push({ role: 'bot', content: assistantMessage, ts: new Date().toISOString() });
+    if (sessionConversations[sessionId].length > 100) sessionConversations[sessionId] = sessionConversations[sessionId].slice(-100);
+
     // ── Procesar LEAD ──
     const leadMatch = rawMessage.match(/<!--LEAD:([\s\S]*?)-->/);
-    console.log('[LEAD match]', !!leadMatch);
-    console.log('[VISITA match]', !!rawMessage.match(/<!--VISITA:([\s\S]*?)-->/));
-    console.log('[RAW snippet]', rawMessage.slice(-300));
+    let notifyApp = null;
     if (leadMatch) {
       try {
         const leadData = JSON.parse(leadMatch[1]);
-        console.log('[LEAD data]', leadData);
-        const { data: existing } = await supabase
-          .from('leads')
-          .select('*')
-          .eq('session_id', sessionId)
-          .single();
+        const { data: existing } = await supabase.from('leads').select('*').eq('session_id', sessionId).single();
+        const conv = sessionConversations[sessionId] || [];
 
         if (existing) {
-          const updates = { updated_at: new Date().toISOString() };
+          const updates = { updated_at: new Date().toISOString(), conversacion: conv };
           if (leadData.nombre) updates.nombre = leadData.nombre;
           if (leadData.telefono) updates.telefono = leadData.telefono;
           if (leadData.ci) updates.ci = leadData.ci;
@@ -143,13 +146,15 @@ router.post('/', async (req, res) => {
           }
           await supabase.from('leads').update(updates).eq('session_id', sessionId);
         } else {
-          await storage.createLead({
+          const newLead = await storage.createLead({
             session_id: sessionId,
             nombre: leadData.nombre || '',
             telefono: leadData.telefono || '',
             ci: leadData.ci || '',
             producto_interes: leadData.productos_interes || '',
+            conversacion: conv,
           });
+          notifyApp = newLead;
         }
       } catch (e) { console.error('Error parsing lead:', e.message); }
     }
@@ -160,31 +165,24 @@ router.post('/', async (req, res) => {
     if (visitaMatch) {
       try {
         const v = JSON.parse(visitaMatch[1]);
-        console.log('[VISITA data]', v);
         visitaPayload = buildVisitaLinks(v, asesor);
-
-        // Guardar fecha_visita y productos en el lead
         const textoFecha = [v.fecha, v.hora].filter(Boolean).join(' ');
         const fechaVisita = parseFechaVisita(textoFecha) || textoFecha || 'Por confirmar';
         const productosStr = (v.productos || []).map(p => p.nombre + (p.precio ? ' Bs ' + p.precio : '')).join(', ');
+        const conv = sessionConversations[sessionId] || [];
         const { data: existingLead } = await supabase.from('leads').select('id').eq('session_id', sessionId).single();
         if (existingLead) {
-          await supabase.from('leads').update({
-            fecha_visita: fechaVisita,
-            producto_interes: productosStr,
-            updated_at: new Date().toISOString()
-          }).eq('session_id', sessionId);
+          await supabase.from('leads').update({ fecha_visita: fechaVisita, producto_interes: productosStr, pipeline_stage: 'visita_agendada', conversacion: conv, updated_at: new Date().toISOString() }).eq('session_id', sessionId);
         } else {
-          await storage.createLead({
-            session_id: sessionId,
-            nombre: v.nombre || '',
-            telefono: v.telefono || '',
-            ci: '',
-            producto_interes: productosStr,
-            fecha_visita: fechaVisita,
-          });
+          const newLead = await storage.createLead({ session_id: sessionId, nombre: v.nombre || '', telefono: v.telefono || '', ci: '', producto_interes: productosStr, fecha_visita: fechaVisita, pipeline_stage: 'visita_agendada', conversacion: conv });
+          notifyApp = newLead;
         }
       } catch (e) { console.error('Error parsing visita:', e.message); }
+    }
+
+    // ── Notificar SSE si hay nuevo lead ──
+    if (notifyApp) {
+      try { const { notifyNewLead } = require('../app'); notifyNewLead(notifyApp); } catch(e) {}
     }
 
     res.json({ reply: assistantMessage, tokens: result.tokens, visita: visitaPayload });
