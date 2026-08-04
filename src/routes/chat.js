@@ -4,8 +4,84 @@ const { chat } = require('../services/ai');
 const storage = require('../services/storage');
 const supabase = require('../services/supabase');
 const SYSTEM_PROMPT = require('../config/prompt');
+const chrono = require('chrono-node');
+
+// In-memory conversation store (per session) for saving to DB
+const sessionConversations = {};
+
+function parseFechaVisita(texto) {
+  if (!texto) return null;
+  try {
+    const parsed = chrono.es.parseDate(texto, new Date());
+    if (parsed) return parsed.toISOString();
+  } catch (e) {}
+  return null;
+}
 
 let asesorIndex = 0;
+
+function buildVisitaLinks(v, asesor) {
+  // Fecha/hora: intentar parsear lo que diga el agente, sino usar mañana 10am
+  let startDate = new Date();
+  startDate.setDate(startDate.getDate() + 1);
+  startDate.setHours(10, 0, 0, 0);
+
+  if (v.fecha) {
+    const parts = v.fecha.split('/');
+    if (parts.length >= 2) {
+      const d = parseInt(parts[0]);
+      const m = parseInt(parts[1]) - 1;
+      const y = parts[2] ? parseInt(parts[2]) : startDate.getFullYear();
+      if (!isNaN(d) && !isNaN(m)) startDate = new Date(y, m, d, 10, 0, 0);
+    }
+  }
+  if (v.hora) {
+    const hm = v.hora.match(/(\d{1,2})[:\.]?(\d{0,2})/);
+    if (hm) {
+      startDate.setHours(parseInt(hm[1]), parseInt(hm[2] || '0'), 0, 0);
+    }
+  }
+
+  const endDate = new Date(startDate.getTime() + 60 * 60 * 1000);
+  const fmt = d => d.toISOString().replace(/[-:]/g,'').split('.')[0] + 'Z';
+
+  const productos = Array.isArray(v.productos) ? v.productos : [];
+  const productosList = productos.map(p => `• ${p.nombre}${p.precio ? ' — Bs ' + p.precio : ''}`).join('\n');
+
+  const calTitle = encodeURIComponent('Visita InCassa DECO — ' + (v.nombre || 'Cliente'));
+  const calDetails = encodeURIComponent(
+    `Visita agendada por Deco IA para ${v.nombre || 'cliente'}.\n\nProductos de interés:\n${productosList}\n\nAsesor: ${asesor.nombre} — ${asesor.telefono}`
+  );
+  const calLocation = encodeURIComponent('InCassa DECO — Tienda');
+  const calUrl = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${calTitle}&dates=${fmt(startDate)}/${fmt(endDate)}&details=${calDetails}&location=${calLocation}`;
+
+  const fechaStr = v.fecha || startDate.toLocaleDateString('es-BO');
+  const horaStr = v.hora || startDate.toLocaleTimeString('es-BO', {hour:'2-digit',minute:'2-digit'});
+
+  // Mensaje al CLIENTE
+  const waMsgCliente = encodeURIComponent(
+    `¡Hola ${v.nombre || ''}! 👋 Te confirmamos tu visita a InCassa DECO.\n\n📅 *Fecha:* ${fechaStr} a las ${horaStr}\n📍 *Tienda:* InCassa DECO\n\n🛋️ *Productos que te interesan:*\n${productosList}\n\n¡Te esperamos! Cualquier consulta respondemos aquí 😊`
+  );
+  const waUrlCliente = `https://wa.me/${(v.telefono || '').replace(/\D/g,'')}?text=${waMsgCliente}`;
+
+  // Mensaje al ASESOR
+  const waMsgAsesor = encodeURIComponent(
+    `📋 *Nuevo lead agendado — Deco IA*\n\n👤 *Cliente:* ${v.nombre || '—'}\n📱 *WhatsApp:* ${v.telefono || '—'}\n📅 *Visita:* ${fechaStr} a las ${horaStr}\n\n🛋️ *Productos de interés:*\n${productosList}\n\n_Agendado por Deco IA_`
+  );
+  const waUrlAsesor = `https://wa.me/${(asesor.telefono || '').replace(/\D/g,'')}?text=${waMsgAsesor}`;
+
+  return {
+    nombre: v.nombre,
+    telefono: v.telefono,
+    fecha: fechaStr,
+    hora: horaStr,
+    productos,
+    asesorNombre: asesor.nombre,
+    calendarUrl: calUrl,
+    whatsappClienteUrl: waUrlCliente,
+    whatsappAsesorUrl: waUrlAsesor,
+  };
+}
 
 async function getAsesorDeTurno() {
   const asesores = await storage.getAsesores();
@@ -32,36 +108,84 @@ router.post('/', async (req, res) => {
     const result = await chat(message, chatHistory, dynamicPrompt);
     let assistantMessage = result.text;
 
-    const leadMatch = assistantMessage.match(/<!--LEAD:(.*?)-->/);
+    // Guardar raw antes de limpiar
+    const rawMessage = result.text;
+
+    // ── Limpiar etiquetas siempre — varios formatos posibles ──
+    assistantMessage = assistantMessage.replace(/<!--LEAD:[\s\S]*?-->/g, '');
+    assistantMessage = assistantMessage.replace(/<!--VISITA:[\s\S]*?-->/g, '');
+    // Por si el modelo escribe sin los comentarios HTML
+    assistantMessage = assistantMessage.replace(/VISITA:\s*\{[\s\S]*?\}(\s*→)?/g, '');
+    assistantMessage = assistantMessage.replace(/LEAD:\s*\{[\s\S]*?\}/g, '');
+    assistantMessage = assistantMessage.trim();
+
+    // ── Guardar conversación en memoria ──
+    if (!sessionConversations[sessionId]) sessionConversations[sessionId] = [];
+    sessionConversations[sessionId].push({ role: 'user', content: message, ts: new Date().toISOString() });
+    sessionConversations[sessionId].push({ role: 'bot', content: assistantMessage, ts: new Date().toISOString() });
+    if (sessionConversations[sessionId].length > 100) sessionConversations[sessionId] = sessionConversations[sessionId].slice(-100);
+
+    // ── Procesar LEAD ──
+    const leadMatch = rawMessage.match(/<!--LEAD:([\s\S]*?)-->/);
+    let notifyApp = null;
     if (leadMatch) {
       try {
         const leadData = JSON.parse(leadMatch[1]);
-        const { data: existing } = await supabase
-          .from('leads')
-          .select('*')
-          .eq('session_id', sessionId)
-          .single();
+        const { data: existing } = await supabase.from('leads').select('*').eq('session_id', sessionId).single();
+        const conv = sessionConversations[sessionId] || [];
 
         if (existing) {
-          const updates = { updated_at: new Date().toISOString() };
+          const updates = { updated_at: new Date().toISOString(), conversacion: conv };
           if (leadData.nombre) updates.nombre = leadData.nombre;
           if (leadData.telefono) updates.telefono = leadData.telefono;
           if (leadData.ci) updates.ci = leadData.ci;
+          if (leadData.productos_interes) updates.producto_interes = leadData.productos_interes;
+          if (leadData.fecha_visita) {
+            const iso = parseFechaVisita(leadData.fecha_visita);
+            updates.fecha_visita = iso || leadData.fecha_visita;
+          }
           await supabase.from('leads').update(updates).eq('session_id', sessionId);
         } else {
-          await storage.createLead({
+          const newLead = await storage.createLead({
             session_id: sessionId,
             nombre: leadData.nombre || '',
             telefono: leadData.telefono || '',
             ci: leadData.ci || '',
-            producto_interes: '',
+            producto_interes: leadData.productos_interes || '',
+            conversacion: conv,
           });
+          notifyApp = newLead;
         }
       } catch (e) { console.error('Error parsing lead:', e.message); }
-      assistantMessage = assistantMessage.replace(/<!--LEAD:.*?-->/g, '').trim();
     }
 
-    res.json({ reply: assistantMessage, tokens: result.tokens });
+    // ── Procesar VISITA ──
+    let visitaPayload = null;
+    const visitaMatch = rawMessage.match(/<!--VISITA:([\s\S]*?)-->/);
+    if (visitaMatch) {
+      try {
+        const v = JSON.parse(visitaMatch[1]);
+        visitaPayload = buildVisitaLinks(v, asesor);
+        const textoFecha = [v.fecha, v.hora].filter(Boolean).join(' ');
+        const fechaVisita = parseFechaVisita(textoFecha) || textoFecha || 'Por confirmar';
+        const productosStr = (v.productos || []).map(p => p.nombre + (p.precio ? ' Bs ' + p.precio : '')).join(', ');
+        const conv = sessionConversations[sessionId] || [];
+        const { data: existingLead } = await supabase.from('leads').select('id').eq('session_id', sessionId).single();
+        if (existingLead) {
+          await supabase.from('leads').update({ fecha_visita: fechaVisita, producto_interes: productosStr, pipeline_stage: 'visita_agendada', conversacion: conv, updated_at: new Date().toISOString() }).eq('session_id', sessionId);
+        } else {
+          const newLead = await storage.createLead({ session_id: sessionId, nombre: v.nombre || '', telefono: v.telefono || '', ci: '', producto_interes: productosStr, fecha_visita: fechaVisita, pipeline_stage: 'visita_agendada', conversacion: conv });
+          notifyApp = newLead;
+        }
+      } catch (e) { console.error('Error parsing visita:', e.message); }
+    }
+
+    // ── Notificar SSE si hay nuevo lead ──
+    if (notifyApp) {
+      try { const { notifyNewLead } = require('../app'); notifyNewLead(notifyApp); } catch(e) {}
+    }
+
+    res.json({ reply: assistantMessage, tokens: result.tokens, visita: visitaPayload });
   } catch (error) {
     console.error('Error calling AI:', error.message);
     res.status(500).json({ error: 'Error al procesar tu mensaje. Intenta de nuevo.' });
