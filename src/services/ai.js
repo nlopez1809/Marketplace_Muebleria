@@ -1,6 +1,10 @@
 const Groq = require('groq-sdk');
 
-const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
+let groq = null;
+function getGroq() {
+  if (!groq) groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
+  return groq;
+}
 
 async function chat(message, history, systemPrompt) {
   const messages = [
@@ -10,7 +14,7 @@ async function chat(message, history, systemPrompt) {
     })
   ];
 
-  const result = await groq.chat.completions.create({
+  const result = await getGroq().chat.completions.create({
     model: 'llama-3.1-8b-instant',
     messages: messages,
     max_tokens: 300,
