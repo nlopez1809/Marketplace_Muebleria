@@ -619,9 +619,14 @@
       <span style="font-family:'Comfortaa',sans-serif;font-weight:600;font-size:17px;color:#40403E">Deco IA</span>
       <span style="font-size:10px;letter-spacing:.05em;color:#9A9A98;margin-top:2px">Tu asistente de InCassa</span>
     </div>
-    <button onClick="{{ closeDeco }}" title="Cerrar" style="margin-left:auto;background:none;border:none;cursor:pointer;width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#737373;transition:background .2s,color .2s" style-hover="background:#F1F1EF;color:#40403E">
-      <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><path d="M6 6l12 12M18 6L6 18"></path></svg>
-    </button>
+    <div style="margin-left:auto;display:flex;gap:4px;align-items:center">
+      <button onClick="{{ resetDeco }}" title="Nueva conversación" style="background:none;border:none;cursor:pointer;width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#737373;transition:background .2s,color .2s" style-hover="background:#F1F1EF;color:#40403E">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path><path d="M3 3v5h5"></path></svg>
+      </button>
+      <button onClick="{{ closeDeco }}" title="Cerrar" style="background:none;border:none;cursor:pointer;width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#737373;transition:background .2s,color .2s" style-hover="background:#F1F1EF;color:#40403E">
+        <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><path d="M6 6l12 12M18 6L6 18"></path></svg>
+      </button>
+    </div>
   </div>
 
   <!-- messages -->
@@ -802,10 +807,17 @@ class Component extends DCLogic {
   }
   toggleDeco(){ this.setState(s=>({deco:{...s.deco,open:!s.deco.open}}), ()=>{ if(this.state.deco.open&&this._decoInput) try{this._decoInput.focus();}catch(e){} }); }
   closeDeco(){ this.setState(s=>({deco:{...s.deco,open:false}})); }
+  resetDeco(){
+    var initMsg = [{role:'bot',text:'¡Hola! Bienvenido/a a InCassa DECO ✨ Soy Deco IA, tu asistente personal de muebles y decoración. Para brindarte una atención personalizada, ¿con quién tengo el gusto de conversar?'}];
+    this._decoHistory = [{role:'assistant',content:initMsg[0].text}];
+    this._decoSessionId = 'deco-dc-' + Math.random().toString(36).slice(2,10);
+    try{ localStorage.removeItem('decoIA_session'); }catch(e){}
+    this.setState({decoMessages: initMsg, decoInput:''});
+  }
   sendDeco(){
     const t=(this.state.decoInput||'').trim(); if(!t) return;
     if(!this._decoSessionId) this._decoSessionId = 'deco-dc-' + Math.random().toString(36).slice(2,10);
-    this.setState(s=>({ decoMessages:[...s.decoMessages,{role:'user',text:t}], decoInput:'', _decoLoading:true }));
+    this.setState(s=>{ var newMsgs=[...s.decoMessages,{role:'user',text:t}]; try{ localStorage.setItem('decoIA_session', JSON.stringify({messages:newMsgs, history:self._decoHistory, sessionId:self._decoSessionId})); }catch(e){} return{ decoMessages:newMsgs, decoInput:'', _decoLoading:true }; });
     const self=this;
     if(!this._decoHistory) this._decoHistory=[{role:'assistant',content:'¡Hola! Bienvenido/a a InCassa DECO ✨ Soy Deco IA, tu asistente personal de muebles y decoración. Para brindarte una atención personalizada, ¿con quién tengo el gusto de conversar?'}];
     this._decoHistory.push({role:'user',content:t});
@@ -816,7 +828,12 @@ class Component extends DCLogic {
         if(self._decoHistory) self._decoHistory.push({role:'assistant',content:reply});
         var delay=Math.min(800+reply.length*12,3000);
         setTimeout(function(){
-          self.setState(function(s){return{decoMessages:[].concat(s.decoMessages,[{role:'bot',text:reply}]),_decoLoading:false};});
+          self.setState(function(s){
+            var newMsgs=[].concat(s.decoMessages,[{role:'bot',text:reply}]);
+            // persist to localStorage
+            try{ localStorage.setItem('decoIA_session', JSON.stringify({messages:newMsgs, history:self._decoHistory, sessionId:self._decoSessionId})); }catch(e){}
+            return{decoMessages:newMsgs,_decoLoading:false};
+          });
         },delay);
       })
       .catch(function(){
@@ -948,7 +965,21 @@ class Component extends DCLogic {
     this.loadAsesores();
     this.loadProductsFromAPI();
     var self=this;
-    window.__decoOpenProduct=function(pid){ self.openLb(pid); };
+
+    // ---- Restore chat from localStorage ----
+    try {
+      var saved = localStorage.getItem('decoIA_session');
+      if(saved){
+        var parsed = JSON.parse(saved);
+        if(parsed.messages && parsed.messages.length > 1){
+          this.setState({ decoMessages: parsed.messages });
+          this._decoHistory = parsed.history || [];
+          this._decoSessionId = parsed.sessionId || null;
+        }
+      }
+    } catch(e){}
+
+    window.__decoOpenProduct=function(pid){ self.openLbBySlug(pid); };
     // reveal observer
     this._io = new IntersectionObserver((ents)=>{
       ents.forEach(en=>{ if(en.isIntersecting){ en.target.classList.add('mb-in'); this._io.unobserve(en.target); } });
@@ -1183,6 +1214,7 @@ class Component extends DCLogic {
       setDecoInput: (e)=>this.setState({decoInput:e.target.value}),
       sendDeco: ()=>this.sendDeco(),
       decoKey: (e)=>{ if(e.key==='Enter'){ e.preventDefault(); this.sendDeco(); } },
+      resetDeco: ()=>this.resetDeco(),
       decoInputRef: (el)=>{ this._decoInput=el; },
       decoSuggestions: [
         { label:'Quiero registrarme', go:()=>{ self.setState({decoInput:'Hola, me gustaría registrarme'}); setTimeout(function(){self.sendDeco();},100); } },
