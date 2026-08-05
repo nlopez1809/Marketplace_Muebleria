@@ -363,7 +363,7 @@
     <div class="table-wrap">
       <table>
         <thead>
-          <tr><th>Nombre</th><th>Teléfono</th><th>Acciones</th></tr>
+          <tr><th>Nombre</th><th>Teléfono</th><th>Horario / Días</th><th>Acciones</th></tr>
         </thead>
         <tbody id="asesor-table"></tbody>
       </table>
@@ -523,6 +523,22 @@
       <div style="display:flex;flex-direction:column;gap:14px">
         <div><label>Nombre completo</label><input id="a-nombre" placeholder="Juan Pérez"></div>
         <div><label>Teléfono (con código país)</label><input id="a-telefono" placeholder="59170000000"></div>
+        <div style="display:flex;gap:12px">
+          <div style="flex:1"><label>Horario inicio</label><input id="a-horario-inicio" type="time" value="08:00"></div>
+          <div style="flex:1"><label>Horario fin</label><input id="a-horario-fin" type="time" value="18:00"></div>
+        </div>
+        <div>
+          <label>Días de atención</label>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:6px" id="a-dias">
+            <label style="display:flex;align-items:center;gap:4px;font-weight:400;cursor:pointer"><input type="checkbox" value="1" checked> Lun</label>
+            <label style="display:flex;align-items:center;gap:4px;font-weight:400;cursor:pointer"><input type="checkbox" value="2" checked> Mar</label>
+            <label style="display:flex;align-items:center;gap:4px;font-weight:400;cursor:pointer"><input type="checkbox" value="3" checked> Mié</label>
+            <label style="display:flex;align-items:center;gap:4px;font-weight:400;cursor:pointer"><input type="checkbox" value="4" checked> Jue</label>
+            <label style="display:flex;align-items:center;gap:4px;font-weight:400;cursor:pointer"><input type="checkbox" value="5" checked> Vie</label>
+            <label style="display:flex;align-items:center;gap:4px;font-weight:400;cursor:pointer"><input type="checkbox" value="6"> Sáb</label>
+            <label style="display:flex;align-items:center;gap:4px;font-weight:400;cursor:pointer"><input type="checkbox" value="0"> Dom</label>
+          </div>
+        </div>
       </div>
       <div class="actions">
         <button class="btn btn-secondary" onclick="closeAsesorModal()">Cancelar</button>
@@ -832,22 +848,41 @@ async function deleteProduct(id){
 function renderAsesores(){
   const tbody=document.getElementById('asesor-table');
   if(!asesores.length){tbody.innerHTML='<tr><td colspan="3"><div class="empty-state"><p>No hay asesores</p></div></td></tr>';return;}
-  tbody.innerHTML=asesores.map(a=>`<tr>
-    <td><strong>${a.nombre}</strong></td><td>${a.telefono}</td>
-    <td><button class="btn btn-secondary" onclick="editAsesor(${a.id})" style="margin-right:4px">Editar</button>
-    <button class="btn btn-danger" onclick="deleteAsesor(${a.id})">Eliminar</button></td>
-  </tr>`).join('');
+  const diasNombres=['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
+  tbody.innerHTML=asesores.map(a=>{
+    const dias=(a.dias_activos||[1,2,3,4,5]).map(d=>diasNombres[d]).join(', ');
+    const horario=`${a.horario_inicio||'08:00'} - ${a.horario_fin||'18:00'}`;
+    return `<tr>
+      <td><strong>${a.nombre}</strong></td><td>${a.telefono}</td>
+      <td style="font-size:13px;color:#555">${horario}<br><span style="color:#888">${dias}</span></td>
+      <td><button class="btn btn-secondary" onclick="editAsesor(${a.id})" style="margin-right:4px">Editar</button>
+      <button class="btn btn-danger" onclick="deleteAsesor(${a.id})">Eliminar</button></td>
+    </tr>`;
+  }).join('');
 }
 function openAsesorModal(asesor){
   editingAsesor=asesor||null;
   document.getElementById('asesor-modal-title').textContent=asesor?'Editar Asesor':'Nuevo Asesor';
   document.getElementById('a-nombre').value=asesor?asesor.nombre:'';
   document.getElementById('a-telefono').value=asesor?asesor.telefono:'';
+  document.getElementById('a-horario-inicio').value=asesor&&asesor.horario_inicio?asesor.horario_inicio:'08:00';
+  document.getElementById('a-horario-fin').value=asesor&&asesor.horario_fin?asesor.horario_fin:'18:00';
+  const diasActivos=asesor&&asesor.dias_activos?asesor.dias_activos:[1,2,3,4,5];
+  document.querySelectorAll('#a-dias input[type=checkbox]').forEach(cb=>{
+    cb.checked=diasActivos.includes(parseInt(cb.value));
+  });
   document.getElementById('asesor-modal').classList.add('open');
 }
 function closeAsesorModal(){document.getElementById('asesor-modal').classList.remove('open');editingAsesor=null;}
 async function saveAsesor(){
-  const body={nombre:document.getElementById('a-nombre').value.trim(),telefono:document.getElementById('a-telefono').value.trim()};
+  const diasActivos=Array.from(document.querySelectorAll('#a-dias input[type=checkbox]:checked')).map(cb=>parseInt(cb.value));
+  const body={
+    nombre:document.getElementById('a-nombre').value.trim(),
+    telefono:document.getElementById('a-telefono').value.trim(),
+    horario_inicio:document.getElementById('a-horario-inicio').value,
+    horario_fin:document.getElementById('a-horario-fin').value,
+    dias_activos:diasActivos,
+  };
   if(!body.nombre||!body.telefono){toast('Todos los campos son obligatorios');return;}
   try{
     const res=await fetch(API+'/asesores'+(editingAsesor?'/'+editingAsesor.id:''),{
