@@ -100,7 +100,7 @@
 
       <!-- BANNER -->
       <div style="position:relative;border-radius:4px;overflow:hidden;height:452px;background:#2f2f2e">
-        <image-slot id="incassa-hero" style="position:absolute;inset:0;width:100%;height:100%;display:block" shape="rect" fit="cover" src="{{ slotHero }}" placeholder="Arrastrá aquí la foto del showroom (sala / sofás)"></image-slot>
+        <img src="{{ slotHero }}" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block">
         <div style="position:absolute;inset:0;background:linear-gradient(100deg,rgba(28,28,27,.82) 0%,rgba(28,28,27,.34) 45%,rgba(28,28,27,0) 73%);pointer-events:none"></div>
         <div style="position:absolute;left:46px;top:54px;max-width:440px">
           <p style="font-family:'DM Serif Display',serif;font-style:italic;font-size:25px;line-height:1.25;color:#F2F2F2;margin-bottom:20px;text-shadow:0 2px 20px rgba(0,0,0,.55)">Diseño que se queda en casa.</p>
@@ -111,12 +111,12 @@
       <!-- ROW A -->
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
         <div style="position:relative;border-radius:4px;overflow:hidden;height:258px;background:#2f2f2e">
-          <image-slot id="incassa-melamina" style="position:absolute;inset:0;width:100%;height:100%;display:block" shape="rect" fit="cover" src="{{ slotMelamina }}" placeholder="Foto · Melamina"></image-slot>
+          <img src="{{ slotMelamina }}" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block">
           <div style="position:absolute;inset:0;background:linear-gradient(135deg,rgba(28,28,27,.52),rgba(28,28,27,.06) 55%);pointer-events:none"></div>
           <button onClick="{{ goMelamina }}" style="position:absolute;left:30px;top:26px;background:none;border:none;cursor:pointer;padding:0;font-family:'Comfortaa',sans-serif;font-weight:300;font-size:44px;letter-spacing:.05em;color:#F2F2F2;text-shadow:0 2px 16px rgba(0,0,0,.55);transition:opacity .25s,letter-spacing .35s" style-hover="opacity:.82;letter-spacing:.1em">MELAMINA</button>
         </div>
         <div style="position:relative;border-radius:4px;overflow:hidden;height:258px;background:#2f2f2e">
-          <image-slot id="incassa-comedor" style="position:absolute;inset:0;width:100%;height:100%;display:block" shape="rect" fit="cover" src="{{ slotComedor }}" placeholder="Foto · Comedor"></image-slot>
+          <img src="{{ slotComedor }}" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block">
           <div style="position:absolute;inset:0;background:linear-gradient(135deg,rgba(28,28,27,.52),rgba(28,28,27,.06) 55%);pointer-events:none"></div>
           <button onClick="{{ goComedor }}" style="position:absolute;left:30px;top:26px;background:none;border:none;cursor:pointer;padding:0;font-family:'Comfortaa',sans-serif;font-weight:300;font-size:44px;letter-spacing:.05em;color:#F2F2F2;text-shadow:0 2px 16px rgba(0,0,0,.55);transition:opacity .25s,letter-spacing .35s" style-hover="opacity:.82;letter-spacing:.1em">COMEDOR</button>
         </div>
@@ -125,12 +125,12 @@
       <!-- ROW B -->
       <div style="display:grid;grid-template-columns:1fr 1.18fr;gap:14px">
         <div style="position:relative;border-radius:4px;overflow:hidden;height:300px;background:#2f2f2e">
-          <image-slot id="incassa-camas" style="position:absolute;inset:0;width:100%;height:100%;display:block" shape="rect" fit="cover" src="{{ slotCamas }}" placeholder="Foto · Camas"></image-slot>
+          <img src="{{ slotCamas }}" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block">
           <div style="position:absolute;inset:0;background:linear-gradient(200deg,rgba(28,28,27,.55),rgba(28,28,27,.05) 55%);pointer-events:none"></div>
           <button onClick="{{ goCamas }}" style="position:absolute;left:30px;bottom:26px;background:none;border:none;cursor:pointer;padding:0;font-family:'Comfortaa',sans-serif;font-weight:300;font-size:44px;letter-spacing:.05em;color:#F2F2F2;text-shadow:0 2px 16px rgba(0,0,0,.55);transition:opacity .25s,letter-spacing .35s" style-hover="opacity:.82;letter-spacing:.1em">CAMAS</button>
         </div>
         <div style="position:relative;border-radius:4px;overflow:hidden;height:300px;background:#2f2f2e">
-          <image-slot id="incassa-sofas" style="position:absolute;inset:0;width:100%;height:100%;display:block" shape="rect" fit="cover" src="{{ slotSofas }}" placeholder="Foto · Sofás"></image-slot>
+          <img src="{{ slotSofas }}" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block">
           <div style="position:absolute;inset:0;background:linear-gradient(160deg,rgba(28,28,27,.5),rgba(28,28,27,.05) 55%);pointer-events:none"></div>
           <button onClick="{{ goSofas }}" style="position:absolute;right:34px;top:26px;background:none;border:none;cursor:pointer;padding:0;font-family:'Comfortaa',sans-serif;font-weight:300;font-size:44px;letter-spacing:.05em;color:#F2F2F2;text-shadow:0 2px 16px rgba(0,0,0,.55);transition:opacity .25s,letter-spacing .35s" style-hover="opacity:.82;letter-spacing:.1em">SOFAS</button>
         </div>
