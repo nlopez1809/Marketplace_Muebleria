@@ -124,18 +124,19 @@ app.use('/api/admin/leads', requireAuth, leadRoutes);
 app.use('/api/admin/asesores', requireAuth, asesoresRoutes);
 
 // ── Store images public endpoint ──
-const STORE_SLOTS = ['hero-showroom', 'cat-melamina', 'cat-comedor', 'cat-camas', 'cat-sofas', 'Logo'];
 app.get('/api/store-images', async (req, res) => {
-  const images = {};
-  for (const slot of STORE_SLOTS) {
-    for (const ext of ['png', 'jpg', 'jpeg', 'webp']) {
-      const { data } = await supabase.storage.from('store-assets').getPublicUrl(slot + '.' + ext);
-      // Check if file exists by trying to list it
-      const { data: list } = await supabase.storage.from('store-assets').list('', { search: slot + '.' + ext });
-      if (list && list.length) { images[slot] = data.publicUrl + '?t=' + Date.now(); break; }
-    }
-  }
-  res.json(images);
+  try {
+    const { data: files } = await supabase.storage.from('store-assets').list('');
+    if (!files || !files.length) return res.json({});
+    const images = {};
+    const ts = Date.now();
+    files.forEach(f => {
+      const slot = f.name.replace(/\.[^.]+$/, '');
+      const { data } = supabase.storage.from('store-assets').getPublicUrl(f.name);
+      images[slot] = data.publicUrl + '?t=' + ts;
+    });
+    res.json(images);
+  } catch(e) { res.json({}); }
 });
 
 // ── Store images upload (Supabase Storage) ──
