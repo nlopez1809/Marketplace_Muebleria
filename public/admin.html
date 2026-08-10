@@ -1113,7 +1113,7 @@ async function uploadStoreImage(slot, input) {
   try {
     const res = await fetch(API + '/store-images/' + slot, { method: 'POST', body: fd });
     const data = await res.json();
-    if (!res.ok) { toast('Error al subir imagen'); return; }
+    if (!res.ok) { toast('Error: ' + (data.error || 'Error al subir imagen')); return; }
     const prev = document.getElementById('prev-' + slot);
     if (prev) prev.src = data.url;
     toast('Imagen actualizada — recarga la tienda para verla');

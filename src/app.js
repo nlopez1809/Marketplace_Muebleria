@@ -151,6 +151,12 @@ app.post('/api/admin/store-images/:slot', requireAuth, storeUpload.single('image
   try {
     const ext = req.file.originalname.split('.').pop().toLowerCase() || 'png';
     const filename = slot + '.' + ext;
+    // Delete any existing files for this slot (different extension)
+    const { data: existing } = await supabase.storage.from('store-assets').list('');
+    if (existing) {
+      const toDelete = existing.filter(f => f.name.replace(/\.[^.]+$/, '') === slot && f.name !== filename).map(f => f.name);
+      if (toDelete.length) await supabase.storage.from('store-assets').remove(toDelete);
+    }
     const { error: upErr } = await supabase.storage
       .from('store-assets')
       .upload(filename, req.file.buffer, { contentType: req.file.mimetype, upsert: true });
@@ -158,6 +164,7 @@ app.post('/api/admin/store-images/:slot', requireAuth, storeUpload.single('image
     const { data } = supabase.storage.from('store-assets').getPublicUrl(filename);
     res.json({ ok: true, url: data.publicUrl + '?t=' + Date.now() });
   } catch (e) {
+    console.error('store-images upload error:', e);
     res.status(500).json({ error: 'Error al subir imagen: ' + e.message });
   }
 });
