@@ -254,6 +254,10 @@
     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
     Calendario
   </div>
+  <div class="tab" data-tab="imagenes">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><path d="M21 15l-5-5L5 21"></path></svg>
+    Imágenes
+  </div>
 </div>
 
 <div class="content">
@@ -443,6 +447,69 @@
     </div>
     <div id="visitas-list"></div>
   </div>
+
+  <!-- ═══ IMÁGENES TIENDA TAB ═══ -->
+  <div id="tab-imagenes" style="display:none">
+    <div class="section-header" style="margin-bottom:24px">
+      <div><div class="section-title">Imágenes de la tienda</div><div class="section-sub">Reemplaza las imágenes que se muestran en la página principal</div></div>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:20px">
+      <div class="card" style="padding:20px">
+        <div style="font-weight:600;margin-bottom:4px">Hero principal</div>
+        <div style="font-size:12px;color:#888;margin-bottom:12px">Imagen grande de la sección inicial</div>
+        <img id="prev-hero-showroom" src="/assets/hero-showroom.png" style="width:100%;height:140px;object-fit:cover;border-radius:4px;margin-bottom:12px;background:#eee">
+        <label class="btn btn-secondary" style="cursor:pointer;display:block;text-align:center">
+          Cambiar imagen
+          <input type="file" accept="image/*" style="display:none" onchange="uploadStoreImage('hero-showroom',this)">
+        </label>
+      </div>
+      <div class="card" style="padding:20px">
+        <div style="font-weight:600;margin-bottom:4px">Categoría: Melamina</div>
+        <div style="font-size:12px;color:#888;margin-bottom:12px">Imagen de la categoría melamina</div>
+        <img id="prev-cat-melamina" src="/assets/cat-melamina.png" style="width:100%;height:140px;object-fit:cover;border-radius:4px;margin-bottom:12px;background:#eee">
+        <label class="btn btn-secondary" style="cursor:pointer;display:block;text-align:center">
+          Cambiar imagen
+          <input type="file" accept="image/*" style="display:none" onchange="uploadStoreImage('cat-melamina',this)">
+        </label>
+      </div>
+      <div class="card" style="padding:20px">
+        <div style="font-weight:600;margin-bottom:4px">Categoría: Comedor</div>
+        <div style="font-size:12px;color:#888;margin-bottom:12px">Imagen de la categoría comedor</div>
+        <img id="prev-cat-comedor" src="/assets/cat-comedor.png" style="width:100%;height:140px;object-fit:cover;border-radius:4px;margin-bottom:12px;background:#eee">
+        <label class="btn btn-secondary" style="cursor:pointer;display:block;text-align:center">
+          Cambiar imagen
+          <input type="file" accept="image/*" style="display:none" onchange="uploadStoreImage('cat-comedor',this)">
+        </label>
+      </div>
+      <div class="card" style="padding:20px">
+        <div style="font-weight:600;margin-bottom:4px">Categoría: Camas</div>
+        <div style="font-size:12px;color:#888;margin-bottom:12px">Imagen de la categoría camas</div>
+        <img id="prev-cat-camas" src="/assets/cat-camas.png" style="width:100%;height:140px;object-fit:cover;border-radius:4px;margin-bottom:12px;background:#eee">
+        <label class="btn btn-secondary" style="cursor:pointer;display:block;text-align:center">
+          Cambiar imagen
+          <input type="file" accept="image/*" style="display:none" onchange="uploadStoreImage('cat-camas',this)">
+        </label>
+      </div>
+      <div class="card" style="padding:20px">
+        <div style="font-weight:600;margin-bottom:4px">Categoría: Sofás</div>
+        <div style="font-size:12px;color:#888;margin-bottom:12px">Imagen de la categoría sofás</div>
+        <img id="prev-cat-sofas" src="/assets/cat-sofas.png" style="width:100%;height:140px;object-fit:cover;border-radius:4px;margin-bottom:12px;background:#eee">
+        <label class="btn btn-secondary" style="cursor:pointer;display:block;text-align:center">
+          Cambiar imagen
+          <input type="file" accept="image/*" style="display:none" onchange="uploadStoreImage('cat-sofas',this)">
+        </label>
+      </div>
+      <div class="card" style="padding:20px">
+        <div style="font-weight:600;margin-bottom:4px">Logo</div>
+        <div style="font-size:12px;color:#888;margin-bottom:12px">Logo de la tienda (navbar y footer)</div>
+        <img id="prev-Logo" src="/assets/Logo.png" style="width:100%;height:140px;object-fit:contain;border-radius:4px;margin-bottom:12px;background:#eee;padding:10px">
+        <label class="btn btn-secondary" style="cursor:pointer;display:block;text-align:center">
+          Cambiar logo
+          <input type="file" accept="image/*" style="display:none" onchange="uploadStoreImage('Logo',this)">
+        </label>
+      </div>
+    </div>
+  </div>
 </div>
 
 <!-- ═══ CONVERSACIÓN MODAL ═══ -->
@@ -568,7 +635,7 @@ let editingProduct = null, editingAsesor = null;
 let newLeadCount = 0;
 
 // ── Tabs ──
-const TABS = ['dashboard','analytics','products','asesores','leads','pipeline','visitas'];
+const TABS = ['dashboard','analytics','products','asesores','leads','pipeline','visitas','imagenes'];
 function switchTab(name) {
   document.querySelectorAll('.tab').forEach(x => x.classList.toggle('active', x.dataset.tab === name));
   TABS.forEach(t => { const el = document.getElementById('tab-'+t); if(el) el.style.display = t===name?'':'none'; });
@@ -1035,6 +1102,23 @@ async function loadVisitas(){
         }).join('')}
       </div>`).join('');
   }catch{document.getElementById('visitas-list').innerHTML='<p style="color:#9A9A98">Error al cargar visitas</p>';}
+}
+
+// ── Store images ──
+async function uploadStoreImage(slot, input) {
+  const file = input.files[0];
+  if (!file) return;
+  const fd = new FormData();
+  fd.append('image', file);
+  try {
+    const res = await fetch(API + '/store-images/' + slot, { method: 'POST', body: fd });
+    const data = await res.json();
+    if (!res.ok) { toast('Error al subir imagen'); return; }
+    const prev = document.getElementById('prev-' + slot);
+    if (prev) prev.src = data.url;
+    toast('Imagen actualizada — recarga la tienda para verla');
+  } catch { toast('Error al subir imagen'); }
+  input.value = '';
 }
 
 // ── Init ──
