@@ -123,23 +123,27 @@ app.use('/api/admin/products', requireAuth, uploadRoutes);
 app.use('/api/admin/leads', requireAuth, leadRoutes);
 app.use('/api/admin/asesores', requireAuth, asesoresRoutes);
 
-// ── Store images upload ──
+// ── Store images upload (Supabase Storage) ──
 const multer = require('multer');
-const path = require('path');
-const fs = require('fs');
 const storeUpload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 10 * 1024 * 1024 } });
-const STORE_ASSETS = path.join(__dirname, '..', 'public', 'assets');
 
-app.post('/api/admin/store-images/:slot', requireAuth, storeUpload.single('image'), (req, res) => {
+app.post('/api/admin/store-images/:slot', requireAuth, storeUpload.single('image'), async (req, res) => {
   if (!req.file) return res.status(400).json({ error: 'No se recibió archivo' });
   const allowed = ['hero-showroom', 'cat-melamina', 'cat-comedor', 'cat-camas', 'cat-sofas', 'Logo'];
   const slot = req.params.slot;
   if (!allowed.includes(slot)) return res.status(400).json({ error: 'Slot inválido' });
-  const ext = req.file.originalname.split('.').pop().toLowerCase() || 'png';
-  const filename = slot + '.' + ext;
-  const filepath = path.join(STORE_ASSETS, filename);
-  fs.writeFileSync(filepath, req.file.buffer);
-  res.json({ ok: true, url: '/assets/' + filename + '?t=' + Date.now() });
+  try {
+    const ext = req.file.originalname.split('.').pop().toLowerCase() || 'png';
+    const filename = slot + '.' + ext;
+    const { error: upErr } = await supabase.storage
+      .from('store-assets')
+      .upload(filename, req.file.buffer, { contentType: req.file.mimetype, upsert: true });
+    if (upErr) throw upErr;
+    const { data } = supabase.storage.from('store-assets').getPublicUrl(filename);
+    res.json({ ok: true, url: data.publicUrl + '?t=' + Date.now() });
+  } catch (e) {
+    res.status(500).json({ error: 'Error al subir imagen: ' + e.message });
+  }
 });
 
 // ── SSE endpoint for real-time notifications ──
