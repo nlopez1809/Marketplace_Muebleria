@@ -846,6 +846,18 @@ class Component extends DCLogic {
       if(list && list.length) self.setState({_asesores:list});
     }).catch(function(){});
   }
+  loadStoreImages(){
+    var self=this;
+    fetch('/api/store-images').then(function(r){return r.json();}).then(function(imgs){
+      var updates={};
+      if(imgs['hero-showroom']) updates.slotHero=imgs['hero-showroom'];
+      if(imgs['cat-melamina']) updates.slotMelamina=imgs['cat-melamina'];
+      if(imgs['cat-comedor']) updates.slotComedor=imgs['cat-comedor'];
+      if(imgs['cat-camas']) updates.slotCamas=imgs['cat-camas'];
+      if(imgs['cat-sofas']) updates.slotSofas=imgs['cat-sofas'];
+      if(Object.keys(updates).length) self.setState(updates);
+    }).catch(function(){});
+  }
 
   loadProductsFromAPI(){
     var self=this;
@@ -966,6 +978,7 @@ class Component extends DCLogic {
     this._reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     this.loadAsesores();
     this.loadProductsFromAPI();
+    this.loadStoreImages();
     var self=this;
 
     // ---- Restore chat from localStorage ----

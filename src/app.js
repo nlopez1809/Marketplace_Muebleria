@@ -123,6 +123,21 @@ app.use('/api/admin/products', requireAuth, uploadRoutes);
 app.use('/api/admin/leads', requireAuth, leadRoutes);
 app.use('/api/admin/asesores', requireAuth, asesoresRoutes);
 
+// ── Store images public endpoint ──
+const STORE_SLOTS = ['hero-showroom', 'cat-melamina', 'cat-comedor', 'cat-camas', 'cat-sofas', 'Logo'];
+app.get('/api/store-images', async (req, res) => {
+  const images = {};
+  for (const slot of STORE_SLOTS) {
+    for (const ext of ['png', 'jpg', 'jpeg', 'webp']) {
+      const { data } = await supabase.storage.from('store-assets').getPublicUrl(slot + '.' + ext);
+      // Check if file exists by trying to list it
+      const { data: list } = await supabase.storage.from('store-assets').list('', { search: slot + '.' + ext });
+      if (list && list.length) { images[slot] = data.publicUrl + '?t=' + Date.now(); break; }
+    }
+  }
+  res.json(images);
+});
+
 // ── Store images upload (Supabase Storage) ──
 const multer = require('multer');
 const storeUpload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 10 * 1024 * 1024 } });
