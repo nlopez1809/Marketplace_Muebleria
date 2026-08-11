@@ -903,7 +903,7 @@ async function saveProduct() {
     closeProductModal(); loadProducts();
   } catch {toast('Error al guardar');}
 }
-function editProduct(id){const p=products.find(x=>x.id===id);if(p)openProductModal(p);}
+function editProduct(id){const p=products.find(x=>String(x.id)===String(id));if(p)openProductModal(p);}
 async function deleteProduct(id){
   const p=products.find(x=>x.id===id);
   if(!confirm('¿Eliminar "'+p.name+'"? Esta acción no se puede deshacer.'))return;
