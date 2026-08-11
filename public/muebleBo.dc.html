@@ -847,20 +847,31 @@ class Component extends DCLogic {
     }).catch(function(){});
   }
   loadStoreImages(){
+    var self=this;
     fetch('/api/store-images').then(function(r){return r.json();}).then(function(imgs){
-      var map={
+      var stateMap={
+        'hero-showroom':'slotHero',
+        'cat-melamina':'slotMelamina',
+        'cat-comedor':'slotComedor',
+        'cat-camas':'slotCamas',
+        'cat-sofas':'slotSofas'
+      };
+      var domMap={
         'hero-showroom':'store-img-hero',
         'cat-melamina':'store-img-melamina',
         'cat-comedor':'store-img-comedor',
         'cat-camas':'store-img-camas',
         'cat-sofas':'store-img-sofas'
       };
-      Object.keys(map).forEach(function(slot){
+      var updates={};
+      Object.keys(stateMap).forEach(function(slot){
         if(imgs[slot]){
-          var el=document.getElementById(map[slot]);
+          updates[stateMap[slot]]=imgs[slot];
+          var el=document.getElementById(domMap[slot]);
           if(el) el.src=imgs[slot];
         }
       });
+      if(Object.keys(updates).length) self.setState(updates);
     }).catch(function(){});
   }
 
