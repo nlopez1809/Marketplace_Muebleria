@@ -1106,11 +1106,32 @@ async function loadVisitas(){
 }
 
 // ── Store images ──
+function compressImage(file, maxW, maxH, quality) {
+  return new Promise(function(resolve) {
+    const img = new Image();
+    const url = URL.createObjectURL(file);
+    img.onload = function() {
+      URL.revokeObjectURL(url);
+      let w = img.width, h = img.height;
+      if (w > maxW) { h = Math.round(h * maxW / w); w = maxW; }
+      if (h > maxH) { w = Math.round(w * maxH / h); h = maxH; }
+      const canvas = document.createElement('canvas');
+      canvas.width = w; canvas.height = h;
+      canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+      canvas.toBlob(resolve, 'image/jpeg', quality);
+    };
+    img.src = url;
+  });
+}
+
 async function uploadStoreImage(slot, input) {
   const file = input.files[0];
   if (!file) return;
+  toast('Comprimiendo imagen...');
+  const blob = await compressImage(file, 1920, 1080, 0.82);
+  const compressed = new File([blob], slot + '.jpg', { type: 'image/jpeg' });
   const fd = new FormData();
-  fd.append('image', file);
+  fd.append('image', compressed);
   try {
     const res = await fetch(API + '/store-images/' + slot, { method: 'POST', body: fd });
     const text = await res.text();
