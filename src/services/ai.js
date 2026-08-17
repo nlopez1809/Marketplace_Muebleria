@@ -19,12 +19,15 @@ async function chat(message, history, systemPrompt) {
     ...filtered,
   ];
 
-  const result = await getGroq().chat.completions.create({
-    model: 'llama-3.1-8b-instant',
-    messages: messages,
-    max_tokens: 400,
-    temperature: 0.7,
-  });
+  const models = ['meta-llama/llama-4-scout-17b-16e-instruct', 'llama-3.1-8b-instant', 'llama3-8b-8192', 'mixtral-8x7b-32768'];
+  let result, lastErr;
+  for (const model of models) {
+    try {
+      result = await getGroq().chat.completions.create({ model, messages, max_tokens: 400, temperature: 0.7 });
+      break;
+    } catch(e) { lastErr = e; if (!e.message?.includes('not exist')) throw e; }
+  }
+  if (!result) throw lastErr;
 
   const text = result.choices[0].message.content;
   const inputTokens = result.usage ? result.usage.prompt_tokens || 0 : 0;
