@@ -1,7 +1,6 @@
 const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
-const rateLimit = require('express-rate-limit');
 const cookieParser = require('cookie-parser');
 const path = require('path');
 
@@ -43,33 +42,6 @@ app.use(cors({
   credentials: true,
 }));
 
-// ── Rate limiting ──
-const apiLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000,
-  max: 100,
-  message: { error: 'Demasiadas solicitudes. Intenta en 15 minutos.' },
-  standardHeaders: true,
-  legacyHeaders: false,
-  validate: { xForwardedForHeader: false },
-});
-
-const chatLimiter = rateLimit({
-  windowMs: 1 * 60 * 1000,
-  max: 20,
-  message: { error: 'Demasiados mensajes. Espera un momento.' },
-  standardHeaders: true,
-  legacyHeaders: false,
-  validate: { xForwardedForHeader: false },
-});
-
-const loginLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000,
-  max: 5,
-  message: { error: 'Demasiados intentos de login. Espera 15 minutos.' },
-  standardHeaders: true,
-  legacyHeaders: false,
-  validate: { xForwardedForHeader: false },
-});
 
 // ── Body parsing + sanitization ──
 app.use(express.json({ limit: '20mb' }));
@@ -91,14 +63,14 @@ app.use('/uploads', express.static(path.join(__dirname, '..', 'uploads')));
 app.use(express.static(path.join(__dirname, '..', 'public'), { index: false, extensions: [] }));
 
 // ── Auth routes ──
-app.post('/api/auth/login', loginLimiter, login);
+app.post('/api/auth/login', login);
 app.post('/api/auth/logout', logout);
 app.get('/api/auth/check', checkSession);
 
 // ── Public API ──
-app.use('/api/chat', chatLimiter, chatRoutes);
-app.use('/api/products', apiLimiter, productsRoutes);
-app.use('/api/asesor', apiLimiter, asesoresRoutes);
+app.use('/api/chat', chatRoutes);
+app.use('/api/products', productsRoutes);
+app.use('/api/asesor', asesoresRoutes);
 app.use('/api/visualize', visualizeRoutes);
 
 // ── Admin API (protected) ──
