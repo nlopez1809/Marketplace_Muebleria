@@ -816,7 +816,7 @@ class Component extends DCLogic {
     fetch('/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:t,sessionId:this._decoSessionId,history:this._decoHistory})})
       .then(function(r){return r.json();})
       .then(function(data){
-        var reply=data.reply||(data.error?'Error: '+data.error:'Lo siento, hubo un error. Intenta de nuevo.');
+        var reply=data.reply||'No disponible momentáneamente, lamentamos los inconvenientes.';
         if(self._decoHistory) self._decoHistory.push({role:'assistant',content:reply});
         var delay=Math.min(800+reply.length*12,3000);
         setTimeout(function(){
