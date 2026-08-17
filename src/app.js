@@ -50,6 +50,7 @@ const apiLimiter = rateLimit({
   message: { error: 'Demasiadas solicitudes. Intenta en 15 minutos.' },
   standardHeaders: true,
   legacyHeaders: false,
+  validate: { xForwardedForHeader: false },
 });
 
 const chatLimiter = rateLimit({
@@ -58,6 +59,7 @@ const chatLimiter = rateLimit({
   message: { error: 'Demasiados mensajes. Espera un momento.' },
   standardHeaders: true,
   legacyHeaders: false,
+  validate: { xForwardedForHeader: false },
 });
 
 const loginLimiter = rateLimit({
@@ -66,6 +68,7 @@ const loginLimiter = rateLimit({
   message: { error: 'Demasiados intentos de login. Espera 15 minutos.' },
   standardHeaders: true,
   legacyHeaders: false,
+  validate: { xForwardedForHeader: false },
 });
 
 // ── Body parsing + sanitization ──
