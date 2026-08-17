@@ -67,6 +67,15 @@ app.post('/api/auth/login', login);
 app.post('/api/auth/logout', logout);
 app.get('/api/auth/check', checkSession);
 
+// ── Diagnóstico (temporal) ──
+app.get('/api/diag', requireAuth, (req, res) => {
+  res.json({
+    groq: !!process.env.GROQ_API_KEY,
+    supabase: !!process.env.SUPABASE_URL,
+    node: process.version,
+  });
+});
+
 // ── Public API ──
 app.use('/api/chat', chatRoutes);
 app.use('/api/products', productsRoutes);
