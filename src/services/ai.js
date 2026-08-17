@@ -7,11 +7,16 @@ function getGroq() {
 }
 
 async function chat(message, history, systemPrompt) {
+  // Groq requires conversation to start with 'user' after 'system'
+  // Drop leading 'assistant' messages to avoid API error
+  let filtered = history.map(function(m) {
+    return { role: m.role, content: m.content };
+  });
+  while (filtered.length && filtered[0].role !== 'user') filtered.shift();
+
   const messages = [
     { role: 'system', content: systemPrompt },
-    ...history.map(function(m) {
-      return { role: m.role, content: m.content };
-    })
+    ...filtered,
   ];
 
   const result = await getGroq().chat.completions.create({
