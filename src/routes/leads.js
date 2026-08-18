@@ -12,6 +12,25 @@ router.get('/', async (req, res) => {
   }
 });
 
+// Create lead manually
+router.post('/', async (req, res) => {
+  try {
+    const { nombre, telefono, ci, producto_interes, notas, pipeline_stage } = req.body;
+    const newLead = await storage.createLead({
+      nombre: nombre || '',
+      telefono: telefono || '',
+      ci: ci || '',
+      producto_interes: producto_interes || '',
+      notas: notas || '',
+      pipeline_stage: pipeline_stage || 'nuevo',
+      session_id: 'manual-' + Date.now(),
+    });
+    res.json(newLead);
+  } catch (e) {
+    res.status(500).json({ error: 'Error al crear lead' });
+  }
+});
+
 // Update lead pipeline stage or any field
 router.patch('/:id', async (req, res) => {
   try {

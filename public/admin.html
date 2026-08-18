@@ -388,7 +388,8 @@
         <h2>Leads capturados por Deco IA</h2>
         <p>Datos de clientes recopilados durante conversaciones con el chatbot</p>
       </div>
-      <a href="/api/admin/leads/export" class="btn btn-primary" style="text-decoration:none;flex-shrink:0">
+      <button class="btn btn-primary" onclick="openNewLeadModal()" style="flex-shrink:0">+ Nuevo lead</button>
+      <a href="/api/admin/leads/export" class="btn btn-secondary" style="text-decoration:none;flex-shrink:0">
         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
         Exportar CSV
       </a>
@@ -527,6 +528,52 @@
           Cambiar logo
           <input type="file" accept="image/*" style="display:none" onchange="uploadStoreImage('Logo',this)">
         </label>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ NUEVO LEAD MODAL ═══ -->
+<div class="modal-overlay" id="new-lead-modal" style="display:none">
+  <div class="modal" style="width:480px">
+    <div class="modal-header">
+      <h3>Nuevo lead</h3>
+      <button class="modal-close" onclick="closeNewLeadModal()">✕</button>
+    </div>
+    <div style="padding:20px;display:flex;flex-direction:column;gap:14px">
+      <div>
+        <label class="form-label">Nombre *</label>
+        <input id="nl-nombre" type="text" class="form-input" placeholder="Nombre completo">
+      </div>
+      <div>
+        <label class="form-label">Teléfono / WhatsApp</label>
+        <input id="nl-telefono" type="text" class="form-input" placeholder="+591 70000000">
+      </div>
+      <div>
+        <label class="form-label">Carnet de identidad (CI)</label>
+        <input id="nl-ci" type="text" class="form-input" placeholder="12345678">
+      </div>
+      <div>
+        <label class="form-label">Productos de interés</label>
+        <input id="nl-producto" type="text" class="form-input" placeholder="Sofá Oslo, Mesa Aurora...">
+      </div>
+      <div>
+        <label class="form-label">Notas</label>
+        <textarea id="nl-notas" class="form-input" rows="3" placeholder="Observaciones adicionales..." style="resize:vertical"></textarea>
+      </div>
+      <div>
+        <label class="form-label">Estado inicial</label>
+        <select id="nl-stage" class="form-input">
+          <option value="nuevo">🆕 Nuevo</option>
+          <option value="contactado">📞 Contactado</option>
+          <option value="visita_agendada">📅 Visita agendada</option>
+          <option value="cerrado">✅ Cerrado</option>
+          <option value="perdido">❌ Perdido</option>
+        </select>
+      </div>
+      <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:4px">
+        <button class="btn btn-secondary" onclick="closeNewLeadModal()">Cancelar</button>
+        <button class="btn btn-primary" onclick="saveNewLead()">Crear lead</button>
       </div>
     </div>
   </div>
@@ -1056,6 +1103,38 @@ async function deleteLead(id){
   if(!confirm('¿Eliminar este lead?'))return;
   try{await fetch(API+'/leads/'+id,{method:'DELETE'});toast('Lead eliminado');loadLeads();}
   catch{toast('Error al eliminar');}
+}
+
+function openNewLeadModal() {
+  ['nl-nombre','nl-telefono','nl-ci','nl-producto','nl-notas'].forEach(id => {
+    const el = document.getElementById(id); if(el) el.value = '';
+  });
+  const stage = document.getElementById('nl-stage'); if(stage) stage.value = 'nuevo';
+  document.getElementById('new-lead-modal').style.display = 'flex';
+  setTimeout(() => document.getElementById('nl-nombre')?.focus(), 100);
+}
+function closeNewLeadModal() {
+  document.getElementById('new-lead-modal').style.display = 'none';
+}
+async function saveNewLead() {
+  const nombre = document.getElementById('nl-nombre')?.value.trim();
+  if (!nombre) { toast('El nombre es requerido'); return; }
+  const body = {
+    nombre,
+    telefono: document.getElementById('nl-telefono')?.value.trim() || '',
+    ci: document.getElementById('nl-ci')?.value.trim() || '',
+    producto_interes: document.getElementById('nl-producto')?.value.trim() || '',
+    notas: document.getElementById('nl-notas')?.value.trim() || '',
+    pipeline_stage: document.getElementById('nl-stage')?.value || 'nuevo',
+  };
+  try {
+    const res = await fetch(API+'/leads', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(body) });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Error');
+    toast('Lead creado ✓');
+    closeNewLeadModal();
+    loadLeads();
+  } catch(e) { toast('Error: ' + e.message); }
 }
 
 // ── Conversación Modal ──
