@@ -7,6 +7,15 @@ const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 10 
 
 const STAGES = ['visita', 'revision_visita', 'diseno', 'revision_diseno', 'dibujo', 'revision_dibujo', 'completado'];
 const STAGE_FOTO_MAP = { visita: 'fotos_visita', diseno: 'fotos_diseno', dibujo: 'fotos_dibujo' };
+const STAGE_LABELS = {
+  visita: 'Visita',
+  revision_visita: 'Revisión Visita',
+  diseno: 'Diseño',
+  revision_diseno: 'Revisión Diseño',
+  dibujo: 'Dibujo',
+  revision_dibujo: 'Revisión Dibujo',
+  completado: 'Completado',
+};
 
 // GET /api/admin/asesoramiento/:leadId
 router.get('/:leadId', async (req, res) => {
@@ -66,6 +75,48 @@ router.post('/:id/fotos', upload.array('fotos', 20), async (req, res) => {
     const { data, error } = await supabase.from('asesoramientos').update({ [fotoField]: updated, updated_at: new Date().toISOString() }).eq('id', req.params.id).select().single();
     if (error) throw error;
     res.json(data);
+  } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
+// PUT /api/admin/asesoramiento/:id/deadline — set deadline for a specific stage
+router.put('/:id/deadline', async (req, res) => {
+  try {
+    const { stage, fecha_limite } = req.body;
+    if (!stage || !STAGES.includes(stage)) return res.status(400).json({ error: 'Etapa inválida' });
+    const { data: ases } = await supabase.from('asesoramientos').select('stage_deadlines').eq('id', req.params.id).single();
+    const deadlines = (ases && ases.stage_deadlines) || {};
+    deadlines[stage] = fecha_limite || null;
+    const { data, error } = await supabase.from('asesoramientos')
+      .update({ stage_deadlines: deadlines, updated_at: new Date().toISOString() })
+      .eq('id', req.params.id).select().single();
+    if (error) throw error;
+    res.json(data);
+  } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
+// GET /api/admin/asesoramiento/reminders — list upcoming deadlines (next 48h)
+router.get('/reminders', async (req, res) => {
+  try {
+    const { data, error } = await supabase.from('asesoramientos')
+      .select('id, lead_id, stage, stage_deadlines')
+      .not('stage_deadlines', 'is', null)
+      .neq('stage', 'completado');
+    if (error) throw error;
+    const now = new Date();
+    const limit = new Date(now.getTime() + 48 * 60 * 60 * 1000);
+    const reminders = [];
+    for (const a of data || []) {
+      const deadlines = a.stage_deadlines || {};
+      for (const [stage, fecha] of Object.entries(deadlines)) {
+        if (!fecha) continue;
+        const d = new Date(fecha);
+        if (d >= now && d <= limit) {
+          reminders.push({ ases_id: a.id, lead_id: a.lead_id, current_stage: a.stage, stage, fecha_limite: fecha, label: STAGE_LABELS[stage] || stage });
+        }
+      }
+    }
+    reminders.sort((a, b) => new Date(a.fecha_limite) - new Date(b.fecha_limite));
+    res.json(reminders);
   } catch (e) { res.status(500).json({ error: e.message }); }
 });
 
