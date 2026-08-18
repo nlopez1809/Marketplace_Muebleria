@@ -254,6 +254,10 @@
     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
     Calendario
   </div>
+  <div class="tab" data-tab="asesoramiento">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+    Asesoramiento
+  </div>
   <div class="tab" data-tab="imagenes">
     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><path d="M21 15l-5-5L5 21"></path></svg>
     Imágenes
@@ -448,6 +452,22 @@
     <div id="visitas-list"></div>
   </div>
 
+  <!-- ═══ ASESORAMIENTO TAB ═══ -->
+  <div id="tab-asesoramiento" style="display:none">
+    <div class="section-header" style="margin-bottom:20px">
+      <div><div class="section-title">Asesoramiento</div><div class="section-sub">Gestión de proyectos de asesoramiento por etapas</div></div>
+    </div>
+    <div id="ases-list-view">
+      <p style="color:#888;margin-bottom:16px">Seleccioná un lead desde la pestaña <strong>Leads</strong> para abrir su asesoramiento, o buscalo aquí:</p>
+      <div id="ases-cards" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px"></div>
+      <div id="ases-empty" style="display:none;color:#aaa;text-align:center;padding:40px">No hay asesoramientos registrados aún.</div>
+    </div>
+    <div id="ases-detail-view" style="display:none">
+      <button class="btn btn-secondary" onclick="closeAsesDetail()" style="margin-bottom:16px">← Volver</button>
+      <div id="ases-detail-content"></div>
+    </div>
+  </div>
+
   <!-- ═══ IMÁGENES TIENDA TAB ═══ -->
   <div id="tab-imagenes" style="display:none">
     <div class="section-header" style="margin-bottom:24px">
@@ -509,6 +529,17 @@
         </label>
       </div>
     </div>
+  </div>
+</div>
+
+<!-- ═══ ASESORAMIENTO MODAL (from leads) ═══ -->
+<div class="modal-overlay" id="ases-modal" style="display:none">
+  <div class="modal" style="width:680px;max-height:90vh;overflow-y:auto">
+    <div class="modal-header">
+      <h3 id="ases-modal-title">Asesoramiento</h3>
+      <button class="modal-close" onclick="closeAsesModal()">✕</button>
+    </div>
+    <div id="ases-modal-body" style="padding:20px"></div>
   </div>
 </div>
 
@@ -636,7 +667,7 @@ let editingProduct = null, editingAsesor = null;
 let newLeadCount = 0;
 
 // ── Tabs ──
-const TABS = ['dashboard','analytics','products','asesores','leads','pipeline','visitas','imagenes'];
+const TABS = ['dashboard','analytics','products','asesores','leads','pipeline','visitas','asesoramiento','imagenes'];
 function switchTab(name) {
   document.querySelectorAll('.tab').forEach(x => x.classList.toggle('active', x.dataset.tab === name));
   TABS.forEach(t => { const el = document.getElementById('tab-'+t); if(el) el.style.display = t===name?'':'none'; });
@@ -645,6 +676,7 @@ function switchTab(name) {
   if(name==='analytics') loadAnalytics();
   if(name==='pipeline') renderPipeline();
   if(name==='visitas') loadVisitas();
+  if(name==='asesoramiento') loadAsesoramientos();
   if(name==='leads') { newLeadCount=0; const b=document.getElementById('tab-leads-badge'); b.style.display='none'; }
 }
 document.querySelectorAll('.tab').forEach(t => t.addEventListener('click', () => switchTab(t.dataset.tab)));
@@ -1002,6 +1034,7 @@ function renderLeads(){
       <td style="white-space:nowrap;display:flex;gap:4px">
         ${hasConv?`<button class="btn btn-secondary" onclick="openConvModal(${l.id})" title="Ver conversación" style="padding:6px 8px">💬</button>`:''}
         ${l.telefono?`<a class="btn btn-secondary" href="https://wa.me/${l.telefono}" target="_blank" style="text-decoration:none">WA</a>`:''}
+        <button class="btn btn-secondary" onclick="openAsesModal(${l.id},'${(l.nombre||'').replace(/'/g,"\\'")}')" title="Asesoramiento" style="padding:6px 8px;background:#F27141;color:#fff;border-color:#F27141">🏠</button>
         <select onchange="updateLeadStage(${l.id},this.value)" style="font-size:11px;border:1px solid #E4E4E3;border-radius:3px;padding:4px 6px;cursor:pointer">
           ${Object.entries(stageLabels).map(([k,v])=>`<option value="${k}" ${st===k?'selected':''}>${v}</option>`).join('')}
         </select>
@@ -1143,6 +1176,193 @@ async function uploadStoreImage(slot, input) {
     toast('Imagen actualizada — recarga la tienda para verla');
   } catch(e) { toast('Error de red: ' + e.message); }
   input.value = '';
+}
+
+// ── Asesoramiento ──
+const ASES_STAGES = [
+  {key:'visita',label:'Visita',icon:'📸',desc:'Fotografías del inmueble'},
+  {key:'revision_visita',label:'Revisión Visita',icon:'🔍',desc:'Gerencia revisa fotos de visita'},
+  {key:'diseno',label:'Diseño',icon:'✏️',desc:'Propuestas de diseño'},
+  {key:'revision_diseno',label:'Revisión Diseño',icon:'🔍',desc:'Gerencia revisa diseños'},
+  {key:'dibujo',label:'Dibujo',icon:'📐',desc:'Planos y dibujos técnicos'},
+  {key:'revision_dibujo',label:'Revisión Dibujo',icon:'🔍',desc:'Gerencia revisa dibujos'},
+  {key:'completado',label:'Completado',icon:'✅',desc:'Proyecto finalizado'},
+];
+const STAGE_FOTO_FIELD = {visita:'fotos_visita',diseno:'fotos_diseno',dibujo:'fotos_dibujo'};
+
+let currentAses = null;
+let allAsesoramientos = [];
+
+async function loadAsesoramientos() {
+  try {
+    const data = await (await fetch(API+'/asesoramiento', {headers: {credentials:'include'}})).json().catch(()=>[]);
+    // The endpoint is per-lead so for the list view we just show a placeholder
+    // We'll fetch all leads that have asesoramientos by checking the Supabase endpoint differently
+    // For now show message to use the 🏠 button from Leads
+    document.getElementById('ases-cards').innerHTML = '';
+    document.getElementById('ases-empty').style.display = '';
+  } catch(e) {}
+}
+
+async function openAsesModal(leadId, leadNombre) {
+  document.getElementById('ases-modal-title').textContent = 'Asesoramiento — ' + (leadNombre || 'Lead');
+  document.getElementById('ases-modal').style.display = 'flex';
+  document.getElementById('ases-modal-body').innerHTML = '<div style="text-align:center;padding:30px;color:#888">Cargando...</div>';
+  try {
+    let ases = await (await fetch(API+'/asesoramiento/'+leadId)).json();
+    if (!ases || ases.error) {
+      // Create new asesoramiento
+      ases = await (await fetch(API+'/asesoramiento', {
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({lead_id: String(leadId)})
+      })).json();
+    }
+    currentAses = ases;
+    renderAsesModal(ases, leadId);
+  } catch(e) {
+    document.getElementById('ases-modal-body').innerHTML = '<p style="color:red">Error: '+e.message+'</p>';
+  }
+}
+
+function renderAsesModal(ases, leadId) {
+  const stageIdx = ASES_STAGES.findIndex(s=>s.key===ases.stage);
+  const isRevision = ases.stage.startsWith('revision_');
+  const hasFotos = STAGE_FOTO_FIELD[ases.stage];
+
+  let stepsHtml = '<div style="display:flex;gap:4px;margin-bottom:24px;flex-wrap:wrap">';
+  ASES_STAGES.forEach((s,i) => {
+    const done = i < stageIdx;
+    const active = i === stageIdx;
+    const bg = done ? '#10B981' : active ? '#F27141' : '#E4E4E3';
+    const color = (done||active) ? '#fff' : '#888';
+    stepsHtml += `<div style="flex:1;min-width:80px;text-align:center;padding:8px 4px;border-radius:8px;background:${bg};color:${color};font-size:11px;font-weight:600">
+      <div style="font-size:16px">${s.icon}</div>${s.label}
+    </div>`;
+    if(i<ASES_STAGES.length-1) stepsHtml += '<div style="align-self:center;color:#ccc;font-size:18px">›</div>';
+  });
+  stepsHtml += '</div>';
+
+  let fechaHtml = `<div style="margin-bottom:20px;padding:16px;background:#F9F9F8;border-radius:8px">
+    <label style="font-weight:600;display:block;margin-bottom:8px">📅 Fecha y hora de visita</label>
+    <input type="datetime-local" id="ases-fecha" value="${ases.fecha_visita ? new Date(ases.fecha_visita).toISOString().slice(0,16) : ''}"
+      style="border:1px solid #E4E4E3;border-radius:6px;padding:8px;width:100%;box-sizing:border-box">
+    <button class="btn btn-primary" onclick="saveFechaAses('${ases.id}')" style="margin-top:8px">Guardar fecha</button>
+  </div>`;
+
+  let fotosHtml = '';
+  if (hasFotos) {
+    const fotos = ases[STAGE_FOTO_FIELD[ases.stage]] || [];
+    const fotosGrid = fotos.length ? `<div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px">
+      ${fotos.map(u=>`<img src="${u}" style="width:100px;height:80px;object-fit:cover;border-radius:6px;cursor:pointer" onclick="window.open('${u}','_blank')">`).join('')}
+    </div>` : '<p style="color:#aaa;font-size:13px">Sin fotos aún.</p>';
+    fotosHtml = `<div style="margin-bottom:20px;padding:16px;background:#F9F9F8;border-radius:8px">
+      <label style="font-weight:600;display:block;margin-bottom:8px">${ASES_STAGES[stageIdx].icon} Fotos — ${ASES_STAGES[stageIdx].label}</label>
+      ${fotosGrid}
+      <input type="file" id="ases-fotos-input" multiple accept="image/*" style="margin-bottom:8px">
+      <button class="btn btn-primary" onclick="uploadAsesFotos('${ases.id}','${leadId}','${ases.stage}')">Subir fotos</button>
+    </div>`;
+  }
+
+  // Show fotos from upload stages for review
+  let prevFotosHtml = '';
+  if (isRevision) {
+    const revisionTo = ases.stage.replace('revision_','');
+    const fField = STAGE_FOTO_FIELD[revisionTo];
+    if (fField) {
+      const fotos = ases[fField] || [];
+      prevFotosHtml = `<div style="margin-bottom:20px;padding:16px;background:#F9F9F8;border-radius:8px">
+        <label style="font-weight:600;display:block;margin-bottom:8px">Fotos de ${revisionTo} para revisar</label>
+        ${fotos.length ? `<div style="display:flex;flex-wrap:wrap;gap:8px">${fotos.map(u=>`<img src="${u}" style="width:120px;height:90px;object-fit:cover;border-radius:6px;cursor:pointer" onclick="window.open('${u}','_blank')">`).join('')}</div>` : '<p style="color:#aaa;font-size:13px">Sin fotos.</p>'}
+      </div>`;
+    }
+  }
+
+  let reviewHtml = '';
+  if (isRevision && ases.stage !== 'completado') {
+    reviewHtml = `<div style="padding:16px;background:#FFF7F3;border:1px solid #F27141;border-radius:8px;margin-bottom:20px">
+      <label style="font-weight:600;display:block;margin-bottom:8px">🔍 Revisión de Gerencia</label>
+      ${ases.notas_gerencia ? `<p style="font-size:13px;color:#555;margin-bottom:8px"><em>Notas anteriores: ${ases.notas_gerencia}</em></p>` : ''}
+      <textarea id="ases-notas" placeholder="Notas / observaciones (opcional)" style="width:100%;box-sizing:border-box;border:1px solid #E4E4E3;border-radius:6px;padding:8px;font-size:13px;resize:vertical;min-height:70px"></textarea>
+      <div style="display:flex;gap:8px;margin-top:10px">
+        <button class="btn btn-primary" onclick="asesAprobar('${ases.id}','${leadId}')" style="background:#10B981;border-color:#10B981">✅ Aprobar</button>
+        <button class="btn btn-danger" onclick="asesRechazar('${ases.id}','${leadId}')">❌ Rechazar (volver)</button>
+      </div>
+    </div>`;
+  }
+
+  let advanceHtml = '';
+  if (!isRevision && ases.stage !== 'completado' && stageIdx < ASES_STAGES.length - 1) {
+    advanceHtml = `<div style="text-align:right;margin-top:8px">
+      <button class="btn btn-primary" onclick="asesAprobar('${ases.id}','${leadId}')">Avanzar a revisión →</button>
+    </div>`;
+  }
+
+  document.getElementById('ases-modal-body').innerHTML = stepsHtml + fechaHtml + prevFotosHtml + fotosHtml + reviewHtml + advanceHtml;
+}
+
+async function saveFechaAses(asesId) {
+  const val = document.getElementById('ases-fecha').value;
+  if (!val) return;
+  try {
+    const data = await (await fetch(API+'/asesoramiento/'+asesId+'/fecha', {
+      method:'PUT', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({fecha_visita: new Date(val).toISOString()})
+    })).json();
+    currentAses = data;
+    toast('Fecha guardada');
+  } catch(e) { toast('Error al guardar fecha'); }
+}
+
+async function uploadAsesFotos(asesId, leadId, stage) {
+  const input = document.getElementById('ases-fotos-input');
+  if (!input || !input.files.length) { toast('Seleccioná al menos una foto'); return; }
+  const fd = new FormData();
+  for (const f of input.files) fd.append('fotos', f);
+  try {
+    const data = await (await fetch(API+'/asesoramiento/'+asesId+'/fotos', {method:'POST', body:fd})).json();
+    if (data.error) throw new Error(data.error);
+    currentAses = data;
+    toast('Fotos subidas');
+    renderAsesModal(data, leadId);
+  } catch(e) { toast('Error: '+e.message); }
+}
+
+async function asesAprobar(asesId, leadId) {
+  const notas = document.getElementById('ases-notas')?.value || '';
+  try {
+    const data = await (await fetch(API+'/asesoramiento/'+asesId+'/aprobar', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({notas})
+    })).json();
+    if (data.error) throw new Error(data.error);
+    currentAses = data;
+    toast('Etapa aprobada ✅');
+    renderAsesModal(data, leadId);
+  } catch(e) { toast('Error: '+e.message); }
+}
+
+async function asesRechazar(asesId, leadId) {
+  const notas = document.getElementById('ases-notas')?.value || '';
+  try {
+    const data = await (await fetch(API+'/asesoramiento/'+asesId+'/rechazar', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({notas})
+    })).json();
+    if (data.error) throw new Error(data.error);
+    currentAses = data;
+    toast('Etapa rechazada — volvió a la etapa anterior');
+    renderAsesModal(data, leadId);
+  } catch(e) { toast('Error: '+e.message); }
+}
+
+function closeAsesModal() {
+  document.getElementById('ases-modal').style.display = 'none';
+  currentAses = null;
+}
+function closeAsesDetail() {
+  document.getElementById('ases-list-view').style.display = '';
+  document.getElementById('ases-detail-view').style.display = 'none';
 }
 
 // ── Init ──
