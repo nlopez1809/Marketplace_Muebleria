@@ -6,7 +6,11 @@ const supabase = require('../services/supabase');
 const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 10 * 1024 * 1024 } });
 
 const STAGES = ['visita', 'revision_visita', 'diseno', 'revision_diseno', 'dibujo', 'revision_dibujo', 'completado'];
-const STAGE_FOTO_MAP = { visita: 'fotos_visita', diseno: 'fotos_diseno', dibujo: 'fotos_dibujo' };
+const STAGE_FOTO_MAP = {
+  visita: 'fotos_visita', revision_visita: 'fotos_visita',
+  diseno: 'fotos_diseno', revision_diseno: 'fotos_diseno',
+  dibujo: 'fotos_dibujo', revision_dibujo: 'fotos_dibujo',
+};
 const STAGE_LABELS = {
   visita: 'Visita',
   revision_visita: 'Revisión Visita',

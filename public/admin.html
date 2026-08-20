@@ -1267,7 +1267,11 @@ const ASES_STAGES = [
   {key:'revision_dibujo',label:'Revisión Dibujo',icon:'🔍',desc:'Gerencia revisa dibujos'},
   {key:'completado',label:'Completado',icon:'✅',desc:'Proyecto finalizado'},
 ];
-const STAGE_FOTO_FIELD = {visita:'fotos_visita',diseno:'fotos_diseno',dibujo:'fotos_dibujo'};
+const STAGE_FOTO_FIELD = {
+  visita:'fotos_visita', revision_visita:'fotos_visita',
+  diseno:'fotos_diseno', revision_diseno:'fotos_diseno',
+  dibujo:'fotos_dibujo', revision_dibujo:'fotos_dibujo',
+};
 
 let currentAses = null;
 let allAsesoramientos = [];
@@ -1370,34 +1374,26 @@ function renderAsesModal(ases, leadId) {
     </div>
   </div>`;
 
-  // ── Fotos etapa actual ──
+  // ── Fotos (subida + galería unificada) ──
   let fotosHtml = '';
-  if (hasFotos) {
-    const fotos = ases[STAGE_FOTO_FIELD[ases.stage]] || [];
-    const fotosGrid = fotos.length ? `<div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px">
-      ${fotos.map(u=>`<img src="${u}" style="width:100px;height:80px;object-fit:cover;border-radius:6px;cursor:pointer" onclick="window.open('${u}','_blank')">`).join('')}
-    </div>` : '<p style="color:#aaa;font-size:13px">Sin fotos aún.</p>';
+  const fotoField = STAGE_FOTO_FIELD[ases.stage];
+  if (fotoField) {
+    const fotos = ases[fotoField] || [];
+    const stageBase = ases.stage.replace('revision_','');
+    const stageInfo = ASES_STAGES.find(s=>s.key===stageBase) || ASES_STAGES[stageIdx];
+    const fotosGrid = fotos.length
+      ? `<div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px">
+          ${fotos.map(u=>`<img src="${u}" style="width:110px;height:85px;object-fit:cover;border-radius:6px;cursor:pointer" onclick="window.open('${u}','_blank')">`).join('')}
+        </div>`
+      : '<p style="color:#aaa;font-size:13px;margin-bottom:12px">Sin fotos aún.</p>';
     fotosHtml = `<div style="margin-bottom:20px;padding:16px;background:#F9F9F8;border-radius:8px">
-      <label style="font-weight:600;display:block;margin-bottom:8px">${ASES_STAGES[stageIdx].icon} Fotos — ${ASES_STAGES[stageIdx].label}</label>
+      <label style="font-weight:600;display:block;margin-bottom:8px">${stageInfo.icon} Fotos — ${stageInfo.label}</label>
       ${fotosGrid}
-      <input type="file" id="ases-fotos-input" multiple accept="image/*" style="margin-bottom:8px">
+      <input type="file" id="ases-fotos-input" multiple accept="image/*" style="margin-bottom:8px;display:block">
       <button class="btn btn-primary" onclick="uploadAsesFotos('${ases.id}','${leadId}','${ases.stage}')">Subir fotos</button>
     </div>`;
   }
-
-  // ── Fotos previas para revisión ──
   let prevFotosHtml = '';
-  if (isRevision) {
-    const revisionTo = ases.stage.replace('revision_','');
-    const fField = STAGE_FOTO_FIELD[revisionTo];
-    if (fField) {
-      const fotos = ases[fField] || [];
-      prevFotosHtml = `<div style="margin-bottom:20px;padding:16px;background:#F9F9F8;border-radius:8px">
-        <label style="font-weight:600;display:block;margin-bottom:8px">Fotos de ${revisionTo} para revisar</label>
-        ${fotos.length ? `<div style="display:flex;flex-wrap:wrap;gap:8px">${fotos.map(u=>`<img src="${u}" style="width:120px;height:90px;object-fit:cover;border-radius:6px;cursor:pointer" onclick="window.open('${u}','_blank')">`).join('')}</div>` : '<p style="color:#aaa;font-size:13px">Sin fotos.</p>'}
-      </div>`;
-    }
-  }
 
   // ── Revisión gerencia ──
   let reviewHtml = '';
