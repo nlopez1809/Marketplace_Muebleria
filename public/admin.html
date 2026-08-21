@@ -1382,22 +1382,38 @@ function renderAsesModal(ases, leadId) {
       }
 
       if (isCurrent) {
-        // Etapa activa: mostrar botones de plazo
         const urgencyColor = isOverdue ? '#EF4444' : dl ? '#10B981' : '#F27141';
-        return `<div style="padding:12px;background:#fff;border:2px solid #F27141;border-radius:8px">
-          <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
+        const header = `<div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
             <span style="font-size:18px">${s.icon}</span>
             <span style="font-weight:700;color:#1a1a1a">${s.label}</span>
             <span style="margin-left:auto;font-size:12px;font-weight:600;color:${urgencyColor}">
-              ${isOverdue ? '⚠️ Vencido' : dlStr ? '⏰ ' + dlStr : 'Sin plazo'}
+              ${isOverdue ? '⚠️ Vencido' : dlStr ? '📅 ' + dlStr : 'Sin fecha'}
             </span>
-          </div>
-          <div style="font-size:12px;color:#888;margin-bottom:8px">${s.key === 'visita' ? 'Fecha de visita al inmueble (desde ahora):' : 'Plazo de entrega desde ahora:'}</div>
+          </div>`;
+
+        if (s.key === 'visita') {
+          // Primera etapa: selector de fecha/hora real
+          return `<div style="padding:12px;background:#fff;border:2px solid #F27141;border-radius:8px">
+            ${header}
+            <div style="font-size:12px;color:#888;margin-bottom:8px">Fecha y hora de visita al inmueble:</div>
+            <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap">
+              <input type="datetime-local" id="dl-visita-input" value="${toLocalInput(dl)}"
+                style="flex:1;min-width:180px;border:1px solid #E4E4E3;border-radius:6px;padding:7px;font-size:13px">
+              <button class="btn btn-primary" onclick="saveVisitaDate('${ases.id}','${leadId}')" style="font-size:12px;padding:7px 14px">Guardar</button>
+              ${dl ? `<button class="btn btn-danger" onclick="quickDeadline('${ases.id}','visita','${leadId}',0)" style="font-size:12px;padding:7px 10px">✕</button>` : ''}
+            </div>
+          </div>`;
+        }
+
+        // Etapas 2+: botones relativos
+        return `<div style="padding:12px;background:#fff;border:2px solid #F27141;border-radius:8px">
+          ${header}
+          <div style="font-size:12px;color:#888;margin-bottom:8px">Plazo de entrega desde ahora:</div>
           <div style="display:flex;gap:6px;flex-wrap:wrap">
             <button class="btn btn-secondary" onclick="quickDeadline('${ases.id}','${s.key}','${leadId}',24)" style="font-size:12px;padding:6px 14px;font-weight:600">+24h</button>
             <button class="btn btn-secondary" onclick="quickDeadline('${ases.id}','${s.key}','${leadId}',48)" style="font-size:12px;padding:6px 14px;font-weight:600">+48h</button>
             <button class="btn btn-secondary" onclick="quickDeadline('${ases.id}','${s.key}','${leadId}',72)" style="font-size:12px;padding:6px 14px;font-weight:600">+72h</button>
-            ${dl ? `<button class="btn btn-danger" onclick="quickDeadline('${ases.id}','${s.key}','${leadId}',0)" style="font-size:12px;padding:6px 10px" title="Quitar plazo">✕</button>` : ''}
+            ${dl ? `<button class="btn btn-danger" onclick="quickDeadline('${ases.id}','${s.key}','${leadId}',0)" style="font-size:12px;padding:6px 10px">✕</button>` : ''}
           </div>
         </div>`;
       }
@@ -1458,6 +1474,21 @@ function renderAsesModal(ases, leadId) {
   }
 
   document.getElementById('ases-modal-body').innerHTML = stepsHtml + fechaHtml + deadlinesHtml + prevFotosHtml + fotosHtml + reviewHtml + advanceHtml;
+}
+
+async function saveVisitaDate(asesId, leadId) {
+  const val = document.getElementById('dl-visita-input')?.value;
+  if (!val) { toast('Seleccioná una fecha y hora'); return; }
+  try {
+    const data = await (await fetch(API+'/asesoramiento/'+asesId+'/deadline', {
+      method:'PUT', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ stage: 'visita', fecha_limite: new Date(val).toISOString() })
+    })).json();
+    if (data.error) throw new Error(data.error);
+    currentAses = data;
+    toast('Fecha de visita guardada ✓');
+    renderAsesModal(data, leadId);
+  } catch(e) { toast('Error: '+e.message); }
 }
 
 async function quickDeadline(asesId, stage, leadId, hours) {
