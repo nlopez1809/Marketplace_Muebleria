@@ -1354,19 +1354,13 @@ function renderAsesModal(ases, leadId) {
   });
   stepsHtml += '</div>';
 
-  // ── Fecha visita ──
-  let fechaHtml = `<div style="margin-bottom:20px;padding:16px;background:#F9F9F8;border-radius:8px">
-    <label style="font-weight:600;display:block;margin-bottom:8px">📅 Fecha y hora de visita al inmueble</label>
-    <input type="datetime-local" id="ases-fecha" value="${toLocalInput(ases.fecha_visita)}"
-      style="border:1px solid #E4E4E3;border-radius:6px;padding:8px;width:100%;box-sizing:border-box">
-    <button class="btn btn-primary" onclick="saveFechaAses('${ases.id}')" style="margin-top:8px">Guardar fecha de visita</button>
-  </div>`;
+  let fechaHtml = '';
 
   // ── Plazos secuenciales por etapa ──
   // Solo la etapa actual y la siguiente (si está definida la actual) tienen botones activos
   const workStages = ASES_STAGES.filter(s => s.key !== 'completado');
   let deadlinesHtml = `<div style="margin-bottom:20px;padding:16px;background:#F9F9F8;border-radius:8px">
-    <label style="font-weight:600;display:block;margin-bottom:12px">⏰ Plazos de entrega</label>
+    <label style="font-weight:600;display:block;margin-bottom:12px">📅 Fecha de visita y plazos por etapa</label>
     <div style="display:flex;flex-direction:column;gap:8px">
     ${workStages.map((s, i) => {
       const sIdx = ASES_STAGES.findIndex(x => x.key === s.key);
@@ -1398,7 +1392,7 @@ function renderAsesModal(ases, leadId) {
               ${isOverdue ? '⚠️ Vencido' : dlStr ? '⏰ ' + dlStr : 'Sin plazo'}
             </span>
           </div>
-          <div style="font-size:12px;color:#888;margin-bottom:8px">Asignar plazo desde ahora:</div>
+          <div style="font-size:12px;color:#888;margin-bottom:8px">${s.key === 'visita' ? 'Fecha de visita al inmueble (desde ahora):' : 'Plazo de entrega desde ahora:'}</div>
           <div style="display:flex;gap:6px;flex-wrap:wrap">
             <button class="btn btn-secondary" onclick="quickDeadline('${ases.id}','${s.key}','${leadId}',24)" style="font-size:12px;padding:6px 14px;font-weight:600">+24h</button>
             <button class="btn btn-secondary" onclick="quickDeadline('${ases.id}','${s.key}','${leadId}',48)" style="font-size:12px;padding:6px 14px;font-weight:600">+48h</button>
