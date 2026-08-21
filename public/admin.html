@@ -1311,6 +1311,13 @@ async function openAsesModal(leadId, leadNombre) {
   }
 }
 
+function toLocalInput(isoStr) {
+  if (!isoStr) return '';
+  const d = new Date(isoStr);
+  const offset = d.getTimezoneOffset() * 60000;
+  return new Date(d.getTime() - offset).toISOString().slice(0, 16);
+}
+
 function deadlineBadge(dateStr) {
   if (!dateStr) return '';
   const d = new Date(dateStr);
@@ -1350,7 +1357,7 @@ function renderAsesModal(ases, leadId) {
   // ── Fecha visita ──
   let fechaHtml = `<div style="margin-bottom:20px;padding:16px;background:#F9F9F8;border-radius:8px">
     <label style="font-weight:600;display:block;margin-bottom:8px">📅 Fecha y hora de visita al inmueble</label>
-    <input type="datetime-local" id="ases-fecha" value="${ases.fecha_visita ? new Date(ases.fecha_visita).toISOString().slice(0,16) : ''}"
+    <input type="datetime-local" id="ases-fecha" value="${toLocalInput(ases.fecha_visita)}"
       style="border:1px solid #E4E4E3;border-radius:6px;padding:8px;width:100%;box-sizing:border-box">
     <button class="btn btn-primary" onclick="saveFechaAses('${ases.id}')" style="margin-top:8px">Guardar fecha de visita</button>
   </div>`;
@@ -1361,7 +1368,7 @@ function renderAsesModal(ases, leadId) {
     <label style="font-weight:600;display:block;margin-bottom:12px">⏰ Fechas límite por etapa</label>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
     ${workStages.map(s => {
-      const val = deadlines[s.key] ? new Date(deadlines[s.key]).toISOString().slice(0,16) : '';
+      const val = toLocalInput(deadlines[s.key]);
       return `<div>
         <label style="font-size:12px;color:#555;display:block;margin-bottom:4px">${s.icon} ${s.label}</label>
         <div style="display:flex;gap:4px">
