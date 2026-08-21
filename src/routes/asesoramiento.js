@@ -21,6 +21,32 @@ const STAGE_LABELS = {
   completado: 'Completado',
 };
 
+// GET /api/admin/asesoramiento/reminders — list all upcoming deadlines
+router.get('/reminders', async (req, res) => {
+  try {
+    const { data, error } = await supabase.from('asesoramientos')
+      .select('id, lead_id, stage, stage_deadlines')
+      .not('stage_deadlines', 'is', null)
+      .neq('stage', 'completado');
+    if (error) throw error;
+    const STAGE_LABELS_LOCAL = {
+      visita: 'Visita', revision_visita: 'Revisión Visita',
+      diseno: 'Diseño', revision_diseno: 'Revisión Diseño',
+      dibujo: 'Dibujo', revision_dibujo: 'Revisión Dibujo', completado: 'Completado',
+    };
+    const reminders = [];
+    for (const a of data || []) {
+      const deadlines = a.stage_deadlines || {};
+      for (const [stage, fecha] of Object.entries(deadlines)) {
+        if (!fecha) continue;
+        reminders.push({ ases_id: a.id, lead_id: a.lead_id, current_stage: a.stage, stage, fecha_limite: fecha, label: STAGE_LABELS_LOCAL[stage] || stage });
+      }
+    }
+    reminders.sort((a, b) => new Date(a.fecha_limite) - new Date(b.fecha_limite));
+    res.json(reminders);
+  } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
 // GET /api/admin/asesoramiento/:leadId
 router.get('/:leadId', async (req, res) => {
   try {
@@ -98,28 +124,6 @@ router.put('/:id/deadline', async (req, res) => {
   } catch (e) { res.status(500).json({ error: e.message }); }
 });
 
-// GET /api/admin/asesoramiento/reminders — list all upcoming deadlines
-router.get('/reminders', async (req, res) => {
-  try {
-    const { data, error } = await supabase.from('asesoramientos')
-      .select('id, lead_id, stage, stage_deadlines')
-      .not('stage_deadlines', 'is', null)
-      .neq('stage', 'completado');
-    if (error) throw error;
-    const now = new Date();
-    const reminders = [];
-    for (const a of data || []) {
-      const deadlines = a.stage_deadlines || {};
-      for (const [stage, fecha] of Object.entries(deadlines)) {
-        if (!fecha) continue;
-        const d = new Date(fecha);
-        reminders.push({ ases_id: a.id, lead_id: a.lead_id, current_stage: a.stage, stage, fecha_limite: fecha, label: STAGE_LABELS[stage] || stage });
-      }
-    }
-    reminders.sort((a, b) => new Date(a.fecha_limite) - new Date(b.fecha_limite));
-    res.json(reminders);
-  } catch (e) { res.status(500).json({ error: e.message }); }
-});
 
 // POST /api/admin/asesoramiento/:id/aprobar — gerente approves current revision stage
 router.post('/:id/aprobar', async (req, res) => {
