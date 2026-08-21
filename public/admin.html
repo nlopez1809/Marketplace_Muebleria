@@ -1368,13 +1368,18 @@ function renderAsesModal(ases, leadId) {
     <label style="font-weight:600;display:block;margin-bottom:12px">⏰ Fechas límite por etapa</label>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
     ${workStages.map(s => {
-      const val = toLocalInput(deadlines[s.key]);
-      return `<div>
-        <label style="font-size:12px;color:#555;display:block;margin-bottom:4px">${s.icon} ${s.label}</label>
-        <div style="display:flex;gap:4px">
-          <input type="datetime-local" id="dl-${s.key}" value="${val}"
-            style="flex:1;border:1px solid #E4E4E3;border-radius:6px;padding:6px;font-size:12px">
-          <button class="btn btn-secondary" onclick="saveDeadline('${ases.id}','${s.key}','${leadId}')" style="padding:6px 8px;font-size:11px">✓</button>
+      const dl = deadlines[s.key];
+      const currentLabel = dl
+        ? `<span style="font-size:11px;color:#10B981;font-weight:600">✓ ${new Date(dl).toLocaleDateString('es-BO',{day:'2-digit',month:'short'})} ${new Date(dl).toLocaleTimeString('es-BO',{hour:'2-digit',minute:'2-digit'})}</span>`
+        : `<span style="font-size:11px;color:#aaa">Sin fecha</span>`;
+      return `<div style="background:#fff;border:1px solid #E4E4E3;border-radius:8px;padding:10px">
+        <div style="font-size:12px;color:#555;font-weight:600;margin-bottom:6px">${s.icon} ${s.label}</div>
+        <div style="margin-bottom:8px">${currentLabel}</div>
+        <div style="display:flex;gap:4px;flex-wrap:wrap">
+          <button class="btn btn-secondary" onclick="quickDeadline('${ases.id}','${s.key}','${leadId}',24)" style="font-size:11px;padding:4px 8px">+24h</button>
+          <button class="btn btn-secondary" onclick="quickDeadline('${ases.id}','${s.key}','${leadId}',48)" style="font-size:11px;padding:4px 8px">+48h</button>
+          <button class="btn btn-secondary" onclick="quickDeadline('${ases.id}','${s.key}','${leadId}',72)" style="font-size:11px;padding:4px 8px">+72h</button>
+          ${dl ? `<button class="btn btn-danger" onclick="quickDeadline('${ases.id}','${s.key}','${leadId}',0)" style="font-size:11px;padding:4px 8px">✕</button>` : ''}
         </div>
       </div>`;
     }).join('')}
@@ -1429,17 +1434,16 @@ function renderAsesModal(ases, leadId) {
   document.getElementById('ases-modal-body').innerHTML = stepsHtml + fechaHtml + deadlinesHtml + prevFotosHtml + fotosHtml + reviewHtml + advanceHtml;
 }
 
-async function saveDeadline(asesId, stage, leadId) {
-  const input = document.getElementById('dl-' + stage);
-  const val = input?.value;
+async function quickDeadline(asesId, stage, leadId, hours) {
+  const fecha_limite = hours > 0 ? new Date(Date.now() + hours * 3600000).toISOString() : null;
   try {
     const data = await (await fetch(API+'/asesoramiento/'+asesId+'/deadline', {
       method:'PUT', headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({ stage, fecha_limite: val ? new Date(val).toISOString() : null })
+      body: JSON.stringify({ stage, fecha_limite })
     })).json();
     if (data.error) throw new Error(data.error);
     currentAses = data;
-    toast('Fecha límite guardada ✓');
+    toast(hours > 0 ? `Límite en ${hours}h guardado ✓` : 'Fecha eliminada');
     renderAsesModal(data, leadId);
   } catch(e) { toast('Error: '+e.message); }
 }
