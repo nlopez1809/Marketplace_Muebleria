@@ -735,27 +735,30 @@ function toast(msg) {
   setTimeout(() => el.classList.remove('show'), 2500);
 }
 
-// ── SSE Notifications ──
-(function startSSE() {
-  const es = new EventSource('/api/admin/events');
-  es.onmessage = function(e) {
-    try {
-      const msg = JSON.parse(e.data);
-      if(msg.type === 'new_lead') {
+// ── Polling para nuevos leads (reemplaza SSE para evitar funciones serverless de larga duración) ──
+let pollLastTs = new Date().toISOString();
+async function pollNewLeads() {
+  try {
+    const res = await fetch(API+'/events/poll?since='+encodeURIComponent(pollLastTs));
+    if (!res.ok) return;
+    const data = await res.json();
+    pollLastTs = data.ts || new Date().toISOString();
+    if (data.leads && data.leads.length) {
+      data.leads.forEach(lead => {
         newLeadCount++;
         const b = document.getElementById('tab-leads-badge');
         b.textContent = newLeadCount; b.style.display='inline';
         const n = document.getElementById('notif-banner');
         const t = document.getElementById('notif-text');
-        t.innerHTML = `<strong>Nuevo lead:</strong> ${msg.lead.nombre||'Cliente'} — ${msg.lead.producto_interes||''}`;
+        t.innerHTML = `<strong>Nuevo lead:</strong> ${lead.nombre||'Cliente'} — ${lead.producto_interes||''}`;
         n.style.display='flex';
         setTimeout(() => n.style.display='none', 6000);
-        loadLeads(); loadDashboard();
-      }
-    } catch(err){}
-  };
-  es.onerror = function() { setTimeout(startSSE, 5000); };
-})();
+      });
+      loadLeads(); loadDashboard();
+    }
+  } catch(e) {}
+}
+setInterval(pollNewLeads, 30000);
 
 // ── Dashboard ──
 async function loadDashboard() {
