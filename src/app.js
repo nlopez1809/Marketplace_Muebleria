@@ -164,7 +164,15 @@ app.get('/api/admin/events', requireAuth, (req, res) => {
   res.flushHeaders();
   res.write('data: {"type":"connected"}\n\n');
   sseClients.add(res);
-  req.on('close', () => sseClients.delete(res));
+
+  // Heartbeat every 30s to detect dead connections
+  const hb = setInterval(() => {
+    try { res.write(':ping\n\n'); }
+    catch(e) { clearInterval(hb); sseClients.delete(res); }
+  }, 30000);
+
+  req.on('close', () => { clearInterval(hb); sseClients.delete(res); });
+  res.on('error', () => { clearInterval(hb); sseClients.delete(res); });
 });
 
 // ── Analytics ──

@@ -8,6 +8,18 @@ const chrono = require('chrono-node');
 
 // In-memory conversation store (per session) for saving to DB
 const sessionConversations = {};
+const sessionTimestamps = {};
+const SESSION_TTL_MS = 30 * 60 * 1000; // 30 min
+const MAX_SESSIONS = 200;
+
+function cleanSessions() {
+  const now = Date.now();
+  const expired = Object.keys(sessionTimestamps).filter(id => now - sessionTimestamps[id] > SESSION_TTL_MS);
+  expired.forEach(id => { delete sessionConversations[id]; delete sessionTimestamps[id]; });
+  // If still too many, evict oldest
+  const ids = Object.keys(sessionTimestamps).sort((a,b) => sessionTimestamps[a] - sessionTimestamps[b]);
+  if (ids.length > MAX_SESSIONS) ids.slice(0, ids.length - MAX_SESSIONS).forEach(id => { delete sessionConversations[id]; delete sessionTimestamps[id]; });
+}
 
 function parseFechaVisita(texto) {
   if (!texto) return null;
@@ -120,10 +132,12 @@ router.post('/', async (req, res) => {
     assistantMessage = assistantMessage.trim();
 
     // ── Guardar conversación en memoria ──
+    cleanSessions();
     if (!sessionConversations[sessionId]) sessionConversations[sessionId] = [];
     sessionConversations[sessionId].push({ role: 'user', content: message, ts: new Date().toISOString() });
     sessionConversations[sessionId].push({ role: 'bot', content: assistantMessage, ts: new Date().toISOString() });
-    if (sessionConversations[sessionId].length > 100) sessionConversations[sessionId] = sessionConversations[sessionId].slice(-100);
+    if (sessionConversations[sessionId].length > 40) sessionConversations[sessionId] = sessionConversations[sessionId].slice(-40);
+    sessionTimestamps[sessionId] = Date.now();
 
     // ── Procesar LEAD ──
     const leadMatch = rawMessage.match(/<!--LEAD:([\s\S]*?)-->/);
