@@ -1492,7 +1492,16 @@ async function saveVisitaDate(asesId, leadId) {
 }
 
 async function quickDeadline(asesId, stage, leadId, hours) {
-  const fecha_limite = hours > 0 ? new Date(Date.now() + hours * 3600000).toISOString() : null;
+  let fecha_limite = null;
+  if (hours > 0) {
+    // Base = deadline de la etapa anterior (o ahora si no existe)
+    const deadlines = currentAses?.stage_deadlines || {};
+    const stageKeys = ['visita','revision_visita','diseno','revision_diseno','dibujo','revision_dibujo'];
+    const idx = stageKeys.indexOf(stage);
+    const prevStage = idx > 0 ? stageKeys[idx - 1] : null;
+    const base = prevStage && deadlines[prevStage] ? new Date(deadlines[prevStage]).getTime() : Date.now();
+    fecha_limite = new Date(base + hours * 3600000).toISOString();
+  }
   try {
     const data = await (await fetch(API+'/asesoramiento/'+asesId+'/deadline', {
       method:'PUT', headers:{'Content-Type':'application/json'},
@@ -1500,7 +1509,7 @@ async function quickDeadline(asesId, stage, leadId, hours) {
     })).json();
     if (data.error) throw new Error(data.error);
     currentAses = data;
-    toast(hours > 0 ? `Límite en ${hours}h guardado ✓` : 'Fecha eliminada');
+    toast(hours > 0 ? `Plazo en ${hours}h desde fecha anterior ✓` : 'Fecha eliminada');
     renderAsesModal(data, leadId);
   } catch(e) { toast('Error: '+e.message); }
 }
