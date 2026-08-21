@@ -1236,18 +1236,22 @@ async function loadVisitas(){
     // ── Combinar visitas de leads + deadlines de asesoramientos ──
     const byDay={};
 
-    // Visitas de Deco IA
+    const todayStr = now.toISOString().slice(0,10);
+
+    // Visitas de Deco IA — solo futuras (desde hoy)
     visitas.forEach(v=>{
       const d=new Date(v.fecha_visita);
-      const key=isNaN(d)?'Sin fecha':d.toISOString().slice(0,10);
+      const key=isNaN(d)?null:d.toISOString().slice(0,10);
+      if(!key || key < todayStr) return;
       if(!byDay[key])byDay[key]=[];
       byDay[key].push({ type:'lead', data:v, date:d });
     });
 
-    // Plazos de asesoramiento
+    // Plazos de asesoramiento — solo futuros (desde hoy)
     asesoramientos.forEach(r=>{
       const d=new Date(r.fecha_limite);
-      const key=isNaN(d)?'Sin fecha':d.toISOString().slice(0,10);
+      const key=isNaN(d)?null:d.toISOString().slice(0,10);
+      if(!key || key < todayStr) return;
       if(!byDay[key])byDay[key]=[];
       byDay[key].push({ type:'ases', data:r, date:d });
     });
