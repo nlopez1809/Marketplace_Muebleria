@@ -25,10 +25,19 @@ const STAGE_LABELS = {
 router.get('/reminders', async (req, res) => {
   try {
     const { data, error } = await supabase.from('asesoramientos')
-      .select('id, lead_id, stage, stage_deadlines, leads(nombre)')
+      .select('id, lead_id, stage, stage_deadlines')
       .not('stage_deadlines', 'is', null)
       .neq('stage', 'completado');
     if (error) throw error;
+
+    // Fetch lead names separately
+    const leadIds = [...new Set((data || []).map(a => a.lead_id).filter(Boolean))];
+    let leadNames = {};
+    if (leadIds.length) {
+      const { data: leads } = await supabase.from('leads').select('id, nombre').in('id', leadIds);
+      (leads || []).forEach(l => { leadNames[l.id] = l.nombre || ''; });
+    }
+
     const STAGE_LABELS_LOCAL = {
       visita: 'Visita', revision_visita: 'Revisión Visita',
       diseno: 'Diseño', revision_diseno: 'Revisión Diseño',
@@ -37,7 +46,7 @@ router.get('/reminders', async (req, res) => {
     const reminders = [];
     for (const a of data || []) {
       const deadlines = a.stage_deadlines || {};
-      const nombre = (a.leads && a.leads.nombre) || '';
+      const nombre = leadNames[a.lead_id] || '';
       for (const [stage, fecha] of Object.entries(deadlines)) {
         if (!fecha) continue;
         reminders.push({ ases_id: a.id, lead_id: a.lead_id, nombre, current_stage: a.stage, stage, fecha_limite: fecha, label: STAGE_LABELS_LOCAL[stage] || stage });
