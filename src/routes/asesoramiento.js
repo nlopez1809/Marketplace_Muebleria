@@ -98,7 +98,7 @@ router.put('/:id/deadline', async (req, res) => {
   } catch (e) { res.status(500).json({ error: e.message }); }
 });
 
-// GET /api/admin/asesoramiento/reminders — list upcoming deadlines (next 48h)
+// GET /api/admin/asesoramiento/reminders — list all upcoming deadlines
 router.get('/reminders', async (req, res) => {
   try {
     const { data, error } = await supabase.from('asesoramientos')
@@ -107,16 +107,13 @@ router.get('/reminders', async (req, res) => {
       .neq('stage', 'completado');
     if (error) throw error;
     const now = new Date();
-    const limit = new Date(now.getTime() + 48 * 60 * 60 * 1000);
     const reminders = [];
     for (const a of data || []) {
       const deadlines = a.stage_deadlines || {};
       for (const [stage, fecha] of Object.entries(deadlines)) {
         if (!fecha) continue;
         const d = new Date(fecha);
-        if (d >= now && d <= limit) {
-          reminders.push({ ases_id: a.id, lead_id: a.lead_id, current_stage: a.stage, stage, fecha_limite: fecha, label: STAGE_LABELS[stage] || stage });
-        }
+        reminders.push({ ases_id: a.id, lead_id: a.lead_id, current_stage: a.stage, stage, fecha_limite: fecha, label: STAGE_LABELS[stage] || stage });
       }
     }
     reminders.sort((a, b) => new Date(a.fecha_limite) - new Date(b.fecha_limite));
