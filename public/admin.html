@@ -1362,30 +1362,62 @@ function renderAsesModal(ases, leadId) {
     <button class="btn btn-primary" onclick="saveFechaAses('${ases.id}')" style="margin-top:8px">Guardar fecha de visita</button>
   </div>`;
 
-  // ── Fechas límite por etapa ──
+  // ── Plazos secuenciales por etapa ──
+  // Solo la etapa actual y la siguiente (si está definida la actual) tienen botones activos
   const workStages = ASES_STAGES.filter(s => s.key !== 'completado');
   let deadlinesHtml = `<div style="margin-bottom:20px;padding:16px;background:#F9F9F8;border-radius:8px">
-    <label style="font-weight:600;display:block;margin-bottom:12px">⏰ Fechas límite por etapa</label>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
-    ${workStages.map(s => {
+    <label style="font-weight:600;display:block;margin-bottom:12px">⏰ Plazos de entrega</label>
+    <div style="display:flex;flex-direction:column;gap:8px">
+    ${workStages.map((s, i) => {
+      const sIdx = ASES_STAGES.findIndex(x => x.key === s.key);
+      const isPast = sIdx < stageIdx;
+      const isCurrent = sIdx === stageIdx;
       const dl = deadlines[s.key];
-      const currentLabel = dl
-        ? `<span style="font-size:11px;color:#10B981;font-weight:600">✓ ${new Date(dl).toLocaleDateString('es-BO',{day:'2-digit',month:'short'})} ${new Date(dl).toLocaleTimeString('es-BO',{hour:'2-digit',minute:'2-digit'})}</span>`
-        : `<span style="font-size:11px;color:#aaa">Sin fecha</span>`;
-      return `<div style="background:#fff;border:1px solid #E4E4E3;border-radius:8px;padding:10px">
-        <div style="font-size:12px;color:#555;font-weight:600;margin-bottom:6px">${s.icon} ${s.label}</div>
-        <div style="margin-bottom:8px">${currentLabel}</div>
-        <div style="display:flex;gap:4px;flex-wrap:wrap">
-          <button class="btn btn-secondary" onclick="quickDeadline('${ases.id}','${s.key}','${leadId}',24)" style="font-size:11px;padding:4px 8px">+24h</button>
-          <button class="btn btn-secondary" onclick="quickDeadline('${ases.id}','${s.key}','${leadId}',48)" style="font-size:11px;padding:4px 8px">+48h</button>
-          <button class="btn btn-secondary" onclick="quickDeadline('${ases.id}','${s.key}','${leadId}',72)" style="font-size:11px;padding:4px 8px">+72h</button>
-          ${dl ? `<button class="btn btn-danger" onclick="quickDeadline('${ases.id}','${s.key}','${leadId}',0)" style="font-size:11px;padding:4px 8px">✕</button>` : ''}
-        </div>
+      const dlStr = dl
+        ? new Date(dl).toLocaleDateString('es-BO',{weekday:'short',day:'2-digit',month:'short'}) + ' ' + new Date(dl).toLocaleTimeString('es-BO',{hour:'2-digit',minute:'2-digit'})
+        : null;
+      const isOverdue = dl && new Date(dl) < new Date();
+
+      if (isPast) {
+        // Etapa pasada: mostrar como historial
+        return `<div style="display:flex;align-items:center;gap:10px;padding:8px 12px;background:#fff;border:1px solid #E4E4E3;border-radius:8px;opacity:0.7">
+          <span style="font-size:16px">${s.icon}</span>
+          <span style="flex:1;font-size:12px;color:#555;font-weight:600">${s.label}</span>
+          ${dlStr ? `<span style="font-size:11px;color:#10B981;font-weight:600">✓ ${dlStr}</span>` : '<span style="font-size:11px;color:#ccc">—</span>'}
+        </div>`;
+      }
+
+      if (isCurrent) {
+        // Etapa activa: mostrar botones de plazo
+        const urgencyColor = isOverdue ? '#EF4444' : dl ? '#10B981' : '#F27141';
+        return `<div style="padding:12px;background:#fff;border:2px solid #F27141;border-radius:8px">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
+            <span style="font-size:18px">${s.icon}</span>
+            <span style="font-weight:700;color:#1a1a1a">${s.label}</span>
+            <span style="margin-left:auto;font-size:12px;font-weight:600;color:${urgencyColor}">
+              ${isOverdue ? '⚠️ Vencido' : dlStr ? '⏰ ' + dlStr : 'Sin plazo'}
+            </span>
+          </div>
+          <div style="font-size:12px;color:#888;margin-bottom:8px">Asignar plazo desde ahora:</div>
+          <div style="display:flex;gap:6px;flex-wrap:wrap">
+            <button class="btn btn-secondary" onclick="quickDeadline('${ases.id}','${s.key}','${leadId}',24)" style="font-size:12px;padding:6px 14px;font-weight:600">+24h</button>
+            <button class="btn btn-secondary" onclick="quickDeadline('${ases.id}','${s.key}','${leadId}',48)" style="font-size:12px;padding:6px 14px;font-weight:600">+48h</button>
+            <button class="btn btn-secondary" onclick="quickDeadline('${ases.id}','${s.key}','${leadId}',72)" style="font-size:12px;padding:6px 14px;font-weight:600">+72h</button>
+            ${dl ? `<button class="btn btn-danger" onclick="quickDeadline('${ases.id}','${s.key}','${leadId}',0)" style="font-size:12px;padding:6px 10px" title="Quitar plazo">✕</button>` : ''}
+          </div>
+        </div>`;
+      }
+
+      // Etapa futura: bloqueada
+      return `<div style="display:flex;align-items:center;gap:10px;padding:8px 12px;background:#F9F9F8;border:1px dashed #E4E4E3;border-radius:8px;opacity:0.4">
+        <span style="font-size:16px">${s.icon}</span>
+        <span style="flex:1;font-size:12px;color:#aaa;font-weight:600">${s.label}</span>
+        <span style="font-size:11px;color:#ccc">🔒 Pendiente</span>
       </div>`;
     }).join('')}
     </div>
     <div style="margin-top:12px">
-      <button class="btn btn-secondary" onclick="sendReminders('${ases.id}')" style="font-size:12px">📲 Ver / enviar recordatorios WhatsApp</button>
+      <button class="btn btn-secondary" onclick="sendReminders('${ases.id}')" style="font-size:12px">📲 Enviar recordatorio WhatsApp</button>
     </div>
   </div>`;
 
