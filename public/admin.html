@@ -1084,7 +1084,8 @@ function renderLeads(){
       <td style="white-space:nowrap;display:flex;gap:4px">
         ${hasConv?`<button class="btn btn-secondary" onclick="openConvModal(${l.id})" title="Ver conversación" style="padding:6px 8px">💬</button>`:''}
         ${l.telefono?`<a class="btn btn-secondary" href="https://wa.me/${l.telefono}" target="_blank" style="text-decoration:none">WA</a>`:''}
-        <button class="btn btn-secondary" onclick="openAsesModal(${l.id},'${(l.nombre||'').replace(/'/g,"\\'")}')" title="Asesoramiento" style="padding:6px 8px;background:#F27141;color:#fff;border-color:#F27141">🏠</button>
+        ${st==='visita_agendada'?`<button class="btn btn-secondary" onclick="openAsesModal(${l.id},'${(l.nombre||'').replace(/'/g,"\\'")}')" title="Asesoramiento" style="padding:6px 8px;background:#F27141;color:#fff;border-color:#F27141">🏠</button>`:''}
+
         <select onchange="updateLeadStage(${l.id},this.value)" style="font-size:11px;border:1px solid #E4E4E3;border-radius:3px;padding:4px 6px;cursor:pointer">
           ${Object.entries(stageLabels).map(([k,v])=>`<option value="${k}" ${st===k?'selected':''}>${v}</option>`).join('')}
         </select>
