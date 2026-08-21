@@ -1224,7 +1224,7 @@ async function loadVisitas(){
         const gcal = gcalReminderUrl(r.fecha_limite, ASES_STAGE_LABELS[r.stage]||r.stage, '');
         return `<div style="display:flex;align-items:center;gap:10px;padding:8px;background:#fff;border-radius:6px">
           <span style="font-weight:600;color:#F27141">${ASES_STAGE_LABELS[r.stage]||r.stage}</span>
-          <span style="font-size:12px;color:#555">Lead: ${r.lead_id}</span>
+          <span style="font-size:12px;color:#555">${r.nombre||'Cliente'}</span>
           <span style="margin-left:auto;font-size:12px;font-weight:600;color:#EF4444">Vence en ${mins} min</span>
           <a href="${gcal}" target="_blank" style="font-size:11px;background:#3B82F6;color:#fff;padding:3px 8px;border-radius:4px;text-decoration:none;white-space:nowrap">📅 GCal</a>
         </div>`;
@@ -1287,7 +1287,7 @@ async function loadVisitas(){
               <div class="visit-time" style="color:${statusColor}">${hora}</div>
               <div class="visit-info">
                 <div class="visit-name">${ASES_STAGE_LABELS[r.stage]||r.stage}</div>
-                <div class="visit-prod" style="font-size:11px;color:#888">Asesoramiento — Lead ${r.lead_id}</div>
+                <div class="visit-prod" style="font-size:11px;color:#888">Asesoramiento — ${r.nombre||'Cliente'}</div>
               </div>
               <span style="font-size:11px;font-weight:600;color:${statusColor};flex-shrink:0">${statusLabel}</span>
             </div>`;
