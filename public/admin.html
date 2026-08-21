@@ -1516,27 +1516,54 @@ async function quickDeadline(asesId, stage, leadId, hours) {
 }
 
 async function sendReminders(asesId) {
+  const ases = currentAses;
+  if (!ases) return;
+  const deadlines = ases.stage_deadlines || {};
+  const STAGE_LABELS_MAP = {
+    visita:'Visita', revision_visita:'Revisión Visita',
+    diseno:'Diseño', revision_diseno:'Revisión Diseño',
+    dibujo:'Dibujo', revision_dibujo:'Revisión Dibujo',
+  };
+  const entries = Object.entries(deadlines).filter(([,v]) => v);
+  if (!entries.length) { toast('No hay fechas límite configuradas'); return; }
+
   try {
-    const reminders = await (await fetch(API+'/asesoramiento/reminders')).json();
-    const mine = reminders.filter(r => r.ases_id === asesId);
-    if (!mine.length) { toast('Sin recordatorios próximos (48h)'); return; }
-    // Open WhatsApp links for each reminder
-    mine.forEach((r, i) => {
-      // Build WA message - needs asesor phone; fetch asesores
-      fetch(API+'/asesor').then(x=>x.json()).then(asesores => {
-        asesores.forEach(a => {
-          const msg = encodeURIComponent(
-            `⏰ *Recordatorio InCassa DECO*\n\n` +
-            `La etapa *${r.label}* vence el *${new Date(r.fecha_limite).toLocaleDateString('es-BO',{weekday:'short',day:'2-digit',month:'short'})} ` +
-            `a las ${new Date(r.fecha_limite).toLocaleTimeString('es-BO',{hour:'2-digit',minute:'2-digit'})}*.\n\n` +
-            `Por favor asegurate de tener tu trabajo listo para esa fecha. 🙏`
-          );
-          const url = `https://wa.me/${(a.telefono||'').replace(/\D/g,'')}?text=${msg}`;
-          setTimeout(() => window.open(url, '_blank'), i * 500);
-        });
+    const asesores = await (await fetch(API+'/asesor')).json();
+    if (!asesores.length) { toast('No hay asesores registrados'); return; }
+
+    // Build one link per (stage, asesor)
+    let linksHtml = '';
+    entries.forEach(([stage, fecha]) => {
+      const label = STAGE_LABELS_MAP[stage] || stage;
+      const fechaStr = new Date(fecha).toLocaleDateString('es-BO',{weekday:'short',day:'2-digit',month:'short'});
+      const horaStr = new Date(fecha).toLocaleTimeString('es-BO',{hour:'2-digit',minute:'2-digit'});
+      asesores.forEach(a => {
+        const msg = encodeURIComponent(
+          `⏰ *Recordatorio InCassa DECO*\n\n` +
+          `Hola ${a.nombre}, la etapa *${label}* vence el *${fechaStr} a las ${horaStr}*.\n\n` +
+          `Por favor asegurate de tener tu trabajo listo para esa fecha. 🙏`
+        );
+        const url = `https://wa.me/${(a.telefono||'').replace(/\D/g,'')}?text=${msg}`;
+        linksHtml += `<a href="${url}" target="_blank" style="display:flex;align-items:center;gap:10px;padding:10px 12px;background:#F0FDF4;border:1px solid #10B981;border-radius:8px;text-decoration:none;color:#065F46;font-size:13px;margin-bottom:8px">
+          <span style="font-size:20px">💬</span>
+          <span><strong>${a.nombre}</strong><br><span style="font-size:12px;color:#555">Etapa: ${label} — ${fechaStr} ${horaStr}</span></span>
+          <span style="margin-left:auto;font-size:11px;background:#25D366;color:#fff;padding:3px 8px;border-radius:4px">WhatsApp</span>
+        </a>`;
       });
     });
-    toast(`Abriendo ${mine.length} recordatorio(s) en WhatsApp...`);
+
+    // Show in a simple overlay
+    const overlay = document.createElement('div');
+    overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:9999;display:flex;align-items:center;justify-content:center';
+    overlay.innerHTML = `<div style="background:#fff;border-radius:12px;padding:24px;width:480px;max-height:80vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,0.3)">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+        <h3 style="margin:0;font-size:16px">📲 Recordatorios WhatsApp</h3>
+        <button onclick="this.closest('div[style*=fixed]').remove()" style="background:none;border:none;font-size:20px;cursor:pointer;color:#888">✕</button>
+      </div>
+      <p style="font-size:12px;color:#888;margin-bottom:16px">Hacé clic en cada mensaje para abrirlo en WhatsApp:</p>
+      ${linksHtml}
+    </div>`;
+    document.body.appendChild(overlay);
   } catch(e) { toast('Error: '+e.message); }
 }
 
