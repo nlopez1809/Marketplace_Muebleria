@@ -198,6 +198,84 @@
   /* ── FILTER BAR ── */
   .filter-select { font-family:inherit; font-size:12px; padding:8px 10px; border:1px solid #E4E4E3; border-radius:3px; background:#fff; color:#40403E; cursor:pointer; }
   .filter-select:focus { outline:none; border-color:#F27141; }
+
+  /* ══ RESPONSIVE ══ */
+  @media (max-width: 768px) {
+    /* Topbar */
+    .topbar { padding:0 16px; height:54px; }
+    .topbar-logo { font-size:16px; }
+    .topbar-badge { display:none; }
+    .topbar-link { display:none; }
+    .btn-logout { padding:6px 10px; font-size:11px; }
+
+    /* Tabs — scroll horizontal */
+    .tabs { padding:0 8px; overflow-x:auto; -webkit-overflow-scrolling:touch; flex-wrap:nowrap; scrollbar-width:none; }
+    .tabs::-webkit-scrollbar { display:none; }
+    .tab { padding:12px 14px; font-size:12px; white-space:nowrap; flex-shrink:0; gap:4px; }
+    .tab svg { display:none; }
+
+    /* Content */
+    .content { padding:0 12px; margin:16px auto; }
+
+    /* Section header */
+    .section-header { flex-direction:column; align-items:flex-start; gap:10px; }
+    .section-header > button, .section-header > a { width:100%; text-align:center; justify-content:center; }
+
+    /* Cards */
+    .card { padding:16px; }
+
+    /* Forms */
+    .form-grid { grid-template-columns:1fr; }
+    .toolbar { flex-wrap:wrap; }
+    .toolbar input { max-width:100%; flex:1; min-width:0; }
+    .toolbar-right { margin-left:0; width:100%; }
+    .toolbar-right button, .toolbar-right a { width:100%; justify-content:center; }
+
+    /* Table — scroll horizontal */
+    .table-wrap { overflow-x:auto; -webkit-overflow-scrolling:touch; }
+    table { min-width:560px; }
+
+    /* Leads table: ocultar columnas menos importantes */
+    th:nth-child(4), td:nth-child(4),
+    th:nth-child(5), td:nth-child(5) { display:none; }
+
+    /* Metric grid */
+    .metric-grid { grid-template-columns:repeat(2,1fr) !important; gap:10px; }
+    .metric-card .metric-val { font-size:24px; }
+
+    /* Analytics grid */
+    #analytics-kpis { grid-template-columns:repeat(2,1fr) !important; }
+    #tab-analytics > div[style*="grid-template-columns"] { display:flex !important; flex-direction:column; }
+
+    /* Kanban — scroll horizontal */
+    #pipeline-board { overflow-x:auto !important; -webkit-overflow-scrolling:touch; display:flex !important; gap:10px; padding-bottom:8px; }
+    #pipeline-board > .kanban-col { min-width:220px; flex-shrink:0; }
+
+    /* Calendar */
+    .visit-card { flex-wrap:wrap; gap:8px; }
+    .visit-time { font-size:16px; min-width:unset; }
+
+    /* Modal */
+    .modal { width:100% !important; max-width:100% !important; max-height:100vh !important; border-radius:0 !important; }
+    .modal-overlay { padding:0; align-items:flex-end; }
+    .modal-body { padding:16px; }
+    .modal-header { padding:16px 20px; }
+
+    /* Actions row */
+    .actions { flex-wrap:wrap; }
+    .actions .btn { flex:1; justify-content:center; }
+
+    /* Toast */
+    .toast { left:12px; right:12px; bottom:12px; width:auto; }
+
+    /* Asesoramiento step labels */
+    #ases-modal-body div[style*="display:flex;gap:4px"] { gap:2px !important; }
+  }
+
+  @media (max-width: 480px) {
+    .metric-grid { grid-template-columns:1fr 1fr !important; }
+    .tab { font-size:11px; padding:10px 10px; }
+  }
 </style>
 </head>
 <body>
@@ -420,7 +498,7 @@
     <div class="section-header" style="margin-bottom:20px">
       <div><div class="section-title">Pipeline de ventas</div><div class="section-sub">Arrastrá los leads entre columnas para actualizar su estado</div></div>
     </div>
-    <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:14px;align-items:start">
+    <div id="pipeline-board" style="display:grid;grid-template-columns:repeat(5,1fr);gap:14px;align-items:start">
       <div class="kanban-col" id="k-nuevo">
         <div class="kanban-header" style="background:#6B7280"><span>🆕 Nuevo</span><span class="kanban-count" id="kc-nuevo">0</span></div>
         <div class="kanban-body" data-stage="nuevo"></div>
