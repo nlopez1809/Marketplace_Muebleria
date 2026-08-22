@@ -1247,8 +1247,9 @@ async function loadVisitas(){
       byDay[key].push({ type:'lead', data:v, date:d });
     });
 
-    // Plazos de asesoramiento — solo futuros (desde hoy)
+    // Plazos de asesoramiento — solo futuros (desde hoy) y con nombre de cliente
     asesoramientos.forEach(r=>{
+      if(!r.nombre) return;
       const d=new Date(r.fecha_limite);
       const key=isNaN(d)?null:d.toISOString().slice(0,10);
       if(!key || key < todayStr) return;
