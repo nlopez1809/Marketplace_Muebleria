@@ -47,6 +47,105 @@
     *{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important;scroll-behavior:auto!important}
     .mb-reveal,.mb-reveal-l,.mb-reveal-r{opacity:1!important;transform:none!important}
   }
+
+  /* ══ RESPONSIVE ══ */
+  @media (max-width:768px){
+    /* Navbar */
+    header > div { padding:0 16px !important; height:58px !important; gap:12px !important; }
+    header input { display:none !important; }
+    header nav a { display:none !important; }
+    header nav { gap:14px !important; }
+    /* Logo image smaller */
+    header img { height:36px !important; }
+    /* Fixed spacer */
+    div[style*="height:118px"] { height:96px !important; }
+    /* Category strip */
+    div[style*="padding:11px 28px"] { padding:8px 14px !important; gap:18px !important; }
+
+    /* Hero bento */
+    section#top > div { padding:0 10px !important; gap:10px !important; }
+    /* Main banner */
+    div[style*="height:452px"] { height:230px !important; }
+    div[style*="left:46px;top:54px"] { left:20px !important; top:22px !important; max-width:260px !important; }
+    div[style*="left:46px;top:54px"] p { font-size:17px !important; margin-bottom:14px !important; }
+    div[style*="left:46px;top:54px"] button { padding:11px 18px !important; font-size:11px !important; }
+    /* Row A & B — stack vertically */
+    div[style*="grid-template-columns:1fr 1fr"] { grid-template-columns:1fr !important; }
+    div[style*="grid-template-columns:1fr 1.18fr"] { grid-template-columns:1fr !important; }
+    div[style*="height:258px"] { height:180px !important; }
+    div[style*="height:300px"] { height:180px !important; }
+    /* Category label buttons in bento */
+    button[style*="font-size:44px"] { font-size:26px !important; left:16px !important; }
+
+    /* Differentiators — 1 column */
+    section > div[style*="grid-template-columns:repeat(3,1fr)"] { grid-template-columns:1fr !important; }
+    div[style*="padding:34px 26px"] { padding:18px 16px !important; }
+
+    /* Category grid — 3 columns instead of 6 */
+    div[style*="grid-template-columns:repeat(6,1fr)"] { grid-template-columns:repeat(3,1fr) !important; gap:8px !important; }
+    section[style*="padding:84px 28px 30px"] { padding:48px 14px 24px !important; }
+    h2[style*="font-size:42px"] { font-size:28px !important; }
+    h2[style*="font-size:44px"] { font-size:28px !important; }
+    h2[style*="font-size:46px"] { font-size:30px !important; }
+
+    /* Product grid — 2 columns */
+    div[style*="grid-template-columns:repeat(4,1fr)"] { grid-template-columns:repeat(2,1fr) !important; gap:12px !important; }
+    section[style*="padding:64px 28px 90px"] { padding:40px 14px 60px !important; }
+
+    /* Promo banner */
+    div[style*="padding:46px 28px;display:flex;align-items:center;justify-content:space-between"] { flex-direction:column !important; align-items:flex-start !important; padding:28px 18px !important; gap:16px !important; }
+    div[style*="font-size:34px"] { font-size:22px !important; }
+
+    /* Stats counters — 2 columns */
+    div[style*="grid-template-columns:repeat(4,1fr);gap:30px"] { grid-template-columns:repeat(2,1fr) !important; gap:20px !important; }
+    div[style*="font-size:50px"] { font-size:36px !important; }
+    div[style*="padding:80px 28px;width:100%"] { padding:44px 18px !important; }
+    div[style*="font-size:40px;letter-spacing:-.6px"] { font-size:24px !important; }
+
+    /* Parallax floats — hide on mobile */
+    div[style*="animation:mbFloat"] { display:none !important; }
+
+    /* Editorial masonry — single column */
+    div[style*="grid-template-columns:repeat(12,1fr)"] { display:flex !important; flex-direction:column !important; }
+    div[style*="grid-column:"] { grid-column:auto !important; grid-row:auto !important; height:200px !important; }
+    section[style*="padding:90px 28px"] { padding:48px 14px !important; }
+
+    /* Snap carousel */
+    section[style*="padding:80px 0 86px"] div[style*="display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:34px"] { flex-direction:column !important; align-items:flex-start !important; gap:12px !important; }
+    div[style*="width:300px;scroll-snap-align"] { width:240px !important; }
+    section[style*="padding:80px 0 86px"] > div { padding:0 14px !important; }
+
+    /* Testimonials */
+    p[style*="font-size:30px"] { font-size:20px !important; }
+    section[style*="padding:90px 28px"][style*="color:#F2F2F2"] { padding:48px 18px !important; }
+
+    /* Catalog — sidebar goes away, full width grid */
+    div[style*="grid-template-columns:248px 1fr"] { grid-template-columns:1fr !important; gap:20px !important; }
+    aside[style*="position:sticky"] { position:static !important; }
+    div[style*="grid-template-columns:repeat(3,1fr);gap:22px"] { grid-template-columns:repeat(2,1fr) !important; gap:12px !important; }
+    section[style*="padding:84px 28px 96px"] { padding:48px 14px 60px !important; }
+
+    /* Footer — stack columns */
+    div[style*="grid-template-columns:1.4fr 1fr 1fr 1fr 1.2fr"] { grid-template-columns:1fr 1fr !important; gap:24px !important; }
+    footer { padding:40px 18px 24px !important; }
+
+    /* Lightbox — full screen single column */
+    div[style*="grid-template-columns:1.15fr 1fr"] { grid-template-columns:1fr !important; grid-template-rows:60vh auto !important; max-height:100vh !important; }
+    div[style*="min-height:440px"] { min-height:0 !important; }
+
+    /* WA float button — smaller */
+    button[style*="width:60px;height:60px"] { width:50px !important; height:50px !important; bottom:18px !important; right:18px !important; }
+
+    /* Chat widget — full width on mobile */
+    #deco-panel { width:calc(100vw - 16px) !important; right:8px !important; left:8px !important; bottom:76px !important; }
+  }
+
+  @media (max-width:480px){
+    div[style*="grid-template-columns:repeat(3,1fr)"][style*="gap:8px"] { grid-template-columns:repeat(2,1fr) !important; }
+    div[style*="grid-template-columns:repeat(2,1fr)"] { grid-template-columns:1fr !important; }
+    div[style*="grid-template-columns:1fr 1fr"][style*="gap:12px"] { grid-template-columns:1fr !important; }
+    div[style*="grid-template-columns:repeat(2,1fr)"][style*="gap:12px"] { grid-template-columns:1fr !important; }
+  }
 </style>
 <script src="image-slot.js"></script>
 </helmet>
