@@ -37,7 +37,8 @@ router.post('/:id/upload', upload.single('image'), async (req, res) => {
 
     res.json({ image: urlData.publicUrl, images: updated.images });
   } catch (e) {
-    res.status(500).json({ error: 'Error al subir imagen' });
+    console.error('upload error:', e);
+    res.status(500).json({ error: 'Error al subir imagen: ' + (e.message || JSON.stringify(e)) });
   }
 });
 

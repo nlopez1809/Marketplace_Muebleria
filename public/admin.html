@@ -1031,7 +1031,7 @@ async function uploadFile(file) {
     const res=await fetch(API+'/products/'+editingProduct.id+'/upload',{method:'POST',body:fd});
     const data=await res.json(); if(!res.ok){toast(data.error);return;}
     editingProduct.images=data.images; renderProductImages(data.images); toast('Imagen subida'); loadProducts();
-  } catch {toast('Error al subir imagen');} fileInput.value='';
+  } catch(err) {toast('Error al subir imagen: '+(err&&err.message?err.message:err));} fileInput.value='';
 }
 async function removeImage(idx) {
   if(!editingProduct||!confirm('¿Eliminar esta imagen?'))return;
