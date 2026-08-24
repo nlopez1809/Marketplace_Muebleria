@@ -16,8 +16,10 @@ router.post('/:id/upload', upload.single('image'), async (req, res) => {
     const product = await storage.getProduct(req.params.id);
     if (!product) return res.status(404).json({ error: 'Producto no encontrado' });
 
-    const ext = req.file.originalname.split('.').pop().toLowerCase();
-    const fileName = `${req.params.id}/${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
+    const mimeExt = { 'image/jpeg':'jpg','image/jpg':'jpg','image/png':'png','image/webp':'webp','image/gif':'gif' };
+    const ext = mimeExt[req.file.mimetype] || req.file.originalname.split('.').pop().replace(/[^a-z0-9]/gi,'').toLowerCase() || 'jpg';
+    const safeId = String(req.params.id).replace(/[^a-zA-Z0-9_-]/g, '_');
+    const fileName = `${safeId}/${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
 
     const { error: uploadError } = await supabase.storage
       .from('product-images')

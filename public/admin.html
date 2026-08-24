@@ -1024,7 +1024,7 @@ async function uploadFile(file) {
   let uploadFile = file;
   if(file.type.startsWith('image/')) {
     const blob = await compressImage(file, 1920, 1920, 0.85);
-    uploadFile = new File([blob], file.name.replace(/\.[^.]+$/, '.jpg'), {type:'image/jpeg'});
+    if(blob && blob.size > 0) uploadFile = new File([blob], file.name.replace(/\.[^.]+$/, '.jpg'), {type:'image/jpeg'});
   }
   const fd=new FormData(); fd.append('image',uploadFile);
   try {
@@ -1409,7 +1409,7 @@ function compressImage(file, maxW, maxH, quality) {
       const canvas = document.createElement('canvas');
       canvas.width = w; canvas.height = h;
       canvas.getContext('2d').drawImage(img, 0, 0, w, h);
-      canvas.toBlob(resolve, 'image/jpeg', quality);
+      canvas.toBlob(blob => resolve(blob || new Blob([new Uint8Array(0)], {type:'image/jpeg'})), 'image/jpeg', quality);
     };
     img.src = url;
   });
