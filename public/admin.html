@@ -1020,7 +1020,13 @@ fileInput.addEventListener('change',()=>{if(fileInput.files.length)uploadFile(fi
 
 async function uploadFile(file) {
   if(!editingProduct){toast('Primero guarda el producto, luego sube imágenes');return;}
-  const fd=new FormData(); fd.append('image',file);
+  toast('Comprimiendo imagen...');
+  let uploadFile = file;
+  if(file.type.startsWith('image/')) {
+    const blob = await compressImage(file, 1920, 1920, 0.85);
+    uploadFile = new File([blob], file.name.replace(/\.[^.]+$/, '.jpg'), {type:'image/jpeg'});
+  }
+  const fd=new FormData(); fd.append('image',uploadFile);
   try {
     const res=await fetch(API+'/products/'+editingProduct.id+'/upload',{method:'POST',body:fd});
     const data=await res.json(); if(!res.ok){toast(data.error);return;}
