@@ -69,7 +69,9 @@
   .mb-footer-grid { display:grid; grid-template-columns:1.4fr 1fr 1fr 1fr 1.2fr; gap:40px; padding-bottom:52px; border-bottom:1px solid rgba(242,113,65,.16); }
   .mb-lb-inner { background:#fff; border-radius:4px; overflow:hidden; width:100%; max-width:1040px; max-height:92vh; display:grid; grid-template-columns:1.15fr 1fr; box-shadow:0 40px 100px rgba(0,0,0,.6); }
 
+  .mb-mobile-cats { display:none; }
   @media (max-width:768px){
+    .mb-mobile-cats { display:flex !important; }
     .mb-navbar-inner { padding:0 14px !important; height:58px !important; gap:10px !important; }
     .mb-navbar-search { display:none !important; }
     .mb-navbar-links a { display:none !important; }
@@ -223,7 +225,7 @@
       </div>
       <div class="mb-catgrid" style="display:grid;grid-template-columns:repeat(6,1fr);gap:14px">
         <sc-for list="{{ catGrid }}" as="c" hint-placeholder-count="6">
-          <a href="#catalogo" class="mb-catcell mb-reveal" style="position:relative;text-decoration:none;border-radius:3px;overflow:hidden;aspect-ratio:3/4;display:block;background:#E4E4E3">
+          <a href="#catalogo" onClick="{{ c.go }}" class="mb-catcell mb-reveal" style="position:relative;text-decoration:none;border-radius:3px;overflow:hidden;aspect-ratio:3/4;display:block;background:#E4E4E3;cursor:pointer">
             <div class="mb-catimg" style="position:absolute;inset:0;background-size:cover;background-position:center;transition:transform .7s cubic-bezier(.16,.84,.44,1);background-image:{{ c.img }}"></div>
             <div style="position:absolute;inset:0;background:linear-gradient(180deg,transparent 45%,rgba(64,64,62,.72))"></div>
             <span class="mb-catlabel" style="position:absolute;left:14px;bottom:14px;color:#F2F2F2;font-size:13px;letter-spacing:.08em;text-transform:uppercase;font-weight:600;transition:color .3s">{{ c.name }}</span>
@@ -427,6 +429,12 @@
         </aside>
 
         <div>
+          <!-- Mobile category filter bar (sidebar is hidden on mobile) -->
+          <div class="mb-mobile-cats mb-scroll-x mb-hide-scroll" style="display:none;gap:8px;margin-bottom:18px;overflow-x:auto;white-space:nowrap;padding-bottom:4px">
+            <sc-for list="{{ filterCats }}" as="fc" hint-placeholder-count="8">
+              <button onClick="{{ fc.set }}" style="flex:none;padding:8px 14px;border-radius:999px;border:1px solid {{ fc.mobileBorder }};background:{{ fc.mobileBg }};color:{{ fc.mobileColor }};font-size:12px;cursor:pointer;font-family:'Inter',sans-serif;white-space:nowrap">{{ fc.label }}</button>
+            </sc-for>
+          </div>
           <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:22px">
             <span style="font-size:13px;color:#737373">{{ catalogCount }} productos</span>
           </div>
@@ -1191,12 +1199,12 @@ class Component extends DCLogic {
       ],
 
       catGrid: [
-        {name:'Sala', img:this.ph('#144659','#3f5247','sofa')},
-        {name:'Comedor', img:this.ph('#7e6440','#9a7a43','table')},
-        {name:'Dormitorio', img:this.ph('#5f4a30','#6b5236','bed')},
-        {name:'Iluminación', img:this.ph('#a9863f','#c9a96a','lamp')},
-        {name:'Oficina', img:this.ph('#595957','#737373','cabinet')},
-        {name:'Exterior', img:this.ph('#525c3b','#6f7a52','outdoor')}
+        {name:'Sala', img:this.ph('#144659','#3f5247','sofa'), go:()=>this.goToCategory('Sofás')},
+        {name:'Comedor', img:this.ph('#7e6440','#9a7a43','table'), go:()=>this.goToCategory('Mesas')},
+        {name:'Dormitorio', img:this.ph('#5f4a30','#6b5236','bed'), go:()=>this.goToCategory('Camas')},
+        {name:'Iluminación', img:this.ph('#a9863f','#c9a96a','lamp'), go:()=>this.goToCategory('Iluminación')},
+        {name:'Oficina', img:this.ph('#595957','#737373','cabinet'), go:()=>this.goToCategory('Almacenamiento')},
+        {name:'Exterior', img:this.ph('#525c3b','#6f7a52','outdoor'), go:()=>this.goToCategory('Exterior')}
       ],
 
       featured: mapped.slice(0,8),
@@ -1237,7 +1245,7 @@ class Component extends DCLogic {
       testiCity: this.TESTI[this.state.testi].c,
       testiDots: this.TESTI.map((t,i)=>({ bg: i===this.state.testi?'#F27141':'rgba(248,246,243,.3)', go:()=>this.gotoTesti(i) })),
 
-      filterCats: catList.map(c=>({ label:c, set:()=>this.setFilter('category',c), color: f.category===c?'#40403E':'#737373', weight: f.category===c?'700':'400' })),
+      filterCats: catList.map(c=>({ label:c, set:()=>this.setFilter('category',c), color: f.category===c?'#40403E':'#737373', weight: f.category===c?'700':'400', mobileBg: f.category===c?'#40403E':'#fff', mobileColor: f.category===c?'#F2F2F2':'#595957', mobileBorder: f.category===c?'#40403E':'#DADAD8' })),
       filterMaterials: matList.map(m=>({ label:m, set:()=>this.setFilter('material',m), border: f.material===m?'#40403E':'#DADAD8', bg: f.material===m?'#40403E':'#fff', color: f.material===m?'#F2F2F2':'#595957' })),
       filterCities: cityList.map(c=>({ label:c, set:()=>this.setFilter('city',c), color: f.city===c?'#40403E':'#737373', weight: f.city===c?'700':'400' })),
       priceMax: f.priceMax,
