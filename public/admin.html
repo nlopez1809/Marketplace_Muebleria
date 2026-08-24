@@ -1064,8 +1064,16 @@ async function saveProduct() {
       headers:{'Content-Type':'application/json'},body:JSON.stringify(body)
     });
     const data=await res.json(); if(!res.ok){toast(data.error);return;}
-    toast(editingProduct?'Producto actualizado':'Producto creado');
-    closeProductModal(); loadProducts();
+    if(editingProduct){
+      toast('Producto actualizado');
+      closeProductModal(); loadProducts();
+    } else {
+      editingProduct=data;
+      document.getElementById('prod-modal-title').textContent='Editar Producto';
+      document.getElementById('p-id').disabled=true;
+      toast('Producto creado — ahora puedes subir fotos');
+      loadProducts();
+    }
   } catch {toast('Error al guardar');}
 }
 function editProduct(id){const p=products.find(x=>String(x.id)===String(id));if(p)openProductModal(p);}
