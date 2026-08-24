@@ -407,7 +407,7 @@
             </div>
 
             <div style="font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:#737373;margin-bottom:6px">Precio máx.</div>
-            <input type="range" min="1000" max="12000" step="100" value="{{ priceMax }}" onInput="{{ setPrice }}" style="width:100%;accent-color:#F27141;margin-bottom:4px" />
+            <input type="range" min="1000" max="50000" step="500" value="{{ priceMax }}" onInput="{{ setPrice }}" style="width:100%;accent-color:#F27141;margin-bottom:4px" />
             <div style="font-size:13px;color:#40403E;font-weight:600;margin-bottom:22px">Hasta Bs {{ priceMaxFmt }}</div>
 
             <div style="font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:#737373;margin-bottom:10px">Material</div>
@@ -713,7 +713,7 @@ class Component extends DCLogic {
     cart: {}, cartOpen: false, cartBump: false,
     wishlist: [],
     lb: { open:false, pid:null, idx:0, loading:false, progress:0, zoom:false, zx:50, zy:50 },
-    filters: { category:'Todos', priceMax:12000, material:'Todos', city:'Todos' },
+    filters: { category:'Todos', priceMax:50000, material:'Todos', city:'Todos' },
     testi: 0,
     toast: null,
     deco: { open:false },
@@ -792,7 +792,7 @@ class Component extends DCLogic {
       price: this.bs(p.price),
       old: p.old ? this.bs(p.old) : null,
       stars: this.rawSvg(this.starsSvg(p.rating)),
-      ratingText: p.rating.toFixed(1)+' ('+p.reviews+')',
+      ratingText: Number(p.rating).toFixed(1)+' ('+p.reviews+')',
       delivery: p.city2+' a '+p.city,
       badgeBg: p.badge==='Nuevo' ? '#144659' : '#F27141',
       badgeFg: p.badge==='Nuevo' ? '#F2F2F2' : '#40403E',
@@ -945,9 +945,9 @@ class Component extends DCLogic {
       return this.state._apiProducts.map(function(p){
         return {
           id: p.id, name: p.name, cat: p.cat||'Otros', type: p.type||'sofa',
-          price: p.price||0, old: p.old||null, badge: p.badge||null,
-          material: p.material||'', city: p.city||'', rating: p.rating||4.5,
-          reviews: p.reviews||0, tones: p.tones||['#595957','#737373'],
+          price: Number(p.price)||0, old: p.old ? Number(p.old) : null, badge: p.badge||null,
+          material: p.material||'', city: p.city||'', rating: Number(p.rating)||4.5,
+          reviews: Number(p.reviews)||0, tones: p.tones||['#595957','#737373'],
           city2: p.city2||'3-5 días', dims: p.dims||'', weight: p.weight||'',
           warranty: p.warranty||'', desc: p.desc||'',
           images: p.images||[]
@@ -1025,7 +1025,7 @@ class Component extends DCLogic {
 
   // ---- filters ----
   setFilter(key,val){ this.setState(s=>({filters:{...s.filters,[key]:val}})); }
-  resetFilters(){ this.setState({filters:{category:'Todos',priceMax:12000,material:'Todos',city:'Todos'}}); }
+  resetFilters(){ this.setState({filters:{category:'Todos',priceMax:50000,material:'Todos',city:'Todos'}}); }
 
   // ---- carousel ----
   carouselScroll(d){ const el=this._carousel; if(el) el.scrollBy({left:d*320,behavior:this._reduce?'auto':'smooth'}); }
