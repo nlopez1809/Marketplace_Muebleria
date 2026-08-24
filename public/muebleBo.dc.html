@@ -952,7 +952,7 @@ class Component extends DCLogic {
     if(this.state._apiProducts && this.state._apiProducts.length){
       return this.state._apiProducts.map(function(p){
         return {
-          id: p.id, name: p.name, cat: p.cat||'Otros', type: p.type||'sofa',
+          id: p.id, name: p.name, cat: (p.cat||'Otros').trim(), type: p.type||'sofa',
           price: Number(p.price)||0, old: p.old ? Number(p.old) : null, badge: p.badge||null,
           material: p.material||'', city: p.city||'', rating: Number(p.rating)||4.5,
           reviews: Number(p.reviews)||0, tones: p.tones||['#595957','#737373'],
@@ -1135,12 +1135,13 @@ class Component extends DCLogic {
     const allProducts=this.getProducts();
     const mapped=allProducts.map(p=>this.mapProduct(p));
 
-    // catalog filtering
+    // catalog filtering — normalize for encoding/whitespace safety
+    const nc = s => (s||'').trim().normalize('NFC').toLowerCase();
     const catalog=allProducts.filter(p=>
-      (f.category==='Todos'||p.cat===f.category) &&
+      (f.category==='Todos'||nc(p.cat)===nc(f.category)) &&
       (p.price<=f.priceMax) &&
-      (f.material==='Todos'||p.material===f.material) &&
-      (f.city==='Todos'||p.city===f.city)
+      (f.material==='Todos'||nc(p.material)===nc(f.material)) &&
+      (f.city==='Todos'||nc(p.city)===nc(f.city))
     ).map(p=>this.mapProduct(p));
 
     // lightbox current
@@ -1148,9 +1149,14 @@ class Component extends DCLogic {
     const idx=this.state.lb.idx;
     const thumbLabels=['Estudio','Ambiente','Detalle','Lateral'];
 
-    const catList=['Todos','Sofás','Sillas','Mesas','Camas','Iluminación','Almacenamiento','Exterior'];
-    const matList=['Todos','Roble','Nogal','Cuero','Terciopelo','Latón','Mármol'];
-    const cityList=['Todos','La Paz','Santa Cruz','Cochabamba','Sucre'];
+    // Build lists dynamically from actual products so they always match DB values
+    const ORDER = ['Sofás','Sillas','Mesas','Camas','Iluminación','Almacenamiento','Exterior'];
+    const dbCats = [...new Set(allProducts.map(p=>(p.cat||'').trim()).filter(Boolean))].sort((a,b)=>{ const ia=ORDER.indexOf(a),ib=ORDER.indexOf(b); return (ia<0?99:ia)-(ib<0?99:ib); });
+    const catList = ['Todos', ...dbCats];
+    const dbMats = [...new Set(allProducts.map(p=>(p.material||'').trim()).filter(Boolean))].sort();
+    const matList = ['Todos', ...dbMats];
+    const dbCities = [...new Set(allProducts.map(p=>(p.city||'').trim()).filter(Boolean))].sort();
+    const cityList = ['Todos', ...dbCities];
 
     return {
       noop: ()=>{},
