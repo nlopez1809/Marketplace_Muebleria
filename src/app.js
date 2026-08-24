@@ -12,15 +12,12 @@ const uploadRoutes = require('./routes/upload');
 const leadRoutes = require('./routes/leads');
 const asesoresRoutes = require('./routes/asesores');
 const visualizeRoutes = require('./routes/visualize');
+const asesoramientoRoutes = require('./routes/asesoramiento');
 const storage = require('./services/storage');
 const supabase = require('./services/supabase');
 
-// ── SSE: notify admin on new lead ──
-const sseClients = new Set();
-function notifyNewLead(lead) {
-  const msg = `data: ${JSON.stringify({ type: 'new_lead', lead })}\n\n`;
-  sseClients.forEach(c => { try { c.write(msg); } catch(e) { sseClients.delete(c); } });
-}
+// notifyNewLead is a no-op — notifications now use client polling instead of SSE
+function notifyNewLead() {}
 module.exports.notifyNewLead = notifyNewLead;
 
 const app = express();
@@ -107,6 +104,7 @@ app.use('/api/admin/products', requireAuth, productsRoutes);
 app.use('/api/admin/products', requireAuth, uploadRoutes);
 app.use('/api/admin/leads', requireAuth, leadRoutes);
 app.use('/api/admin/asesores', requireAuth, asesoresRoutes);
+app.use('/api/admin/asesoramiento', requireAuth, asesoramientoRoutes);
 
 // ── Store images public endpoint ──
 app.get('/api/store-images', async (req, res) => {
@@ -154,15 +152,13 @@ app.post('/api/admin/store-images/:slot', requireAuth, storeUpload.single('image
   }
 });
 
-// ── SSE endpoint for real-time notifications ──
-app.get('/api/admin/events', requireAuth, (req, res) => {
-  res.setHeader('Content-Type', 'text/event-stream');
-  res.setHeader('Cache-Control', 'no-cache');
-  res.setHeader('Connection', 'keep-alive');
-  res.flushHeaders();
-  res.write('data: {"type":"connected"}\n\n');
-  sseClients.add(res);
-  req.on('close', () => sseClients.delete(res));
+// ── Poll endpoint for new leads (replaces SSE to avoid long-running serverless functions) ──
+app.get('/api/admin/events/poll', requireAuth, async (req, res) => {
+  try {
+    const since = req.query.since ? new Date(req.query.since).toISOString() : new Date(Date.now() - 60000).toISOString();
+    const { data } = await supabase.from('leads').select('*').gt('created_at', since).order('created_at', { ascending: false });
+    res.json({ leads: data || [], ts: new Date().toISOString() });
+  } catch(e) { res.json({ leads: [], ts: new Date().toISOString() }); }
 });
 
 // ── Analytics ──

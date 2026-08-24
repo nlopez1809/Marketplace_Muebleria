@@ -1,9 +1,17 @@
 {
   "version": 2,
   "builds": [
-    { "src": "api/index.js", "use": "@vercel/node", "config": { "maxDuration": 60 } }
+    { "src": "api/index.js", "use": "@vercel/node", "config": { "maxDuration": 60 } },
+    { "src": "api/cron/check-deadlines.js", "use": "@vercel/node" }
   ],
   "routes": [
+    { "src": "/api/cron/check-deadlines", "dest": "/api/cron/check-deadlines.js" },
     { "src": "/(.*)", "dest": "/api/index.js" }
+  ],
+  "crons": [
+    {
+      "path": "/api/cron/check-deadlines",
+      "schedule": "0 12 * * *"
+    }
   ]
 }
