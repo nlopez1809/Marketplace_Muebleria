@@ -1150,7 +1150,7 @@ class Component extends DCLogic {
     const thumbLabels=['Estudio','Ambiente','Detalle','Lateral'];
 
     // Build lists dynamically from actual products so they always match DB values
-    const ORDER = ['Sofás','Sillas','Mesas','Camas','Iluminación','Almacenamiento','Exterior'];
+    const ORDER = ['Sofás','Poltronas','Ottoman','Sillas','Mesas','Comedores','Camas','Bufeteras','Muebles en Melamina','Iluminación','Almacenamiento','Exterior'];
     const dbCats = [...new Set(allProducts.map(p=>(p.cat||'').trim()).filter(Boolean))].sort((a,b)=>{ const ia=ORDER.indexOf(a),ib=ORDER.indexOf(b); return (ia<0?99:ia)-(ib<0?99:ib); });
     const catList = ['Todos', ...dbCats];
     const dbMats = [...new Set(allProducts.map(p=>(p.material||'').trim()).filter(Boolean))].sort();
