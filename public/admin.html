@@ -1423,6 +1423,10 @@ async function uploadStoreImage(slot, input) {
   toast('Comprimiendo imagen...');
   const blob = await compressImage(file, 1920, 1080, 0.82);
   const compressed = new File([blob], slot + '.jpg', { type: 'image/jpeg' });
+  // Show preview immediately using local blob URL (avoids browser cache)
+  const prev = document.getElementById('prev-' + slot);
+  const localUrl = URL.createObjectURL(blob);
+  if (prev) prev.src = localUrl;
   const fd = new FormData();
   fd.append('image', compressed);
   try {
@@ -1430,10 +1434,10 @@ async function uploadStoreImage(slot, input) {
     const text = await res.text();
     let data = {};
     try { data = JSON.parse(text); } catch(e) {}
+    URL.revokeObjectURL(localUrl);
     if (!res.ok) { toast('Error ' + res.status + ': ' + (data.error || text.slice(0,120))); return; }
-    const prev = document.getElementById('prev-' + slot);
-    if (prev) prev.src = data.url;
-    toast('Imagen actualizada — recarga la tienda para verla');
+    if (prev && data.url) prev.src = data.url;
+    toast('Imagen actualizada');
   } catch(e) { toast('Error de red: ' + e.message); }
   input.value = '';
 }
