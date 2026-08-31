@@ -809,6 +809,24 @@ function switchTab(name) {
   if(name==='visitas') loadVisitas();
   if(name==='asesoramiento') loadAsesoramientos();
   if(name==='leads') { newLeadCount=0; const b=document.getElementById('tab-leads-badge'); b.style.display='none'; }
+  if(name==='imagenes') loadCurrentStoreImages();
+}
+
+async function loadCurrentStoreImages() {
+  try {
+    const imgs = await (await fetch(API + '/store-images')).json();
+    const map = {
+      'hero-showroom':'prev-hero-showroom',
+      'cat-melamina':'prev-cat-melamina',
+      'cat-comedor':'prev-cat-comedor',
+      'cat-camas':'prev-cat-camas',
+      'cat-sofas':'prev-cat-sofas',
+      'Logo':'prev-Logo'
+    };
+    Object.entries(map).forEach(([slot, id]) => {
+      if(imgs[slot]) { const el=document.getElementById(id); if(el) el.src=imgs[slot]; }
+    });
+  } catch(e) {}
 }
 document.querySelectorAll('.tab').forEach(t => t.addEventListener('click', () => switchTab(t.dataset.tab)));
 
