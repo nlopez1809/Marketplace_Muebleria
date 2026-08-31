@@ -10,7 +10,7 @@ async function getProducts({ includeInactive = true } = {}) {
 
 async function getDashboard() {
   const [products, leads, asesores] = await Promise.all([
-    supabase.from('products').select('id, active, images'),
+    supabase.from('products').select('*'),
     supabase.from('leads').select('id, created_at'),
     supabase.from('asesores').select('id'),
   ]);
