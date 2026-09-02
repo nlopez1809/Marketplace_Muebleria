@@ -336,6 +336,10 @@
     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
     Asesoramiento
   </div>
+  <div class="tab" data-tab="proformas">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+    Proformas
+  </div>
   <div class="tab" data-tab="imagenes">
     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><path d="M21 15l-5-5L5 21"></path></svg>
     Imágenes
@@ -549,6 +553,76 @@
     <div id="ases-detail-view" style="display:none">
       <button class="btn btn-secondary" onclick="closeAsesDetail()" style="margin-bottom:16px">← Volver</button>
       <div id="ases-detail-content"></div>
+    </div>
+  </div>
+
+  <!-- ═══ PROFORMAS TAB ═══ -->
+  <div id="tab-proformas" style="display:none">
+    <div class="section-header" style="margin-bottom:20px">
+      <div><div class="section-title">Proformas</div><div class="section-sub">Cotizaciones formales para clientes</div></div>
+      <button class="btn btn-primary" onclick="openProformaModal(null,null)">+ Nueva proforma</button>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr>
+          <th>#</th><th>Cliente</th><th>Teléfono</th><th>Items</th><th>Total</th><th>Estado</th><th>Fecha</th><th>Acciones</th>
+        </tr></thead>
+        <tbody id="proformas-tbody"><tr><td colspan="8" style="text-align:center;color:#aaa;padding:30px">Cargando…</td></tr></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Modal Proforma -->
+  <div id="proforma-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:200;overflow-y:auto">
+    <div style="background:#fff;max-width:820px;margin:40px auto;border-radius:6px;overflow:hidden">
+      <div style="background:#40403E;padding:20px 28px;display:flex;justify-content:space-between;align-items:center">
+        <span style="color:#fff;font-weight:700;font-size:16px" id="pf-modal-title">Nueva Proforma</span>
+        <button onclick="closeProformaModal()" style="background:none;border:none;color:#fff;font-size:20px;cursor:pointer">×</button>
+      </div>
+      <div style="padding:28px">
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-bottom:20px">
+          <div><label style="font-size:12px;font-weight:600;color:#888;display:block;margin-bottom:4px">CLIENTE</label>
+            <input id="pf-nombre" class="form-input" placeholder="Nombre completo" style="width:100%"></div>
+          <div><label style="font-size:12px;font-weight:600;color:#888;display:block;margin-bottom:4px">TELÉFONO</label>
+            <input id="pf-telefono" class="form-input" placeholder="+591 7..." style="width:100%"></div>
+          <div><label style="font-size:12px;font-weight:600;color:#888;display:block;margin-bottom:4px">CI</label>
+            <input id="pf-ci" class="form-input" placeholder="Carnet de identidad" style="width:100%"></div>
+        </div>
+        <div style="margin-bottom:20px">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+            <span style="font-weight:700;font-size:14px">Ítems</span>
+            <button class="btn btn-secondary" onclick="pfAddItem()" style="font-size:12px;padding:6px 12px">+ Agregar ítem</button>
+          </div>
+          <div id="pf-items-list"></div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px">
+          <div><label style="font-size:12px;font-weight:600;color:#888;display:block;margin-bottom:4px">DESCUENTO GLOBAL (%)</label>
+            <input id="pf-descuento" type="number" min="0" max="100" class="form-input" placeholder="0" oninput="pfUpdateTotal()" style="width:100%"></div>
+          <div><label style="font-size:12px;font-weight:600;color:#888;display:block;margin-bottom:4px">VALIDEZ (días)</label>
+            <input id="pf-validez" type="number" min="1" class="form-input" placeholder="7" style="width:100%"></div>
+        </div>
+        <div style="margin-bottom:20px"><label style="font-size:12px;font-weight:600;color:#888;display:block;margin-bottom:4px">NOTAS</label>
+          <textarea id="pf-notas" class="form-input" rows="3" placeholder="Condiciones de pago, notas adicionales…" style="width:100%;resize:vertical"></textarea></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px">
+          <div><label style="font-size:12px;font-weight:600;color:#888;display:block;margin-bottom:4px">ESTADO</label>
+            <select id="pf-estado" class="form-input" style="width:100%">
+              <option value="borrador">Borrador</option>
+              <option value="enviada">Enviada</option>
+              <option value="aceptada">Aceptada</option>
+              <option value="rechazada">Rechazada</option>
+            </select></div>
+          <div style="display:flex;align-items:flex-end;justify-content:flex-end">
+            <div style="text-align:right">
+              <div style="font-size:12px;color:#888;margin-bottom:4px">TOTAL</div>
+              <div id="pf-total-display" style="font-size:26px;font-weight:700;color:#F27141">Bs 0</div>
+            </div>
+          </div>
+        </div>
+        <div style="display:flex;gap:10px;justify-content:flex-end">
+          <button class="btn btn-secondary" onclick="closeProformaModal()">Cancelar</button>
+          <button class="btn btn-primary" onclick="saveProforma()">Guardar proforma</button>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -793,12 +867,13 @@ function doLogout() {
 }
 
 const API = '/api/admin';
-let products = [], asesores = [], leads = [];
-let editingProduct = null, editingAsesor = null;
+let products = [], asesores = [], leads = [], proformas = [];
+let editingProduct = null, editingAsesor = null, editingProforma = null;
+let proformaItems = [];
 let newLeadCount = 0;
 
 // ── Tabs ──
-const TABS = ['dashboard','analytics','products','asesores','leads','pipeline','visitas','asesoramiento','imagenes'];
+const TABS = ['dashboard','analytics','products','asesores','leads','pipeline','visitas','asesoramiento','proformas','imagenes'];
 function switchTab(name) {
   document.querySelectorAll('.tab').forEach(x => x.classList.toggle('active', x.dataset.tab === name));
   TABS.forEach(t => { const el = document.getElementById('tab-'+t); if(el) el.style.display = t===name?'':'none'; });
@@ -809,6 +884,7 @@ function switchTab(name) {
   if(name==='visitas') loadVisitas();
   if(name==='asesoramiento') loadAsesoramientos();
   if(name==='leads') { newLeadCount=0; const b=document.getElementById('tab-leads-badge'); b.style.display='none'; }
+  if(name==='proformas') loadProformas();
   if(name==='imagenes') loadCurrentStoreImages();
 }
 
@@ -1201,6 +1277,7 @@ function renderLeads(){
         ${hasConv?`<button class="btn btn-secondary" onclick="openConvModal(${l.id})" title="Ver conversación" style="padding:6px 8px">💬</button>`:''}
         ${l.telefono?`<a class="btn btn-secondary" href="https://wa.me/${l.telefono}" target="_blank" style="text-decoration:none">WA</a>`:''}
         ${st==='visita_agendada'?`<button class="btn btn-secondary" onclick="openAsesModal(${l.id},'${(l.nombre||'').replace(/'/g,"\\'")}')" title="Asesoramiento" style="padding:6px 8px;background:#F27141;color:#fff;border-color:#F27141">🏠</button>`:''}
+        <button class="btn btn-secondary" onclick="crearProformaDesde(leads.find(x=>x.id===${l.id}))" title="Crear proforma" style="padding:6px 8px;font-size:11px">📄</button>
 
         <select onchange="updateLeadStage(${l.id},this.value)" style="font-size:11px;border:1px solid #E4E4E3;border-radius:3px;padding:4px 6px;cursor:pointer">
           ${Object.entries(stageLabels).map(([k,v])=>`<option value="${k}" ${st===k?'selected':''}>${v}</option>`).join('')}
@@ -1884,6 +1961,213 @@ function closeAsesModal() {
 function closeAsesDetail() {
   document.getElementById('ases-list-view').style.display = '';
   document.getElementById('ases-detail-view').style.display = 'none';
+}
+
+// ── Proformas ──
+async function loadProformas() {
+  try {
+    const data = await (await fetch(API+'/proformas', {credentials:'same-origin'})).json();
+    proformas = Array.isArray(data) ? data : [];
+    renderProformasTable();
+  } catch(e) { proformas = []; renderProformasTable(); }
+}
+
+function proformaTotal(items, descGlobal) {
+  const sub = (items||[]).reduce((s,it) => {
+    const precio = Number(it.precio)||0;
+    const cant = Number(it.cantidad)||1;
+    const disc = Number(it.descuento)||0;
+    return s + precio * cant * (1 - disc/100);
+  }, 0);
+  return sub * (1 - (Number(descGlobal)||0)/100);
+}
+
+function renderProformasTable() {
+  const tb = document.getElementById('proformas-tbody');
+  if(!proformas.length) { tb.innerHTML='<tr><td colspan="8" style="text-align:center;color:#aaa;padding:30px">Sin proformas aún. Crea la primera con "+ Nueva proforma"</td></tr>'; return; }
+  const estadoColor = {borrador:'#E4E4E3',enviada:'#e3f2fd',aceptada:'#e8f5e9',rechazada:'#ffebee'};
+  const estadoText = {borrador:'Borrador',enviada:'Enviada',aceptada:'Aceptada',rechazada:'Rechazada'};
+  tb.innerHTML = proformas.map(p => {
+    const total = proformaTotal(p.items, p.descuento_global);
+    const fecha = new Date(p.created_at).toLocaleDateString('es-BO');
+    const st = p.estado||'borrador';
+    return `<tr>
+      <td><strong>#${p.numero}</strong></td>
+      <td>${p.cliente_nombre||'—'}</td>
+      <td>${p.cliente_telefono||'—'}</td>
+      <td style="color:#888">${(p.items||[]).length} ítem(s)</td>
+      <td><strong>Bs ${total.toLocaleString('es-BO',{minimumFractionDigits:0,maximumFractionDigits:0})}</strong></td>
+      <td><span class="pill" style="background:${estadoColor[st]||'#E4E4E3'}">${estadoText[st]||st}</span></td>
+      <td style="color:#888;font-size:12px">${fecha}</td>
+      <td style="display:flex;gap:6px">
+        <button class="btn btn-secondary" onclick="openProformaModal('${p.id}')" style="padding:5px 10px;font-size:11px">Editar</button>
+        <button class="btn btn-secondary" onclick="printProforma('${p.id}')" style="padding:5px 10px;font-size:11px" title="Imprimir">🖨</button>
+        <button class="btn btn-danger" onclick="deleteProforma('${p.id}')" style="padding:5px 10px;font-size:11px">✕</button>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+function openProformaModal(id, prefill) {
+  editingProforma = id ? proformas.find(p=>p.id===id)||null : null;
+  const p = editingProforma || {};
+  document.getElementById('pf-modal-title').textContent = editingProforma ? `Proforma #${p.numero}` : 'Nueva Proforma';
+  document.getElementById('pf-nombre').value = (prefill&&prefill.nombre)||p.cliente_nombre||'';
+  document.getElementById('pf-telefono').value = (prefill&&prefill.telefono)||p.cliente_telefono||'';
+  document.getElementById('pf-ci').value = (prefill&&prefill.ci)||p.cliente_ci||'';
+  document.getElementById('pf-descuento').value = p.descuento_global||0;
+  document.getElementById('pf-validez').value = p.validez_dias||7;
+  document.getElementById('pf-notas').value = p.notas||'';
+  document.getElementById('pf-estado').value = p.estado||'borrador';
+  proformaItems = prefill&&prefill.items ? prefill.items : (p.items ? JSON.parse(JSON.stringify(p.items)) : []);
+  if(!proformaItems.length) proformaItems.push({descripcion:'',cantidad:1,precio:0,descuento:0});
+  renderProformaItems();
+  document.getElementById('proforma-modal').style.display='';
+}
+
+function closeProformaModal() {
+  document.getElementById('proforma-modal').style.display='none';
+  editingProforma=null; proformaItems=[];
+}
+
+function pfAddItem() {
+  proformaItems.push({descripcion:'',cantidad:1,precio:0,descuento:0});
+  renderProformaItems();
+}
+
+function pfRemoveItem(i) {
+  proformaItems.splice(i,1);
+  if(!proformaItems.length) proformaItems.push({descripcion:'',cantidad:1,precio:0,descuento:0});
+  renderProformaItems();
+}
+
+function pfItemChange(i, field, val) {
+  proformaItems[i][field] = field==='descripcion' ? val : Number(val)||0;
+  pfUpdateTotal();
+}
+
+function renderProformaItems() {
+  const cont = document.getElementById('pf-items-list');
+  cont.innerHTML = proformaItems.map((it,i) => `
+    <div style="display:grid;grid-template-columns:3fr 60px 100px 80px 32px;gap:8px;margin-bottom:8px;align-items:center">
+      <input class="form-input" placeholder="Descripción del producto" value="${(it.descripcion||'').replace(/"/g,'&quot;')}"
+        oninput="pfItemChange(${i},'descripcion',this.value)" style="width:100%">
+      <input class="form-input" type="number" min="1" placeholder="Cant" value="${it.cantidad||1}"
+        oninput="pfItemChange(${i},'cantidad',this.value)" style="width:100%;text-align:center">
+      <input class="form-input" type="number" min="0" placeholder="Precio Bs" value="${it.precio||''}"
+        oninput="pfItemChange(${i},'precio',this.value)" style="width:100%">
+      <input class="form-input" type="number" min="0" max="100" placeholder="Desc%" value="${it.descuento||''}"
+        oninput="pfItemChange(${i},'descuento',this.value)" style="width:100%;text-align:center">
+      <button onclick="pfRemoveItem(${i})" style="background:none;border:none;color:#e53935;font-size:18px;cursor:pointer;padding:0">×</button>
+    </div>
+  `).join('');
+  pfUpdateTotal();
+}
+
+function pfUpdateTotal() {
+  const desc = Number(document.getElementById('pf-descuento').value)||0;
+  const total = proformaTotal(proformaItems, desc);
+  document.getElementById('pf-total-display').textContent = 'Bs ' + total.toLocaleString('es-BO',{minimumFractionDigits:0,maximumFractionDigits:0});
+}
+
+async function saveProforma() {
+  const body = {
+    cliente_nombre: document.getElementById('pf-nombre').value.trim(),
+    cliente_telefono: document.getElementById('pf-telefono').value.trim(),
+    cliente_ci: document.getElementById('pf-ci').value.trim(),
+    items: proformaItems,
+    descuento_global: Number(document.getElementById('pf-descuento').value)||0,
+    validez_dias: Number(document.getElementById('pf-validez').value)||7,
+    notas: document.getElementById('pf-notas').value.trim(),
+    estado: document.getElementById('pf-estado').value,
+  };
+  try {
+    const url = editingProforma ? API+'/proformas/'+editingProforma.id : API+'/proformas';
+    const method = editingProforma ? 'PUT' : 'POST';
+    const data = await (await fetch(url, {method, headers:{'Content-Type':'application/json'}, credentials:'same-origin', body:JSON.stringify(body)})).json();
+    if(data.error) throw new Error(data.error);
+    toast(editingProforma ? 'Proforma actualizada' : 'Proforma creada');
+    closeProformaModal();
+    loadProformas();
+  } catch(e) { toast('Error: '+e.message); }
+}
+
+async function deleteProforma(id) {
+  if(!confirm('¿Eliminar esta proforma?')) return;
+  try {
+    await fetch(API+'/proformas/'+id, {method:'DELETE', credentials:'same-origin'});
+    toast('Proforma eliminada');
+    loadProformas();
+  } catch(e) { toast('Error al eliminar'); }
+}
+
+function crearProformaDesde(lead) {
+  if(!lead) return;
+  const items = [];
+  if(lead.producto_interes) {
+    lead.producto_interes.split(',').forEach(part => {
+      const m = part.trim().match(/^(.+?)\s+Bs\s+([\d,.]+)/i);
+      if(m) {
+        const precio = Number(m[2].replace(',','.')) || 0;
+        items.push({descripcion: m[1].trim(), cantidad:1, precio, descuento:0});
+      } else if(part.trim()) {
+        items.push({descripcion: part.trim(), cantidad:1, precio:0, descuento:0});
+      }
+    });
+  }
+  if(!items.length) items.push({descripcion:'',cantidad:1,precio:0,descuento:0});
+  switchTab('proformas');
+  openProformaModal(null, {nombre:lead.nombre||'', telefono:lead.telefono||'', ci:lead.ci||'', items});
+}
+
+function printProforma(id) {
+  const p = proformas.find(x=>x.id===id);
+  if(!p) return;
+  const total = proformaTotal(p.items, p.descuento_global);
+  const validHasta = new Date(Date.now() + (p.validez_dias||7)*86400000).toLocaleDateString('es-BO');
+  const rows = (p.items||[]).map(it => {
+    const sub = (Number(it.precio)||0)*(Number(it.cantidad)||1)*(1-(Number(it.descuento)||0)/100);
+    return `<tr>
+      <td style="padding:8px 12px;border-bottom:1px solid #eee">${it.descripcion||'—'}</td>
+      <td style="padding:8px 12px;border-bottom:1px solid #eee;text-align:center">${it.cantidad||1}</td>
+      <td style="padding:8px 12px;border-bottom:1px solid #eee;text-align:right">Bs ${Number(it.precio).toLocaleString('es-BO')}</td>
+      <td style="padding:8px 12px;border-bottom:1px solid #eee;text-align:center">${it.descuento||0}%</td>
+      <td style="padding:8px 12px;border-bottom:1px solid #eee;text-align:right">Bs ${sub.toLocaleString('es-BO',{minimumFractionDigits:0,maximumFractionDigits:0})}</td>
+    </tr>`;
+  }).join('');
+  const html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Proforma #${p.numero}</title>
+  <style>body{font-family:Inter,sans-serif;color:#40403E;padding:40px;max-width:760px;margin:0 auto}
+  h1{font-size:22px;color:#F27141}table{width:100%;border-collapse:collapse}
+  th{background:#40403E;color:#fff;padding:10px 12px;text-align:left;font-size:12px;letter-spacing:.06em}
+  @media print{button{display:none}}</style></head>
+  <body>
+  <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:32px">
+    <div><h1>InCassa DECO</h1><div style="font-size:12px;color:#888">Muebles y diseño de interiores</div></div>
+    <div style="text-align:right"><div style="font-size:20px;font-weight:700">PROFORMA #${p.numero}</div>
+      <div style="font-size:12px;color:#888">Válida hasta: ${validHasta}</div></div>
+  </div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:28px;background:#f9f9f9;padding:16px;border-radius:4px">
+    <div><div style="font-size:11px;font-weight:700;color:#888;letter-spacing:.08em;margin-bottom:4px">CLIENTE</div>
+      <div style="font-weight:600">${p.cliente_nombre||'—'}</div>
+      <div style="color:#888">${p.cliente_telefono||''}</div>
+      ${p.cliente_ci?`<div style="color:#888">CI: ${p.cliente_ci}</div>`:''}</div>
+    <div><div style="font-size:11px;font-weight:700;color:#888;letter-spacing:.08em;margin-bottom:4px">FECHA</div>
+      <div>${new Date(p.created_at).toLocaleDateString('es-BO')}</div></div>
+  </div>
+  <table><thead><tr>
+    <th>DESCRIPCIÓN</th><th style="text-align:center">CANT</th><th style="text-align:right">PRECIO</th>
+    <th style="text-align:center">DESC</th><th style="text-align:right">SUBTOTAL</th>
+  </tr></thead><tbody>${rows}</tbody></table>
+  <div style="text-align:right;margin-top:16px">
+    ${p.descuento_global?`<div style="color:#888;margin-bottom:4px">Descuento global: ${p.descuento_global}%</div>`:''}
+    <div style="font-size:22px;font-weight:700;color:#F27141">TOTAL: Bs ${total.toLocaleString('es-BO',{minimumFractionDigits:0,maximumFractionDigits:0})}</div>
+  </div>
+  ${p.notas?`<div style="margin-top:24px;padding:14px;background:#f9f9f9;border-radius:4px;font-size:13px;color:#555">${p.notas}</div>`:''}
+  <div style="text-align:center;margin-top:40px"><button onclick="window.print()" style="background:#F27141;color:#fff;border:none;padding:10px 28px;border-radius:3px;cursor:pointer;font-size:14px">Imprimir / Guardar PDF</button></div>
+  </body></html>`;
+  const w = window.open('','_blank');
+  w.document.write(html);
+  w.document.close();
 }
 
 // ── Init ──
