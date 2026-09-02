@@ -17,11 +17,12 @@ router.get('/', async (req, res) => {
 
 router.post('/', async (req, res) => {
   try {
-    const { lead_id, cliente_nombre, cliente_telefono, cliente_ci, items, descuento_global, notas, validez_dias } = req.body;
+    const { lead_id, asesor_id, cliente_nombre, cliente_telefono, cliente_ci, items, descuento_global, notas, validez_dias } = req.body;
     const { data, error } = await supabase
       .from('proformas')
       .insert({
         lead_id: lead_id || null,
+        asesor_id: asesor_id || null,
         cliente_nombre: cliente_nombre || '',
         cliente_telefono: cliente_telefono || '',
         cliente_ci: cliente_ci || '',
@@ -42,7 +43,7 @@ router.post('/', async (req, res) => {
 
 router.put('/:id', async (req, res) => {
   try {
-    const allowed = ['cliente_nombre','cliente_telefono','cliente_ci','items','descuento_global','notas','validez_dias','estado'];
+    const allowed = ['cliente_nombre','cliente_telefono','cliente_ci','items','descuento_global','notas','validez_dias','estado','asesor_id'];
     const updates = { updated_at: new Date().toISOString() };
     for (const key of allowed) {
       if (req.body[key] !== undefined) updates[key] = req.body[key];
