@@ -2178,7 +2178,7 @@ async function printProforma(id) {
       const imgs = await fetch('/api/store-images').then(r=>r.json());
       logoUrl = imgs['Logo'] || null;
     }
-    if (logoUrl) logoHtml = `<img src="${logoUrl}" style="max-height:70px;max-width:200px;object-fit:contain" crossorigin="anonymous">`;
+    if (logoUrl) logoHtml = `<div style="display:flex;align-items:center;gap:14px"><img src="${logoUrl}" style="max-height:70px;max-width:70px;object-fit:contain" crossorigin="anonymous"><div><div style="font-family:Comfortaa,cursive;font-size:22px;font-weight:700;color:#F27141">InCassa DECO</div></div></div>`;
   } catch(e){}
   const rows = (p.items||[]).map(it => {
     const sub = (Number(it.precio)||0)*(Number(it.cantidad)||1)*(1-(Number(it.descuento)||0)/100);
