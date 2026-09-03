@@ -1996,11 +1996,9 @@ function closeAsesDetail() {
 // ── Proformas ──
 async function loadProformas() {
   try {
+    const imgs = await fetch('/api/store-images').then(r=>r.json());
     const prevLogo = document.getElementById('prev-Logo');
-    if (prevLogo && prevLogo.src.includes('/assets/Logo')) {
-      const imgs = await fetch('/api/store-images').then(r=>r.json());
-      if (imgs['Logo']) prevLogo.src = imgs['Logo'];
-    }
+    if (prevLogo && imgs['Logo']) prevLogo.src = imgs['Logo'];
   } catch(e) {}
   try {
     const data = await (await fetch(API+'/proformas', {credentials:'same-origin'})).json();
@@ -2172,13 +2170,8 @@ async function printProforma(id) {
   // Fetch logo URL
   let logoHtml = `<div style="font-family:Comfortaa,cursive;font-size:28px;font-weight:700;color:#F27141">InCassa DECO</div>`;
   try {
-    const prevLogo = document.getElementById('prev-Logo');
-    let logoUrl = (prevLogo && prevLogo.src && !prevLogo.src.includes('/assets/Logo')) ? prevLogo.src : null;
-    if (!logoUrl) {
-      const imgs = await fetch('/api/store-images').then(r=>r.json());
-      logoUrl = imgs['Logo'] || null;
-    }
-    if (logoUrl) logoHtml = `<div style="display:flex;align-items:center;gap:14px"><img src="${logoUrl}" style="max-height:70px;max-width:70px;object-fit:contain" crossorigin="anonymous"><div><div style="font-family:Comfortaa,cursive;font-size:22px;font-weight:700;color:#F27141">InCassa DECO</div></div></div>`;
+    const imgs = await fetch('/api/store-images?t=' + Date.now()).then(r=>r.json());
+    if (imgs['Logo']) logoHtml = `<div style="display:flex;align-items:center;gap:14px"><img src="${imgs['Logo']}" style="max-height:70px;max-width:70px;object-fit:contain" crossorigin="anonymous"><div><div style="font-family:Comfortaa,cursive;font-size:22px;font-weight:700;color:#F27141">InCassa DECO</div></div></div>`;
   } catch(e){}
   const rows = (p.items||[]).map(it => {
     const sub = (Number(it.precio)||0)*(Number(it.cantidad)||1)*(1-(Number(it.descuento)||0)/100);
