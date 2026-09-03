@@ -1566,13 +1566,36 @@ let allAsesoramientos = [];
 
 async function loadAsesoramientos() {
   try {
-    const data = await (await fetch(API+'/asesoramiento', {headers: {credentials:'include'}})).json().catch(()=>[]);
-    // The endpoint is per-lead so for the list view we just show a placeholder
-    // We'll fetch all leads that have asesoramientos by checking the Supabase endpoint differently
-    // For now show message to use the 🏠 button from Leads
-    document.getElementById('ases-cards').innerHTML = '';
+    const data = await (await fetch(API+'/asesoramiento', {credentials:'same-origin'})).json();
+    const list = Array.isArray(data) ? data : [];
+    const cards = document.getElementById('ases-cards');
+    const empty = document.getElementById('ases-empty');
+    if (!list.length) { cards.innerHTML = ''; empty.style.display = ''; return; }
+    empty.style.display = 'none';
+    const stageLabel = {visita:'Visita',revision_visita:'Revisión Visita',diseno:'Diseño',revision_diseno:'Revisión Diseño',dibujo:'Dibujo',revision_dibujo:'Revisión Dibujo',completado:'Completado'};
+    const stageColor = {visita:'#e3f2fd',revision_visita:'#fff3e0',diseno:'#f3e5f5',revision_diseno:'#fce4ec',dibujo:'#e8f5e9',revision_dibujo:'#fff8e1',completado:'#e8f5e9'};
+    cards.innerHTML = list.map(a => {
+      const lead = a.lead || {};
+      const label = stageLabel[a.stage] || a.stage;
+      const color = stageColor[a.stage] || '#f5f5f5';
+      const fecha = a.fecha_visita ? new Date(a.fecha_visita).toLocaleDateString('es-BO') : '—';
+      const upd = new Date(a.updated_at||a.created_at).toLocaleDateString('es-BO');
+      return `<div class="card" style="padding:18px;cursor:pointer" onclick="openAsesModal(${a.lead_id},'${(lead.nombre||'').replace(/'/g,"\\'")}')">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px">
+          <div style="font-weight:700;font-size:14px">${lead.nombre||'Lead #'+a.lead_id}</div>
+          <span class="pill" style="background:${color}">${label}</span>
+        </div>
+        ${lead.telefono?`<div style="font-size:12px;color:#888;margin-bottom:4px">📞 ${lead.telefono}</div>`:''}
+        ${lead.producto_interes?`<div style="font-size:12px;color:#888;margin-bottom:8px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">🛋 ${lead.producto_interes}</div>`:''}
+        <div style="display:flex;justify-content:space-between;font-size:11px;color:#aaa;margin-top:8px;border-top:1px solid #f0f0f0;padding-top:8px">
+          <span>Visita: ${fecha}</span><span>Actualizado: ${upd}</span>
+        </div>
+      </div>`;
+    }).join('');
+  } catch(e) {
     document.getElementById('ases-empty').style.display = '';
-  } catch(e) {}
+    document.getElementById('ases-cards').innerHTML = '';
+  }
 }
 
 async function openAsesModal(leadId, leadNombre) {

@@ -21,6 +21,24 @@ const STAGE_LABELS = {
   completado: 'Completado',
 };
 
+// GET /api/admin/asesoramiento — list all asesoramientos with lead info
+router.get('/', async (req, res) => {
+  try {
+    const { data, error } = await supabase.from('asesoramientos')
+      .select('id, lead_id, stage, fecha_visita, created_at, updated_at')
+      .order('updated_at', { ascending: false });
+    if (error) throw error;
+    const leadIds = [...new Set((data || []).map(a => a.lead_id).filter(Boolean))];
+    let leadMap = {};
+    if (leadIds.length) {
+      const { data: leads } = await supabase.from('leads').select('id, nombre, telefono, producto_interes').in('id', leadIds);
+      (leads || []).forEach(l => { leadMap[l.id] = l; });
+    }
+    const result = (data || []).map(a => ({ ...a, lead: leadMap[a.lead_id] || null }));
+    res.json(result);
+  } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
 // GET /api/admin/asesoramiento/reminders — list all upcoming deadlines
 router.get('/reminders', async (req, res) => {
   try {
