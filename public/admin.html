@@ -1398,8 +1398,8 @@ const ASES_STAGE_LABELS = {
 async function loadVisitas(){
   try{
     const [visitas, asesoramientos] = await Promise.all([
-      fetch(API+'/visitas').then(r=>r.json()),
-      fetch(API+'/asesoramiento/reminders').then(r=>r.json()).catch(()=>[]),
+      fetch(API+'/visitas', {credentials:'same-origin'}).then(r=>r.json()),
+      fetch(API+'/asesoramiento/reminders', {credentials:'same-origin'}).then(r=>r.json()).catch(()=>[]),
     ]);
     const el=document.getElementById('visitas-list');
     const now = new Date();
