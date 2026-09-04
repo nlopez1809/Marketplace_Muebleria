@@ -1397,10 +1397,12 @@ const ASES_STAGE_LABELS = {
 
 async function loadVisitas(){
   try{
-    const [visitas, asesoramientos] = await Promise.all([
-      fetch(API+'/visitas', {credentials:'same-origin'}).then(r=>r.json()),
+    const [_visitas, _asesoramientos] = await Promise.all([
+      fetch(API+'/visitas', {credentials:'same-origin'}).then(r=>r.json()).catch(()=>[]),
       fetch(API+'/asesoramiento/reminders', {credentials:'same-origin'}).then(r=>r.json()).catch(()=>[]),
     ]);
+    const visitas = Array.isArray(_visitas) ? _visitas : [];
+    const asesoramientos = Array.isArray(_asesoramientos) ? _asesoramientos : [];
     const el=document.getElementById('visitas-list');
     const now = new Date();
 
@@ -1492,7 +1494,10 @@ async function loadVisitas(){
         }).join('')}
       </div>`;
     }).join('');
-  }catch(e){document.getElementById('visitas-list').innerHTML='<p style="color:#9A9A98">Error al cargar calendario</p>';}
+  }catch(e){
+    console.error('loadVisitas error:', e);
+    document.getElementById('visitas-list').innerHTML='<p style="color:#9A9A98">Error al cargar calendario: '+e.message+'</p>';
+  }
 }
 
 // Revisar recordatorios urgentes cada 5 minutos cuando el tab de visitas está activo
