@@ -141,14 +141,28 @@
 
   <!-- ============ CATEGORY STRIP ============ -->
   <div style="background:#FFFFFF;border-bottom:1px solid #E4E4E3">
-    <div class="mb-scroll-x mb-hide-scroll" style="max-width:1320px;margin:0 auto;padding:11px 28px;display:flex;gap:30px;align-items:center;overflow-x:auto;white-space:nowrap">
-      <button onClick="{{ toggleDeco }}" title="Abrir Deco IA, tu asistente" style="flex:none;background:linear-gradient(118deg,#7E5BC4 0%,#9B6FC9 42%,#D8BE8C 100%);color:#FFFFFF;border:none;border-radius:999px;padding:9px 17px;font-family:'Comfortaa',sans-serif;font-weight:700;font-size:11px;letter-spacing:.14em;text-transform:uppercase;cursor:pointer;display:flex;align-items:center;gap:7px;box-shadow:0 1px 6px rgba(192,101,201,.25);transition:filter .2s,transform .15s" style-hover="filter:brightness(1.07)" style-active="transform:scale(.96)">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.4a8 8 0 0 1-11.5 7.2L4 20l1.4-4.8A8 8 0 1 1 21 11.4z"></path><path d="M12.4 6.6l1.05 3.05 3.05 1.05-3.05 1.05-1.05 3.05-1.05-3.05-3.05-1.05 3.05-1.05z" fill="#FFFFFF" stroke="#FFFFFF" stroke-width="0.5"></path></svg>
+    <div style="max-width:1320px;margin:0 auto;padding:0 28px;display:flex;align-items:center;gap:20px;height:48px">
+      <!-- Deco IA button -->
+      <button onClick="{{ toggleDeco }}" title="Abrir Deco IA, tu asistente" style="flex:none;background:linear-gradient(118deg,#7E5BC4 0%,#9B6FC9 42%,#D8BE8C 100%);color:#FFFFFF;border:none;border-radius:999px;padding:7px 14px;font-family:'Comfortaa',sans-serif;font-weight:700;font-size:11px;letter-spacing:.14em;text-transform:uppercase;cursor:pointer;display:flex;align-items:center;gap:7px;box-shadow:0 1px 6px rgba(192,101,201,.25);transition:filter .2s,transform .15s" style-hover="filter:brightness(1.07)" style-active="transform:scale(.96)">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.4a8 8 0 0 1-11.5 7.2L4 20l1.4-4.8A8 8 0 1 1 21 11.4z"></path><path d="M12.4 6.6l1.05 3.05 3.05 1.05-3.05 1.05-1.05 3.05-1.05-3.05-3.05-1.05 3.05-1.05z" fill="#FFFFFF" stroke="#FFFFFF" stroke-width="0.5"></path></svg>
         Deco IA
       </button>
-      <sc-for list="{{ stripCats }}" as="c" hint-placeholder-count="8">
-        <a href="#catalogo" style="color:#595957;text-decoration:none;font-size:12px;letter-spacing:.06em;flex:none" style-hover="color:#F27141">{{ c }}</a>
-      </sc-for>
+      <!-- Category dropdown -->
+      <div style="position:relative" onClick="{{ toggleCatMenu }}">
+        <button style="background:none;border:1px solid #E4E4E3;border-radius:4px;padding:7px 14px;font-size:12px;font-weight:600;letter-spacing:.05em;color:#40403E;cursor:pointer;display:flex;align-items:center;gap:8px;font-family:inherit;transition:border-color .15s" style-hover="border-color:#F27141;color:#F27141">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+          Categorías
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+        </button>
+        <div sc-if="{{ catMenuOpen }}" style="position:absolute;top:calc(100% + 6px);left:0;background:#fff;border:1px solid #E4E4E3;border-radius:6px;box-shadow:0 8px 24px rgba(0,0,0,.12);z-index:60;min-width:210px;padding:6px 0" onClick="{{ stopProp }}">
+          <a href="#catalogo" onClick="{{ setCatTodos }}" style="display:block;padding:9px 18px;font-size:13px;color:#40403E;text-decoration:none;font-weight:600;border-bottom:1px solid #F2F2F2" style-hover="background:#FFF7F3;color:#F27141">Todos los productos</a>
+          <sc-for list="{{ stripCats }}" as="c" hint-placeholder-count="8">
+            <a href="#catalogo" onClick="{{ c.go }}" style="display:block;padding:8px 18px;font-size:13px;color:#595957;text-decoration:none" style-hover="background:#FFF7F3;color:#F27141">{{ c.label }}</a>
+          </sc-for>
+        </div>
+      </div>
+      <!-- Active category badge -->
+      <span sc-if="{{ activeCatLabel }}" style="font-size:12px;color:#F27141;font-weight:600;letter-spacing:.04em">{{ activeCatLabel }}</span>
     </div>
   </div>
   </div><!-- end fixed wrapper -->
@@ -1196,7 +1210,15 @@ class Component extends DCLogic {
       goCamas: ()=>{ window.location.href='Camas.dc.html'; },
       goSofas: ()=>this.goToCategory('Sofás'),
 
-      stripCats: ['Sofás','Seccionales','Sillas & Butacas','Mesas de comedor','Mesas de centro','Camas','Cómodas','Iluminación','Estanterías','Exterior','Alfombras','Decoración'],
+      catMenuOpen: false,
+      activeCatLabel: '',
+      toggleCatMenu: (e)=>{ if(e&&e.stopPropagation)e.stopPropagation(); this.setState(s=>({catMenuOpen:!s.catMenuOpen})); },
+      stopProp: (e)=>{ if(e&&e.stopPropagation)e.stopPropagation(); },
+      setCatTodos: (e)=>{ if(e&&e.stopPropagation)e.stopPropagation(); this.setState({catMenuOpen:false,activeCatLabel:''}); this.setState(s=>({filters:{...s.filters,category:''}})); setTimeout(()=>this.scrollTo('#catalogo'),80); },
+      stripCats: ['Sofás','Seccionales','Sillas & Butacas','Mesas de comedor','Mesas de centro','Camas','Cómodas','Iluminación','Estanterías','Exterior','Alfombras','Decoración'].map(label=>({
+        label,
+        go:(e)=>{ if(e&&e.stopPropagation)e.stopPropagation(); this.setState({catMenuOpen:false,activeCatLabel:label}); this.goToCategory(label); },
+      })),
 
       diffs: [
         { icon:this.rawSvg(`<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M8 8h3v3H8z M13 8h3v3h-3z M8 13h3v3H8z M14 14h2v2h-2z"/></svg>`), title:'Pago 100% local', body:'QR de Banco Unión, BNB y Bisa, transferencia o pago contra-entrega. Sin tarjetas internacionales.' },
