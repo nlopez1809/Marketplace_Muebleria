@@ -694,6 +694,43 @@
         </label>
       </div>
     </div>
+
+    <!-- Sección "Para cada rincón" -->
+    <div style="margin-top:32px;margin-bottom:12px;font-size:14px;font-weight:700;color:#40403E;border-bottom:2px solid #F27141;padding-bottom:6px">Sección "Para cada rincón"</div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:16px">
+      ${[['grid-sala','Sala'],['grid-comedor','Comedor'],['grid-dormitorio','Dormitorio'],['grid-iluminacion','Iluminación'],['grid-oficina','Oficina'],['grid-exterior','Exterior']].map(([slot,label])=>`
+      <div class="card" style="padding:16px">
+        <div style="font-weight:600;margin-bottom:4px">${label}</div>
+        <img id="prev-${slot}" style="width:100%;height:110px;object-fit:cover;border-radius:4px;margin-bottom:10px;background:#eee">
+        <label class="btn btn-secondary" style="cursor:pointer;display:block;text-align:center;font-size:12px">Subir imagen<input type="file" accept="image/*" style="display:none" onchange="uploadStoreImage('${slot}',this)"></label>
+      </div>`).join('')}
+    </div>
+
+    <!-- Sección "Inspírate en cada espacio" -->
+    <div style="margin-top:32px;margin-bottom:12px;font-size:14px;font-weight:700;color:#40403E;border-bottom:2px solid #F27141;padding-bottom:6px">Sección "Inspírate en cada espacio"</div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:16px">
+      ${[['edit-sala','Sala – Calidez de altura'],['edit-comedor','Comedor – Mesa para los tuyos'],['edit-dormitorio','Dormitorio – Descanso noble'],['edit-detalle','Detalle – Latón y luz'],['edit-exterior','Exterior – Vivir afuera']].map(([slot,label])=>`
+      <div class="card" style="padding:16px">
+        <div style="font-weight:600;margin-bottom:4px">${label}</div>
+        <img id="prev-${slot}" style="width:100%;height:110px;object-fit:cover;border-radius:4px;margin-bottom:10px;background:#eee">
+        <label class="btn btn-secondary" style="cursor:pointer;display:block;text-align:center;font-size:12px">Subir imagen<input type="file" accept="image/*" style="display:none" onchange="uploadStoreImage('${slot}',this)"></label>
+      </div>`).join('')}
+    </div>
+
+    <!-- Sección de estadísticas (imágenes flotantes) -->
+    <div style="margin-top:32px;margin-bottom:12px;font-size:14px;font-weight:700;color:#40403E;border-bottom:2px solid #F27141;padding-bottom:6px">Sección estadísticas – imágenes decorativas</div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:16px">
+      <div class="card" style="padding:16px">
+        <div style="font-weight:600;margin-bottom:4px">Imagen flotante izquierda</div>
+        <img id="prev-deco-left" style="width:100%;height:110px;object-fit:cover;border-radius:4px;margin-bottom:10px;background:#eee">
+        <label class="btn btn-secondary" style="cursor:pointer;display:block;text-align:center;font-size:12px">Subir imagen<input type="file" accept="image/*" style="display:none" onchange="uploadStoreImage('deco-left',this)"></label>
+      </div>
+      <div class="card" style="padding:16px">
+        <div style="font-weight:600;margin-bottom:4px">Imagen flotante derecha</div>
+        <img id="prev-deco-right" style="width:100%;height:110px;object-fit:cover;border-radius:4px;margin-bottom:10px;background:#eee">
+        <label class="btn btn-secondary" style="cursor:pointer;display:block;text-align:center;font-size:12px">Subir imagen<input type="file" accept="image/*" style="display:none" onchange="uploadStoreImage('deco-right',this)"></label>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -904,7 +941,12 @@ async function loadCurrentStoreImages() {
       'cat-comedor':'prev-cat-comedor',
       'cat-camas':'prev-cat-camas',
       'cat-sofas':'prev-cat-sofas',
-      'Logo':'prev-Logo'
+      'Logo':'prev-Logo',
+      'grid-sala':'prev-grid-sala','grid-comedor':'prev-grid-comedor','grid-dormitorio':'prev-grid-dormitorio',
+      'grid-iluminacion':'prev-grid-iluminacion','grid-oficina':'prev-grid-oficina','grid-exterior':'prev-grid-exterior',
+      'edit-sala':'prev-edit-sala','edit-comedor':'prev-edit-comedor','edit-dormitorio':'prev-edit-dormitorio',
+      'edit-detalle':'prev-edit-detalle','edit-exterior':'prev-edit-exterior',
+      'deco-left':'prev-deco-left','deco-right':'prev-deco-right',
     };
     Object.entries(map).forEach(([slot, id]) => {
       if(imgs[slot]) { const el=document.getElementById(id); if(el) el.src=imgs[slot]; }

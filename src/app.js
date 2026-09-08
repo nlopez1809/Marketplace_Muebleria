@@ -130,7 +130,12 @@ const storeUpload = multer({ storage: multer.memoryStorage(), limits: { fileSize
 
 app.post('/api/admin/store-images/:slot', requireAuth, storeUpload.single('image'), async (req, res) => {
   if (!req.file) return res.status(400).json({ error: 'No se recibió archivo' });
-  const allowed = ['hero-showroom', 'cat-melamina', 'cat-comedor', 'cat-camas', 'cat-sofas', 'Logo'];
+  const allowed = [
+    'hero-showroom', 'cat-melamina', 'cat-comedor', 'cat-camas', 'cat-sofas', 'Logo',
+    'grid-sala', 'grid-comedor', 'grid-dormitorio', 'grid-iluminacion', 'grid-oficina', 'grid-exterior',
+    'edit-sala', 'edit-comedor', 'edit-dormitorio', 'edit-detalle', 'edit-exterior',
+    'deco-left', 'deco-right',
+  ];
   const slot = req.params.slot;
   if (!allowed.includes(slot)) return res.status(400).json({ error: 'Slot inválido' });
   try {

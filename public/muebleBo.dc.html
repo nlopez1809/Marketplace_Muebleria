@@ -736,6 +736,9 @@
 class Component extends DCLogic {
   state = {
     cart: {}, cartOpen: false, cartBump: false, catMenuOpen: false, activeCatLabel: '',
+    slotGridSala:'', slotGridComedor:'', slotGridDormitorio:'', slotGridIluminacion:'', slotGridOficina:'', slotGridExterior:'',
+    slotEditSala:'', slotEditComedor:'', slotEditDormitorio:'', slotEditDetalle:'', slotEditExterior:'',
+    slotDecoLeft:'', slotDecoRight:'',
     wishlist: [],
     lb: { open:false, pid:null, idx:0, loading:false, progress:0, zoom:false, zx:50, zy:50 },
     filters: { category:'Todos', priceMax:50000, material:'Todos', city:'Todos' },
@@ -937,7 +940,20 @@ class Component extends DCLogic {
         'cat-melamina':'slotMelamina',
         'cat-comedor':'slotComedor',
         'cat-camas':'slotCamas',
-        'cat-sofas':'slotSofas'
+        'cat-sofas':'slotSofas',
+        'grid-sala':'slotGridSala',
+        'grid-comedor':'slotGridComedor',
+        'grid-dormitorio':'slotGridDormitorio',
+        'grid-iluminacion':'slotGridIluminacion',
+        'grid-oficina':'slotGridOficina',
+        'grid-exterior':'slotGridExterior',
+        'edit-sala':'slotEditSala',
+        'edit-comedor':'slotEditComedor',
+        'edit-dormitorio':'slotEditDormitorio',
+        'edit-detalle':'slotEditDetalle',
+        'edit-exterior':'slotEditExterior',
+        'deco-left':'slotDecoLeft',
+        'deco-right':'slotDecoRight',
       };
       var domMap={
         'hero-showroom':'store-img-hero',
@@ -1234,12 +1250,12 @@ class Component extends DCLogic {
       ],
 
       catGrid: [
-        {name:'Sala', img:this.ph('#144659','#3f5247','sofa'), go:()=>this.goToCategory('Sofás')},
-        {name:'Comedor', img:this.ph('#7e6440','#9a7a43','table'), go:()=>this.goToCategory('Mesas')},
-        {name:'Dormitorio', img:this.ph('#5f4a30','#6b5236','bed'), go:()=>this.goToCategory('Camas')},
-        {name:'Iluminación', img:this.ph('#a9863f','#c9a96a','lamp'), go:()=>this.goToCategory('Iluminación')},
-        {name:'Oficina', img:this.ph('#595957','#737373','cabinet'), go:()=>this.goToCategory('Almacenamiento')},
-        {name:'Exterior', img:this.ph('#525c3b','#6f7a52','outdoor'), go:()=>this.goToCategory('Exterior')}
+        {name:'Sala', img:this.state.slotGridSala?`url(${this.state.slotGridSala})`:this.ph('#144659','#3f5247','sofa'), go:()=>this.goToCategory('Sofás')},
+        {name:'Comedor', img:this.state.slotGridComedor?`url(${this.state.slotGridComedor})`:this.ph('#7e6440','#9a7a43','table'), go:()=>this.goToCategory('Mesas')},
+        {name:'Dormitorio', img:this.state.slotGridDormitorio?`url(${this.state.slotGridDormitorio})`:this.ph('#5f4a30','#6b5236','bed'), go:()=>this.goToCategory('Camas')},
+        {name:'Iluminación', img:this.state.slotGridIluminacion?`url(${this.state.slotGridIluminacion})`:this.ph('#a9863f','#c9a96a','lamp'), go:()=>this.goToCategory('Iluminación')},
+        {name:'Oficina', img:this.state.slotGridOficina?`url(${this.state.slotGridOficina})`:this.ph('#595957','#737373','cabinet'), go:()=>this.goToCategory('Almacenamiento')},
+        {name:'Exterior', img:this.state.slotGridExterior?`url(${this.state.slotGridExterior})`:this.ph('#525c3b','#6f7a52','outdoor'), go:()=>this.goToCategory('Exterior')}
       ],
 
       featured: mapped.slice(0,8),
@@ -1251,17 +1267,17 @@ class Component extends DCLogic {
       marqueeItems: (()=>{ const base=['Roble macizo','Entrega en 48h','Pago con QR','Diseño boliviano','Garantía 7 días','Terciopelo italiano','Nogal premium']; return [...base,...base]; })(),
 
       editorial: [
-        {tag:'Sala', title:'Calidez de altura', img:this.ph('#144659','#3f5247','sofa','',135), col:'1 / 7', row:'1 / 4', reveal:'mb-reveal-l'},
-        {tag:'Comedor', title:'Mesa para los tuyos', img:this.ph('#7e6440','#9a7a43','table','',60), col:'7 / 13', row:'1 / 3', reveal:'mb-reveal-r'},
-        {tag:'Dormitorio', title:'Descanso noble', img:this.ph('#5f4a30','#6b5236','bed','',200), col:'7 / 10', row:'3 / 5', reveal:'mb-reveal-r'},
-        {tag:'Detalle', title:'Latón y luz', img:this.ph('#a9863f','#c9a96a','lamp','',310), col:'10 / 13', row:'3 / 5', reveal:'mb-reveal-r'},
-        {tag:'Exterior', title:'Vivir afuera', img:this.ph('#525c3b','#6f7a52','outdoor','',135), col:'1 / 7', row:'4 / 6', reveal:'mb-reveal-l'}
+        {tag:'Sala', title:'Calidez de altura', img:this.state.slotEditSala?`url(${this.state.slotEditSala})`:this.ph('#144659','#3f5247','sofa','',135), col:'1 / 7', row:'1 / 4', reveal:'mb-reveal-l'},
+        {tag:'Comedor', title:'Mesa para los tuyos', img:this.state.slotEditComedor?`url(${this.state.slotEditComedor})`:this.ph('#7e6440','#9a7a43','table','',60), col:'7 / 13', row:'1 / 3', reveal:'mb-reveal-r'},
+        {tag:'Dormitorio', title:'Descanso noble', img:this.state.slotEditDormitorio?`url(${this.state.slotEditDormitorio})`:this.ph('#5f4a30','#6b5236','bed','',200), col:'7 / 10', row:'3 / 5', reveal:'mb-reveal-r'},
+        {tag:'Detalle', title:'Latón y luz', img:this.state.slotEditDetalle?`url(${this.state.slotEditDetalle})`:this.ph('#a9863f','#c9a96a','lamp','',310), col:'10 / 13', row:'3 / 5', reveal:'mb-reveal-r'},
+        {tag:'Exterior', title:'Vivir afuera', img:this.state.slotEditExterior?`url(${this.state.slotEditExterior})`:this.ph('#525c3b','#6f7a52','outdoor','',135), col:'1 / 7', row:'4 / 6', reveal:'mb-reveal-l'}
       ],
 
       parallaxBg: this.ph('#5f4a30','#144659','table','',135),
       parallaxBgRef:(el)=>{this._pBg=el;},
-      floatA: this.prodImgReal(allProducts[0],3),
-      floatB: allProducts.length>4 ? this.prodImgReal(allProducts[4],2) : this.prodImgReal(allProducts[0],2),
+      floatA: this.state.slotDecoRight ? `url(${this.state.slotDecoRight})` : this.prodImgReal(allProducts[0],3),
+      floatB: this.state.slotDecoLeft ? `url(${this.state.slotDecoLeft})` : (allProducts.length>4 ? this.prodImgReal(allProducts[4],2) : this.prodImgReal(allProducts[0],2)),
       floatARef:(el)=>{this._fA=el;}, floatBRef:(el)=>{this._fB=el;},
       stats: [
         {target:12400, prefix:'', suffix:'', decimals:0, shown:'0', label:'Hogares amueblados'},
