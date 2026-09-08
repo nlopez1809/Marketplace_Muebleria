@@ -733,7 +733,7 @@
 <script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1320,&quot;height&quot;:900}}">
 class Component extends DCLogic {
   state = {
-    cart: {}, cartOpen: false, cartBump: false,
+    cart: {}, cartOpen: false, cartBump: false, catMenuOpen: false, activeCatLabel: '',
     wishlist: [],
     lb: { open:false, pid:null, idx:0, loading:false, progress:0, zoom:false, zx:50, zy:50 },
     filters: { category:'Todos', priceMax:50000, material:'Todos', city:'Todos' },
@@ -1215,11 +1215,11 @@ class Component extends DCLogic {
       goCamas: ()=>{ window.location.href='Camas.dc.html'; },
       goSofas: ()=>this.goToCategory('Sofás'),
 
-      catMenuOpen: false,
-      activeCatLabel: '',
+      catMenuOpen: this.state.catMenuOpen,
+      activeCatLabel: this.state.activeCatLabel||'',
       toggleCatMenu: (e)=>{ if(e&&e.stopPropagation)e.stopPropagation(); this.setState(s=>({catMenuOpen:!s.catMenuOpen})); },
       stopProp: (e)=>{ if(e&&e.stopPropagation)e.stopPropagation(); },
-      setCatTodos: (e)=>{ if(e&&e.stopPropagation)e.stopPropagation(); this.setState({catMenuOpen:false,activeCatLabel:''}); this.setState(s=>({filters:{...s.filters,category:''}})); setTimeout(()=>this.scrollTo('#catalogo'),80); },
+      setCatTodos: (e)=>{ if(e&&e.stopPropagation)e.stopPropagation(); this.setState(s=>({catMenuOpen:false,activeCatLabel:'',filters:{...s.filters,category:'Todos'}})); setTimeout(()=>this.scrollTo('#catalogo'),80); },
       stripCats: ['Sofás','Seccionales','Sillas & Butacas','Mesas de comedor','Mesas de centro','Camas','Cómodas','Iluminación','Estanterías','Exterior','Alfombras','Decoración'].map(label=>({
         label,
         go:(e)=>{ if(e&&e.stopPropagation)e.stopPropagation(); this.setState({catMenuOpen:false,activeCatLabel:label}); this.goToCategory(label); },
