@@ -147,22 +147,23 @@
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.4a8 8 0 0 1-11.5 7.2L4 20l1.4-4.8A8 8 0 1 1 21 11.4z"></path><path d="M12.4 6.6l1.05 3.05 3.05 1.05-3.05 1.05-1.05 3.05-1.05-3.05-3.05-1.05 3.05-1.05z" fill="#FFFFFF" stroke="#FFFFFF" stroke-width="0.5"></path></svg>
         Deco IA
       </button>
-      <!-- Category dropdown -->
-      <div style="position:relative" onClick="{{ toggleCatMenu }}">
-        <button style="background:none;border:1px solid #E4E4E3;border-radius:4px;padding:7px 14px;font-size:12px;font-weight:600;letter-spacing:.05em;color:#40403E;cursor:pointer;display:flex;align-items:center;gap:8px;font-family:inherit;transition:border-color .15s" style-hover="border-color:#F27141;color:#F27141">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
-          Categorías
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
-        </button>
-        <div sc-if="{{ catMenuOpen }}" style="position:absolute;top:calc(100% + 6px);left:0;background:#fff;border:1px solid #E4E4E3;border-radius:6px;box-shadow:0 8px 24px rgba(0,0,0,.12);z-index:60;min-width:210px;padding:6px 0" onClick="{{ stopProp }}">
-          <a href="#catalogo" onClick="{{ setCatTodos }}" style="display:block;padding:9px 18px;font-size:13px;color:#40403E;text-decoration:none;font-weight:600;border-bottom:1px solid #F2F2F2" style-hover="background:#FFF7F3;color:#F27141">Todos los productos</a>
-          <sc-for list="{{ stripCats }}" as="c" hint-placeholder-count="8">
-            <a href="#catalogo" onClick="{{ c.go }}" style="display:block;padding:8px 18px;font-size:13px;color:#595957;text-decoration:none" style-hover="background:#FFF7F3;color:#F27141">{{ c.label }}</a>
-          </sc-for>
+      <!-- Category dropdown (right-aligned) -->
+      <div style="margin-left:auto;display:flex;align-items:center;gap:12px">
+        <span sc-if="{{ activeCatLabel }}" style="font-size:12px;color:#F27141;font-weight:600;letter-spacing:.04em">{{ activeCatLabel }}</span>
+        <div style="position:relative" onClick="{{ toggleCatMenu }}">
+          <button style="background:none;border:1px solid #E4E4E3;border-radius:4px;padding:7px 14px;font-size:12px;font-weight:600;letter-spacing:.05em;color:#40403E;cursor:pointer;display:flex;align-items:center;gap:8px;font-family:inherit;transition:border-color .15s" style-hover="border-color:#F27141;color:#F27141">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+            Categorías
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>
+          <div sc-if="{{ catMenuOpen }}" style="position:absolute;top:calc(100% + 6px);right:0;background:#fff;border:1px solid #E4E4E3;border-radius:6px;box-shadow:0 8px 24px rgba(0,0,0,.12);z-index:60;min-width:210px;padding:6px 0" onClick="{{ stopProp }}">
+            <a href="#catalogo" onClick="{{ setCatTodos }}" style="display:block;padding:9px 18px;font-size:13px;color:#40403E;text-decoration:none;font-weight:600;border-bottom:1px solid #F2F2F2" style-hover="background:#FFF7F3;color:#F27141">Todos los productos</a>
+            <sc-for list="{{ stripCats }}" as="c" hint-placeholder-count="8">
+              <a href="#catalogo" onClick="{{ c.go }}" style="display:block;padding:8px 18px;font-size:13px;color:#595957;text-decoration:none" style-hover="background:#FFF7F3;color:#F27141">{{ c.label }}</a>
+            </sc-for>
+          </div>
         </div>
       </div>
-      <!-- Active category badge -->
-      <span sc-if="{{ activeCatLabel }}" style="font-size:12px;color:#F27141;font-weight:600;letter-spacing:.04em">{{ activeCatLabel }}</span>
     </div>
   </div>
   </div><!-- end fixed wrapper -->
