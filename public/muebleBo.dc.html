@@ -187,29 +187,29 @@
 
       <!-- ROW A -->
       <div class="mb-hero-row-a" style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
-        <div class="mb-hero-cell-a" style="position:relative;border-radius:4px;overflow:hidden;height:258px;background:#2f2f2e">
+        <div class="mb-hero-cell-a" onClick="{{ goMelamina }}" style="position:relative;border-radius:4px;overflow:hidden;height:258px;background:#2f2f2e;cursor:pointer">
           <img id="store-img-melamina" src="{{ slotMelamina }}" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block" onerror="this.style.display='none'" onload="this.style.display='block'">
           <div style="position:absolute;inset:0;background:linear-gradient(135deg,rgba(28,28,27,.52),rgba(28,28,27,.06) 55%);pointer-events:none"></div>
-          <button onClick="{{ goMelamina }}" class="mb-cat-btn" style="position:absolute;left:30px;top:26px;background:none;border:none;cursor:pointer;padding:0;font-family:'Comfortaa',sans-serif;font-weight:300;font-size:44px;letter-spacing:.05em;color:#F2F2F2;text-shadow:0 2px 16px rgba(0,0,0,.55);transition:opacity .25s,letter-spacing .35s" style-hover="opacity:.82;letter-spacing:.1em">MELAMINA</button>
+          <span class="mb-cat-btn" style="position:absolute;left:30px;top:26px;font-family:'Comfortaa',sans-serif;font-weight:300;font-size:44px;letter-spacing:.05em;color:#F2F2F2;text-shadow:0 2px 16px rgba(0,0,0,.55);pointer-events:none">MELAMINA</span>
         </div>
-        <div class="mb-hero-cell-a" style="position:relative;border-radius:4px;overflow:hidden;height:258px;background:#2f2f2e">
+        <div class="mb-hero-cell-a" onClick="{{ goComedor }}" style="position:relative;border-radius:4px;overflow:hidden;height:258px;background:#2f2f2e;cursor:pointer">
           <img id="store-img-comedor" src="{{ slotComedor }}" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block" onerror="this.style.display='none'" onload="this.style.display='block'">
           <div style="position:absolute;inset:0;background:linear-gradient(135deg,rgba(28,28,27,.52),rgba(28,28,27,.06) 55%);pointer-events:none"></div>
-          <button onClick="{{ goComedor }}" class="mb-cat-btn" style="position:absolute;left:30px;top:26px;background:none;border:none;cursor:pointer;padding:0;font-family:'Comfortaa',sans-serif;font-weight:300;font-size:44px;letter-spacing:.05em;color:#F2F2F2;text-shadow:0 2px 16px rgba(0,0,0,.55);transition:opacity .25s,letter-spacing .35s" style-hover="opacity:.82;letter-spacing:.1em">COMEDOR</button>
+          <span class="mb-cat-btn" style="position:absolute;left:30px;top:26px;font-family:'Comfortaa',sans-serif;font-weight:300;font-size:44px;letter-spacing:.05em;color:#F2F2F2;text-shadow:0 2px 16px rgba(0,0,0,.55);pointer-events:none">COMEDOR</span>
         </div>
       </div>
 
       <!-- ROW B -->
       <div class="mb-hero-row-b" style="display:grid;grid-template-columns:1fr 1.18fr;gap:14px">
-        <div class="mb-hero-cell-b" style="position:relative;border-radius:4px;overflow:hidden;height:300px;background:#2f2f2e">
+        <div class="mb-hero-cell-b" onClick="{{ goCamas }}" style="position:relative;border-radius:4px;overflow:hidden;height:300px;background:#2f2f2e;cursor:pointer">
           <img id="store-img-camas" src="{{ slotCamas }}" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block" onerror="this.style.display='none'" onload="this.style.display='block'">
           <div style="position:absolute;inset:0;background:linear-gradient(200deg,rgba(28,28,27,.55),rgba(28,28,27,.05) 55%);pointer-events:none"></div>
-          <button onClick="{{ goCamas }}" class="mb-cat-btn" style="position:absolute;left:30px;bottom:26px;top:auto;background:none;border:none;cursor:pointer;padding:0;font-family:'Comfortaa',sans-serif;font-weight:300;font-size:44px;letter-spacing:.05em;color:#F2F2F2;text-shadow:0 2px 16px rgba(0,0,0,.55);transition:opacity .25s,letter-spacing .35s" style-hover="opacity:.82;letter-spacing:.1em">CAMAS</button>
+          <span class="mb-cat-btn" style="position:absolute;left:30px;bottom:26px;font-family:'Comfortaa',sans-serif;font-weight:300;font-size:44px;letter-spacing:.05em;color:#F2F2F2;text-shadow:0 2px 16px rgba(0,0,0,.55);pointer-events:none">CAMAS</span>
         </div>
-        <div class="mb-hero-cell-b" style="position:relative;border-radius:4px;overflow:hidden;height:300px;background:#2f2f2e">
+        <div class="mb-hero-cell-b" onClick="{{ goSofas }}" style="position:relative;border-radius:4px;overflow:hidden;height:300px;background:#2f2f2e;cursor:pointer">
           <img id="store-img-sofas" src="{{ slotSofas }}" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block" onerror="this.style.display='none'" onload="this.style.display='block'">
           <div style="position:absolute;inset:0;background:linear-gradient(160deg,rgba(28,28,27,.5),rgba(28,28,27,.05) 55%);pointer-events:none"></div>
-          <button onClick="{{ goSofas }}" class="mb-cat-btn" style="position:absolute;right:34px;left:auto;top:26px;background:none;border:none;cursor:pointer;padding:0;font-family:'Comfortaa',sans-serif;font-weight:300;font-size:44px;letter-spacing:.05em;color:#F2F2F2;text-shadow:0 2px 16px rgba(0,0,0,.55);transition:opacity .25s,letter-spacing .35s" style-hover="opacity:.82;letter-spacing:.1em">SOFAS</button>
+          <span class="mb-cat-btn" style="position:absolute;right:34px;top:26px;font-family:'Comfortaa',sans-serif;font-weight:300;font-size:44px;letter-spacing:.05em;color:#F2F2F2;text-shadow:0 2px 16px rgba(0,0,0,.55);pointer-events:none">SOFAS</span>
         </div>
       </div>
     </div>
