@@ -698,23 +698,66 @@
     <!-- Sección "Para cada rincón" -->
     <div style="margin-top:32px;margin-bottom:12px;font-size:14px;font-weight:700;color:#40403E;border-bottom:2px solid #F27141;padding-bottom:6px">Sección "Para cada rincón"</div>
     <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:16px">
-      ${[['grid-sala','Sala'],['grid-comedor','Comedor'],['grid-dormitorio','Dormitorio'],['grid-iluminacion','Iluminación'],['grid-oficina','Oficina'],['grid-exterior','Exterior']].map(([slot,label])=>`
       <div class="card" style="padding:16px">
-        <div style="font-weight:600;margin-bottom:4px">${label}</div>
-        <img id="prev-${slot}" style="width:100%;height:110px;object-fit:cover;border-radius:4px;margin-bottom:10px;background:#eee">
-        <label class="btn btn-secondary" style="cursor:pointer;display:block;text-align:center;font-size:12px">Subir imagen<input type="file" accept="image/*" style="display:none" onchange="uploadStoreImage('${slot}',this)"></label>
-      </div>`).join('')}
+        <div style="font-weight:600;margin-bottom:4px">Sala</div>
+        <img id="prev-grid-sala" style="width:100%;height:110px;object-fit:cover;border-radius:4px;margin-bottom:10px;background:#eee">
+        <label class="btn btn-secondary" style="cursor:pointer;display:block;text-align:center;font-size:12px">Subir imagen<input type="file" accept="image/*" style="display:none" onchange="uploadStoreImage('grid-sala',this)"></label>
+      </div>
+      <div class="card" style="padding:16px">
+        <div style="font-weight:600;margin-bottom:4px">Comedor</div>
+        <img id="prev-grid-comedor" style="width:100%;height:110px;object-fit:cover;border-radius:4px;margin-bottom:10px;background:#eee">
+        <label class="btn btn-secondary" style="cursor:pointer;display:block;text-align:center;font-size:12px">Subir imagen<input type="file" accept="image/*" style="display:none" onchange="uploadStoreImage('grid-comedor',this)"></label>
+      </div>
+      <div class="card" style="padding:16px">
+        <div style="font-weight:600;margin-bottom:4px">Dormitorio</div>
+        <img id="prev-grid-dormitorio" style="width:100%;height:110px;object-fit:cover;border-radius:4px;margin-bottom:10px;background:#eee">
+        <label class="btn btn-secondary" style="cursor:pointer;display:block;text-align:center;font-size:12px">Subir imagen<input type="file" accept="image/*" style="display:none" onchange="uploadStoreImage('grid-dormitorio',this)"></label>
+      </div>
+      <div class="card" style="padding:16px">
+        <div style="font-weight:600;margin-bottom:4px">Iluminación</div>
+        <img id="prev-grid-iluminacion" style="width:100%;height:110px;object-fit:cover;border-radius:4px;margin-bottom:10px;background:#eee">
+        <label class="btn btn-secondary" style="cursor:pointer;display:block;text-align:center;font-size:12px">Subir imagen<input type="file" accept="image/*" style="display:none" onchange="uploadStoreImage('grid-iluminacion',this)"></label>
+      </div>
+      <div class="card" style="padding:16px">
+        <div style="font-weight:600;margin-bottom:4px">Oficina</div>
+        <img id="prev-grid-oficina" style="width:100%;height:110px;object-fit:cover;border-radius:4px;margin-bottom:10px;background:#eee">
+        <label class="btn btn-secondary" style="cursor:pointer;display:block;text-align:center;font-size:12px">Subir imagen<input type="file" accept="image/*" style="display:none" onchange="uploadStoreImage('grid-oficina',this)"></label>
+      </div>
+      <div class="card" style="padding:16px">
+        <div style="font-weight:600;margin-bottom:4px">Exterior</div>
+        <img id="prev-grid-exterior" style="width:100%;height:110px;object-fit:cover;border-radius:4px;margin-bottom:10px;background:#eee">
+        <label class="btn btn-secondary" style="cursor:pointer;display:block;text-align:center;font-size:12px">Subir imagen<input type="file" accept="image/*" style="display:none" onchange="uploadStoreImage('grid-exterior',this)"></label>
+      </div>
     </div>
 
     <!-- Sección "Inspírate en cada espacio" -->
     <div style="margin-top:32px;margin-bottom:12px;font-size:14px;font-weight:700;color:#40403E;border-bottom:2px solid #F27141;padding-bottom:6px">Sección "Inspírate en cada espacio"</div>
     <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:16px">
-      ${[['edit-sala','Sala – Calidez de altura'],['edit-comedor','Comedor – Mesa para los tuyos'],['edit-dormitorio','Dormitorio – Descanso noble'],['edit-detalle','Detalle – Latón y luz'],['edit-exterior','Exterior – Vivir afuera']].map(([slot,label])=>`
       <div class="card" style="padding:16px">
-        <div style="font-weight:600;margin-bottom:4px">${label}</div>
-        <img id="prev-${slot}" style="width:100%;height:110px;object-fit:cover;border-radius:4px;margin-bottom:10px;background:#eee">
-        <label class="btn btn-secondary" style="cursor:pointer;display:block;text-align:center;font-size:12px">Subir imagen<input type="file" accept="image/*" style="display:none" onchange="uploadStoreImage('${slot}',this)"></label>
-      </div>`).join('')}
+        <div style="font-weight:600;margin-bottom:4px">Sala – Calidez de altura</div>
+        <img id="prev-edit-sala" style="width:100%;height:110px;object-fit:cover;border-radius:4px;margin-bottom:10px;background:#eee">
+        <label class="btn btn-secondary" style="cursor:pointer;display:block;text-align:center;font-size:12px">Subir imagen<input type="file" accept="image/*" style="display:none" onchange="uploadStoreImage('edit-sala',this)"></label>
+      </div>
+      <div class="card" style="padding:16px">
+        <div style="font-weight:600;margin-bottom:4px">Comedor – Mesa para los tuyos</div>
+        <img id="prev-edit-comedor" style="width:100%;height:110px;object-fit:cover;border-radius:4px;margin-bottom:10px;background:#eee">
+        <label class="btn btn-secondary" style="cursor:pointer;display:block;text-align:center;font-size:12px">Subir imagen<input type="file" accept="image/*" style="display:none" onchange="uploadStoreImage('edit-comedor',this)"></label>
+      </div>
+      <div class="card" style="padding:16px">
+        <div style="font-weight:600;margin-bottom:4px">Dormitorio – Descanso noble</div>
+        <img id="prev-edit-dormitorio" style="width:100%;height:110px;object-fit:cover;border-radius:4px;margin-bottom:10px;background:#eee">
+        <label class="btn btn-secondary" style="cursor:pointer;display:block;text-align:center;font-size:12px">Subir imagen<input type="file" accept="image/*" style="display:none" onchange="uploadStoreImage('edit-dormitorio',this)"></label>
+      </div>
+      <div class="card" style="padding:16px">
+        <div style="font-weight:600;margin-bottom:4px">Detalle – Latón y luz</div>
+        <img id="prev-edit-detalle" style="width:100%;height:110px;object-fit:cover;border-radius:4px;margin-bottom:10px;background:#eee">
+        <label class="btn btn-secondary" style="cursor:pointer;display:block;text-align:center;font-size:12px">Subir imagen<input type="file" accept="image/*" style="display:none" onchange="uploadStoreImage('edit-detalle',this)"></label>
+      </div>
+      <div class="card" style="padding:16px">
+        <div style="font-weight:600;margin-bottom:4px">Exterior – Vivir afuera</div>
+        <img id="prev-edit-exterior" style="width:100%;height:110px;object-fit:cover;border-radius:4px;margin-bottom:10px;background:#eee">
+        <label class="btn btn-secondary" style="cursor:pointer;display:block;text-align:center;font-size:12px">Subir imagen<input type="file" accept="image/*" style="display:none" onchange="uploadStoreImage('edit-exterior',this)"></label>
+      </div>
     </div>
 
     <!-- Sección de estadísticas (imágenes flotantes) -->
