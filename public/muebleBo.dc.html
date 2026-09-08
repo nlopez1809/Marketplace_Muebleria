@@ -1238,7 +1238,7 @@ class Component extends DCLogic {
       toggleCatMenu: (e)=>{ if(e&&e.stopPropagation)e.stopPropagation(); this.setState(s=>({catMenuOpen:!s.catMenuOpen})); },
       stopProp: (e)=>{ if(e&&e.stopPropagation)e.stopPropagation(); },
       setCatTodos: (e)=>{ if(e&&e.stopPropagation)e.stopPropagation(); this.setState(s=>({catMenuOpen:false,activeCatLabel:'',filters:{...s.filters,category:'Todos'}})); setTimeout(()=>this.scrollTo('#catalogo'),80); },
-      stripCats: ['Sofás','Seccionales','Sillas & Butacas','Mesas de comedor','Mesas de centro','Camas','Cómodas','Iluminación','Estanterías','Exterior','Alfombras','Decoración'].map(label=>({
+      stripCats: ['Sofás','Sillas & Butacas','Mesas de comedor','Mesas de centro','Camas','Cómodas','Iluminación','Estanterías','Exterior','Alfombras','Decoración'].map(label=>({
         label,
         go:(e)=>{ if(e&&e.stopPropagation)e.stopPropagation(); this.setState({catMenuOpen:false,activeCatLabel:label}); this.goToCategory(label); },
       })),
