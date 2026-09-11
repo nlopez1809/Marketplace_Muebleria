@@ -1187,7 +1187,7 @@ class Component extends DCLogic {
     const thumbLabels=['Estudio','Ambiente','Detalle','Lateral'];
 
     // Build lists dynamically from actual products so they always match DB values
-    const ORDER = ['Sofás','Poltronas','Ottoman','Sillas','Mesas','Comedores','Camas','Bufeteras','Muebles en Melamina','Iluminación','Almacenamiento','Exterior'];
+    const ORDER = ['Sofás','Poltronas','Ottoman','Sillas','Taburetes','Mesas','Comedores','Mesas centrales','Veladores','Camas','Bufeteras','Muebles en Melamina','Iluminación','Almacenamiento','Exterior'];
     const dbCats = [...new Set(allProducts.map(p=>(p.cat||'').trim()).filter(Boolean))].sort((a,b)=>{ const ia=ORDER.indexOf(a),ib=ORDER.indexOf(b); return (ia<0?99:ia)-(ib<0?99:ib); });
     const catList = ['Todos', ...dbCats];
     const dbMats = [...new Set(allProducts.map(p=>(p.material||'').trim()).filter(Boolean))].sort();
@@ -1238,7 +1238,7 @@ class Component extends DCLogic {
       toggleCatMenu: (e)=>{ if(e&&e.stopPropagation)e.stopPropagation(); this.setState(s=>({catMenuOpen:!s.catMenuOpen})); },
       stopProp: (e)=>{ if(e&&e.stopPropagation)e.stopPropagation(); },
       setCatTodos: (e)=>{ if(e&&e.stopPropagation)e.stopPropagation(); this.setState(s=>({catMenuOpen:false,activeCatLabel:'',filters:{...s.filters,category:'Todos'}})); setTimeout(()=>this.scrollTo('#catalogo'),80); },
-      stripCats: ['Sofás','Sillas & Butacas','Mesas de comedor','Mesas de centro','Camas','Cómodas','Iluminación','Estanterías','Exterior','Alfombras','Decoración'].map(label=>({
+      stripCats: ['Sofás','Sillas & Butacas','Taburetes','Mesas de comedor','Mesas centrales','Veladores','Camas','Cómodas','Iluminación','Estanterías','Exterior','Alfombras','Decoración'].map(label=>({
         label,
         go:(e)=>{ if(e&&e.stopPropagation)e.stopPropagation(); this.setState({catMenuOpen:false,activeCatLabel:label}); this.goToCategory(label); },
       })),
