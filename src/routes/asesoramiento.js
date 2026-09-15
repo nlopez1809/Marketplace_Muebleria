@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const multer = require('multer');
 const supabase = require('../services/supabase');
+const { requireRole } = require('../middleware/auth');
 
 const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 10 * 1024 * 1024 } });
 
@@ -153,8 +154,8 @@ router.put('/:id/deadline', async (req, res) => {
 });
 
 
-// POST /api/admin/asesoramiento/:id/aprobar — gerente approves current revision stage
-router.post('/:id/aprobar', async (req, res) => {
+// POST /api/admin/asesoramiento/:id/aprobar — solo gerente
+router.post('/:id/aprobar', requireRole('gerente'), async (req, res) => {
   try {
     const { data: ases, error: fetchErr } = await supabase.from('asesoramientos').select('stage').eq('id', req.params.id).single();
     if (fetchErr) throw fetchErr;
@@ -167,15 +168,35 @@ router.post('/:id/aprobar', async (req, res) => {
   } catch (e) { res.status(500).json({ error: e.message }); }
 });
 
-// POST /api/admin/asesoramiento/:id/rechazar — gerente rejects, goes back one stage
-router.post('/:id/rechazar', async (req, res) => {
+// POST /api/admin/asesoramiento/:id/rechazar — solo gerente; borra fotos de la etapa rechazada
+router.post('/:id/rechazar', requireRole('gerente'), async (req, res) => {
   try {
-    const { data: ases, error: fetchErr } = await supabase.from('asesoramientos').select('stage').eq('id', req.params.id).single();
+    const { data: ases, error: fetchErr } = await supabase.from('asesoramientos').select('*').eq('id', req.params.id).single();
     if (fetchErr) throw fetchErr;
     const idx = STAGES.indexOf(ases.stage);
     if (idx <= 0) return res.status(400).json({ error: 'No se puede retroceder desde esta etapa' });
     const prevStage = STAGES[idx - 1];
-    const { data, error } = await supabase.from('asesoramientos').update({ stage: prevStage, notas_gerencia: req.body.notas || null, updated_at: new Date().toISOString() }).eq('id', req.params.id).select().single();
+
+    // Borrar fotos asociadas a la etapa de revisión rechazada
+    const fotoField = STAGE_FOTO_MAP[ases.stage];
+    const clearUpdate = { stage: prevStage, notas_gerencia: req.body.notas || null, updated_at: new Date().toISOString() };
+    if (fotoField && ases[fotoField] && ases[fotoField].length) {
+      // Extraer paths relativos de las URLs públicas y borrarlos del bucket
+      const paths = ases[fotoField].map(url => {
+        try {
+          const u = new URL(url);
+          // Path after /object/public/asesoramiento-files/
+          const match = u.pathname.match(/\/object\/public\/asesoramiento-files\/(.+)/);
+          return match ? decodeURIComponent(match[1]) : null;
+        } catch { return null; }
+      }).filter(Boolean);
+      if (paths.length) {
+        await supabase.storage.from('asesoramiento-files').remove(paths);
+      }
+      clearUpdate[fotoField] = [];
+    }
+
+    const { data, error } = await supabase.from('asesoramientos').update(clearUpdate).eq('id', req.params.id).select().single();
     if (error) throw error;
     res.json(data);
   } catch (e) { res.status(500).json({ error: e.message }); }

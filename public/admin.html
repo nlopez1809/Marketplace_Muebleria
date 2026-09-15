@@ -1963,22 +1963,32 @@ function renderAsesModal(ases, leadId) {
   // ── Revisión gerencia ──
   let reviewHtml = '';
   if (isRevision && ases.stage !== 'completado') {
-    reviewHtml = `<div style="padding:16px;background:#FFF7F3;border:1px solid #F27141;border-radius:8px;margin-bottom:20px">
-      <label style="font-weight:600;display:block;margin-bottom:8px">🔍 Revisión de Gerencia</label>
-      ${ases.notas_gerencia ? `<p style="font-size:13px;color:#555;margin-bottom:8px"><em>Notas anteriores: ${ases.notas_gerencia}</em></p>` : ''}
-      <textarea id="ases-notas" placeholder="Notas / observaciones (opcional)" style="width:100%;box-sizing:border-box;border:1px solid #E4E4E3;border-radius:6px;padding:8px;font-size:13px;resize:vertical;min-height:70px"></textarea>
-      <div style="display:flex;gap:8px;margin-top:10px">
-        <button class="btn btn-primary" onclick="asesAprobar('${ases.id}','${leadId}')" style="background:#10B981;border-color:#10B981">✅ Aprobar</button>
-        <button class="btn btn-danger" onclick="asesRechazar('${ases.id}','${leadId}')">❌ Rechazar (volver)</button>
-      </div>
-    </div>`;
+    if (currentRole === 'gerente') {
+      reviewHtml = `<div style="padding:16px;background:#FFF7F3;border:1px solid #F27141;border-radius:8px;margin-bottom:20px">
+        <label style="font-weight:600;display:block;margin-bottom:8px">🔍 Revisión de Gerencia</label>
+        ${ases.notas_gerencia ? `<p style="font-size:13px;color:#555;margin-bottom:8px"><em>Notas anteriores: ${ases.notas_gerencia}</em></p>` : ''}
+        <textarea id="ases-notas" placeholder="Notas / observaciones (opcional)" style="width:100%;box-sizing:border-box;border:1px solid #E4E4E3;border-radius:6px;padding:8px;font-size:13px;resize:vertical;min-height:70px"></textarea>
+        <div style="display:flex;gap:8px;margin-top:10px">
+          <button class="btn btn-primary" onclick="asesAprobar('${ases.id}','${leadId}')" style="background:#10B981;border-color:#10B981">✅ Aprobar</button>
+          <button class="btn btn-danger" onclick="asesRechazar('${ases.id}','${leadId}')">❌ Rechazar y borrar fotos</button>
+        </div>
+      </div>`;
+    } else {
+      reviewHtml = `<div style="padding:16px;background:#F9F9F8;border:1px solid #E4E4E3;border-radius:8px;margin-bottom:20px">
+        <label style="font-weight:600;display:block;margin-bottom:6px">🔍 Revisión de Gerencia</label>
+        ${ases.notas_gerencia ? `<p style="font-size:13px;color:#555;margin-bottom:6px"><em>${ases.notas_gerencia}</em></p>` : ''}
+        <p style="font-size:13px;color:#aaa;margin:0">⏳ Pendiente de aprobación por el Gerente.</p>
+      </div>`;
+    }
   }
 
   let advanceHtml = '';
   if (!isRevision && ases.stage !== 'completado' && stageIdx < ASES_STAGES.length - 1) {
-    advanceHtml = `<div style="text-align:right;margin-top:8px">
-      <button class="btn btn-primary" onclick="asesAprobar('${ases.id}','${leadId}')">Avanzar a revisión →</button>
-    </div>`;
+    if (currentRole === 'gerente') {
+      advanceHtml = `<div style="text-align:right;margin-top:8px">
+        <button class="btn btn-primary" onclick="asesAprobar('${ases.id}','${leadId}')">Avanzar a revisión →</button>
+      </div>`;
+    }
   }
 
   document.getElementById('ases-modal-body').innerHTML = stepsHtml + fechaHtml + deadlinesHtml + prevFotosHtml + fotosHtml + reviewHtml + advanceHtml;
