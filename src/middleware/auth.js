@@ -9,7 +9,7 @@ function getUsers() {
     try { return JSON.parse(process.env.USERS_JSON); } catch (e) { /* fall through */ }
   }
   // Built-in accounts (hashes set via individual env vars for each user)
-  return [
+  const users = [
     {
       user: 'disenador',
       hash: process.env.HASH_DISENADOR || '$2b$10$zmNjfTERrzI7OxHLakw8Auk2I3t1s7t2X0rQGb0vsApl07jvq7zoW',
@@ -31,6 +31,12 @@ function getUsers() {
       role: 'asesor',
     },
   ];
+  // Backward compatibility: si hay ADMIN_USER + ADMIN_HASH en env (configuración anterior de Vercel)
+  // se agrega como gerente para no romper acceso existente
+  if (process.env.ADMIN_USER && process.env.ADMIN_HASH) {
+    users.unshift({ user: process.env.ADMIN_USER, hash: process.env.ADMIN_HASH, role: 'gerente' });
+  }
+  return users;
 }
 
 // Roles that have full admin access
