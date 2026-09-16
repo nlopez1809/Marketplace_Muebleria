@@ -157,12 +157,21 @@ router.put('/:id/deadline', async (req, res) => {
 // POST /api/admin/asesoramiento/:id/aprobar — solo gerente
 router.post('/:id/aprobar', requireRole('gerente'), async (req, res) => {
   try {
-    const { data: ases, error: fetchErr } = await supabase.from('asesoramientos').select('stage').eq('id', req.params.id).single();
+    const { data: ases, error: fetchErr } = await supabase.from('asesoramientos').select('*').eq('id', req.params.id).single();
     if (fetchErr) throw fetchErr;
     const idx = STAGES.indexOf(ases.stage);
     if (idx < 0 || idx >= STAGES.length - 1) return res.status(400).json({ error: 'No se puede avanzar desde esta etapa' });
     const nextStage = STAGES[idx + 1];
-    const { data, error } = await supabase.from('asesoramientos').update({ stage: nextStage, notas_gerencia: req.body.notas || null, updated_at: new Date().toISOString() }).eq('id', req.params.id).select().single();
+
+    // Al aprobar una etapa de revisión, copiar las fotos aprobadas a la siguiente etapa de trabajo
+    const updatePayload = { stage: nextStage, notas_gerencia: req.body.notas || null, updated_at: new Date().toISOString() };
+    const currentFotoField = STAGE_FOTO_MAP[ases.stage];
+    const nextFotoField = STAGE_FOTO_MAP[nextStage];
+    if (currentFotoField && nextFotoField && currentFotoField !== nextFotoField && ases[currentFotoField]?.length) {
+      updatePayload[nextFotoField] = ases[currentFotoField];
+    }
+
+    const { data, error } = await supabase.from('asesoramientos').update(updatePayload).eq('id', req.params.id).select().single();
     if (error) throw error;
     res.json(data);
   } catch (e) { res.status(500).json({ error: e.message }); }
