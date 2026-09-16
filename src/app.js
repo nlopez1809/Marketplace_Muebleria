@@ -14,6 +14,7 @@ const asesoresRoutes = require('./routes/asesores');
 const visualizeRoutes = require('./routes/visualize');
 const asesoramientoRoutes = require('./routes/asesoramiento');
 const proformasRoutes = require('./routes/proformas');
+const produccionRoutes = require('./routes/produccion');
 const storage = require('./services/storage');
 const supabase = require('./services/supabase');
 
@@ -107,6 +108,7 @@ app.use('/api/admin/leads', requireAuth, leadRoutes);
 app.use('/api/admin/asesores', requireAuth, asesoresRoutes);
 app.use('/api/admin/asesoramiento', requireAuth, asesoramientoRoutes);
 app.use('/api/admin/proformas', requireAuth, proformasRoutes);
+app.use('/api/admin/produccion', requireAuth, produccionRoutes);
 
 // ── Store images public endpoint ──
 app.get('/api/store-images', async (req, res) => {

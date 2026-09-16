@@ -341,6 +341,10 @@
     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
     Proformas
   </div>
+  <div class="tab" id="tab-produccion" data-tab="produccion">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"></path><path d="M2 17l10 5 10-5"></path><path d="M2 12l10 5 10-5"></path></svg>
+    Producción
+  </div>
   <div class="tab" id="tab-images" data-tab="imagenes">
     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><path d="M21 15l-5-5L5 21"></path></svg>
     Imágenes
@@ -631,6 +635,29 @@
           <button class="btn btn-primary" onclick="saveProforma()">Guardar proforma</button>
         </div>
       </div>
+    </div>
+  </div>
+
+  <!-- ═══ PRODUCCIÓN TAB ═══ -->
+  <div id="tab-produccion" style="display:none">
+    <div class="section-header" style="margin-bottom:20px">
+      <div>
+        <div class="section-title">Producción</div>
+        <div class="section-sub">Control de fabricación de muebles aprobados en asesoramiento</div>
+      </div>
+      <button class="btn btn-primary" onclick="loadProduccion()" style="font-size:12px">↻ Actualizar</button>
+    </div>
+
+    <!-- List view -->
+    <div id="prod-list-view">
+      <div id="prod-list-empty" style="display:none;color:#aaa;text-align:center;padding:40px">No hay órdenes de producción registradas.</div>
+      <div id="prod-list-cards" style="display:flex;flex-direction:column;gap:10px"></div>
+    </div>
+
+    <!-- Detail view -->
+    <div id="prod-detail-view" style="display:none">
+      <button class="btn btn-secondary" onclick="closeProdDetail()" style="margin-bottom:16px;font-size:12px">← Volver a la lista</button>
+      <div id="prod-detail-body"></div>
     </div>
   </div>
 
@@ -968,7 +995,7 @@ fetch('/api/auth/check', { credentials: 'same-origin' })
       // Hide write actions in leads
       document.querySelectorAll('.admin-write-only').forEach(el => el.style.display = 'none');
     }
-    // Diseñador: only products + images tabs
+    // Diseñador: only products + images + produccion tabs
     if (d.role === 'disenador') {
       ['tab-leads','tab-asesores','tab-asesoramiento','tab-proformas','tab-config'].forEach(id => {
         const el = document.getElementById(id);
@@ -990,7 +1017,7 @@ let proformaItems = [];
 let newLeadCount = 0;
 
 // ── Tabs ──
-const TABS = ['dashboard','analytics','products','asesores','leads','pipeline','visitas','asesoramiento','proformas','imagenes'];
+const TABS = ['dashboard','analytics','products','asesores','leads','pipeline','visitas','asesoramiento','proformas','produccion','imagenes'];
 function switchTab(name) {
   document.querySelectorAll('.tab').forEach(x => x.classList.toggle('active', x.dataset.tab === name));
   TABS.forEach(t => { const el = document.getElementById('tab-'+t); if(el) el.style.display = t===name?'':'none'; });
@@ -1002,6 +1029,7 @@ function switchTab(name) {
   if(name==='asesoramiento') loadAsesoramientos();
   if(name==='leads') { newLeadCount=0; const b=document.getElementById('tab-leads-badge'); b.style.display='none'; }
   if(name==='proformas') loadProformas();
+  if(name==='produccion') loadProduccion();
   if(name==='imagenes') loadCurrentStoreImages();
 }
 
@@ -1991,7 +2019,19 @@ function renderAsesModal(ases, leadId) {
     }
   }
 
-  document.getElementById('ases-modal-body').innerHTML = stepsHtml + fechaHtml + deadlinesHtml + prevFotosHtml + fotosHtml + reviewHtml + advanceHtml;
+  // Botón para enviar a Producción cuando el asesoramiento está completado
+  let prodBtnHtml = '';
+  if (ases.stage === 'completado') {
+    prodBtnHtml = `<div style="margin-top:16px;padding:16px;background:#F0FDF4;border:1px solid #10B981;border-radius:8px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px">
+      <div>
+        <div style="font-weight:600;font-size:14px">✅ Asesoramiento completado</div>
+        <div style="font-size:12px;color:#555;margin-top:2px">Las fotos aprobadas pueden enviarse al módulo de Producción para fabricación.</div>
+      </div>
+      <button class="btn btn-primary" onclick="crearProdDesdeAses('${ases.id}')" style="background:#10B981;border-color:#10B981">🏭 Crear orden de producción</button>
+    </div>`;
+  }
+
+  document.getElementById('ases-modal-body').innerHTML = stepsHtml + fechaHtml + deadlinesHtml + prevFotosHtml + fotosHtml + reviewHtml + advanceHtml + prodBtnHtml;
 }
 
 async function saveVisitaDate(asesId, leadId) {
@@ -2401,6 +2441,303 @@ async function printProforma(id) {
   const w = window.open('','_blank');
   w.document.write(html);
   w.document.close();
+}
+
+// ── Producción ──
+let prodOrders = [];
+let currentProd = null;
+
+const PROD_STAGE_LABELS = { ingreso:'Ingreso de imágenes', revision:'Revisión', taller:'Entrega a taller', produccion:'Producción' };
+const PROD_STAGE_ICONS  = { ingreso:'📥', revision:'🔍', taller:'🔨', produccion:'🏭' };
+const ETAPAS_PROD = ['En Producción','Barnizado','Terminado','Tapizado','Entregado'];
+const ETAPA_COLORS = { 'En Producción':'#3B82F6','Barnizado':'#8B5CF6','Terminado':'#10B981','Tapizado':'#F59E0B','Entregado':'#6B7280' };
+
+async function loadProduccion() {
+  try {
+    prodOrders = await fetch(API+'/produccion',{credentials:'same-origin'}).then(r=>r.json());
+    if (!Array.isArray(prodOrders)) prodOrders = [];
+    renderProdList();
+  } catch(e) { toast('Error cargando producción'); }
+}
+
+function renderProdList() {
+  const el = document.getElementById('prod-list-cards');
+  const empty = document.getElementById('prod-list-empty');
+  if (!prodOrders.length) { el.innerHTML=''; empty.style.display=''; return; }
+  empty.style.display='none';
+  const stageOrder = ['ingreso','revision','taller','produccion'];
+  el.innerHTML = prodOrders.map(p => {
+    const lead = p.lead;
+    const sIdx = stageOrder.indexOf(p.stage);
+    const color = p.stage==='produccion' ? '#10B981' : '#F27141';
+    const etapaColor = ETAPA_COLORS[p.etapa_produccion] || '#888';
+    return `<div style="background:#fff;border:1px solid #E4E4E3;border-radius:10px;padding:16px 20px;cursor:pointer;display:flex;align-items:center;gap:16px;flex-wrap:wrap"
+      onclick="openProdDetail('${p.id}')">
+      <div style="flex:1;min-width:180px">
+        <div style="font-weight:700;font-size:14px">${p.codigo_cliente || '—'}</div>
+        <div style="font-size:12px;color:#888;margin-top:2px">${lead?.nombre || 'Cliente'} ${lead?.telefono ? '· '+lead.telefono : ''}</div>
+      </div>
+      <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap">
+        ${stageOrder.map((s,i) => {
+          const done = i<sIdx; const active = i===sIdx;
+          const bg = done?'#10B981':active?'#F27141':'#E4E4E3';
+          const col = (done||active)?'#fff':'#aaa';
+          return `<div style="padding:3px 8px;border-radius:12px;background:${bg};color:${col};font-size:11px;font-weight:600">${PROD_STAGE_ICONS[s]} ${PROD_STAGE_LABELS[s]}</div>`;
+        }).join('<span style="color:#ccc">›</span>')}
+      </div>
+      ${p.stage==='produccion' ? `<div style="padding:4px 10px;border-radius:12px;background:${etapaColor}20;color:${etapaColor};font-size:12px;font-weight:600">${p.etapa_produccion}</div>` : ''}
+      <div style="font-size:11px;color:#aaa">${new Date(p.created_at).toLocaleDateString('es-BO')}</div>
+    </div>`;
+  }).join('');
+}
+
+async function openProdDetail(id) {
+  try {
+    currentProd = await fetch(API+'/produccion/'+id,{credentials:'same-origin'}).then(r=>r.json());
+    const lead = prodOrders.find(p=>p.id===id)?.lead || null;
+    document.getElementById('prod-list-view').style.display='none';
+    document.getElementById('prod-detail-view').style.display='';
+    renderProdDetail(currentProd, lead);
+  } catch(e) { toast('Error cargando detalle'); }
+}
+
+function closeProdDetail() {
+  document.getElementById('prod-detail-view').style.display='none';
+  document.getElementById('prod-list-view').style.display='';
+  currentProd = null;
+}
+
+function renderProdDetail(prod, lead) {
+  const stageOrder = ['ingreso','revision','taller','produccion'];
+  const sIdx = stageOrder.indexOf(prod.stage);
+  const leadName = lead?.nombre || 'Cliente';
+
+  // Stepper
+  let stepper = `<div style="display:flex;gap:4px;margin-bottom:24px;flex-wrap:wrap">`;
+  stageOrder.forEach((s,i) => {
+    const done=i<sIdx; const active=i===sIdx;
+    const bg=done?'#10B981':active?'#F27141':'#E4E4E3';
+    const col=(done||active)?'#fff':'#888';
+    stepper += `<div style="flex:1;min-width:90px;text-align:center;padding:10px 6px;border-radius:8px;background:${bg};color:${col};font-size:11px;font-weight:600">
+      <div style="font-size:18px">${PROD_STAGE_ICONS[s]}</div>${PROD_STAGE_LABELS[s]}</div>`;
+    if(i<3) stepper += '<div style="align-self:center;color:#ccc;font-size:18px">›</div>';
+  });
+  stepper += '</div>';
+
+  // Header info
+  const headerInfo = `<div style="background:#F9F9F8;border-radius:8px;padding:16px;margin-bottom:20px;display:flex;flex-wrap:wrap;gap:16px">
+    <div><div style="font-size:11px;color:#888;font-weight:600">CÓDIGO CLIENTE</div><div style="font-size:16px;font-weight:700">${prod.codigo_cliente}</div></div>
+    <div><div style="font-size:11px;color:#888;font-weight:600">CLIENTE</div><div style="font-size:14px">${leadName}</div></div>
+    <div><div style="font-size:11px;color:#888;font-weight:600">RECEPCIÓN</div><div style="font-size:13px">${new Date(prod.fecha_recepcion).toLocaleDateString('es-BO')}</div></div>
+    <div style="margin-left:auto">
+      <button class="btn btn-primary" onclick="iniciarProdDesdeAses('${prod.id}')" style="display:none"></button>
+    </div>
+  </div>`;
+
+  // Stage-specific content
+  let stageHtml = '';
+
+  if (prod.stage === 'ingreso') {
+    const fotos = prod.fotos || [];
+    const grid = fotos.length
+      ? fotos.map(u=>`<img src="${u}" style="width:120px;height:90px;object-fit:cover;border-radius:6px;cursor:pointer" onclick="window.open('${u}','_blank')">`).join('')
+      : '<p style="color:#aaa;font-size:13px">No hay fotos. Vinculá desde un asesoramiento completado.</p>';
+    stageHtml = `<div style="padding:16px;background:#fff;border:1px solid #E4E4E3;border-radius:8px;margin-bottom:20px">
+      <div style="font-weight:600;margin-bottom:12px">📥 Imágenes aprobadas en asesoramiento</div>
+      <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px">${grid}</div>
+      ${fotos.length ? `<a href="data:application/json;charset=utf-8,${encodeURIComponent(JSON.stringify(fotos))}" download="${prod.codigo_cliente}-fotos.json" class="btn btn-secondary" style="font-size:12px;text-decoration:none">⬇️ Descargar lista de imágenes</a>` : ''}
+      <div style="margin-top:16px;text-align:right">
+        <button class="btn btn-primary" onclick="prodAvanzar('${prod.id}')">Enviar a Revisión →</button>
+      </div>
+    </div>`;
+  }
+
+  if (prod.stage === 'revision') {
+    const fotos = prod.fotos || [];
+    const grid = fotos.map(u=>`<img src="${u}" style="width:120px;height:90px;object-fit:cover;border-radius:6px;cursor:pointer" onclick="window.open('${u}','_blank')">`).join('');
+    const notasAnt = prod.notas_revision ? `<p style="font-size:13px;color:#555;margin-bottom:8px"><em>Observaciones anteriores: ${prod.notas_revision}</em></p>` : '';
+    const gerenteActions = currentRole==='gerente' ? `
+      ${notasAnt}
+      <textarea id="prod-rev-notas" placeholder="Observaciones de revisión (medidas, materiales, etc.)" style="width:100%;box-sizing:border-box;border:1px solid #E4E4E3;border-radius:6px;padding:8px;font-size:13px;resize:vertical;min-height:80px"></textarea>
+      <div style="display:flex;gap:8px;margin-top:10px">
+        <button class="btn btn-primary" onclick="prodAprobarRevision('${prod.id}')" style="background:#10B981;border-color:#10B981">✅ Aprobar — enviar a taller</button>
+        <button class="btn btn-danger" onclick="prodRechazarRevision('${prod.id}')">❌ Rechazar — volver a ingreso</button>
+      </div>` : `${notasAnt}<p style="color:#aaa;font-size:13px">⏳ Pendiente de aprobación por el Gerente.</p>`;
+    stageHtml = `<div style="padding:16px;background:#FFF7F3;border:2px solid #F27141;border-radius:8px;margin-bottom:20px">
+      <div style="font-weight:600;margin-bottom:12px">🔍 Revisión — verificar medidas, materiales y detalles</div>
+      <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px">${grid}</div>
+      ${gerenteActions}
+    </div>`;
+  }
+
+  if (prod.stage === 'taller') {
+    const fotos = prod.fotos || [];
+    const grid = fotos.map(u=>`<img src="${u}" style="width:120px;height:90px;object-fit:cover;border-radius:6px;cursor:pointer" onclick="window.open('${u}','_blank')">`).join('');
+    const notas = prod.notas_revision || '';
+    stageHtml = `<div style="padding:16px;background:#F0FDF4;border:1px solid #10B981;border-radius:8px;margin-bottom:20px">
+      <div style="font-weight:600;margin-bottom:12px">🔨 Entrega a encargado de taller</div>
+      <div style="margin-bottom:12px">
+        <div style="font-size:12px;color:#888;font-weight:600;margin-bottom:6px">IMÁGENES APROBADAS</div>
+        <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px">${grid}</div>
+        <a href="data:application/json;charset=utf-8,${encodeURIComponent(JSON.stringify(fotos))}" download="${prod.codigo_cliente}-fotos.json" class="btn btn-secondary" style="font-size:12px;text-decoration:none">⬇️ Descargar imágenes</a>
+      </div>
+      ${notas ? `<div style="padding:10px;background:#fff;border-radius:6px;border:1px solid #E4E4E3;margin-bottom:12px"><div style="font-size:11px;color:#888;font-weight:600;margin-bottom:4px">OBSERVACIONES DE REVISIÓN</div><div style="font-size:13px">${notas}</div></div>` : ''}
+      <div style="margin-top:4px">
+        <label style="font-size:12px;font-weight:600;display:block;margin-bottom:4px">Notas para el taller</label>
+        <textarea id="prod-taller-notas" placeholder="Indicaciones adicionales..." style="width:100%;box-sizing:border-box;border:1px solid #E4E4E3;border-radius:6px;padding:8px;font-size:13px;resize:vertical;min-height:70px">${prod.notas_taller||''}</textarea>
+        <div style="display:flex;gap:8px;margin-top:8px;justify-content:flex-end">
+          <button class="btn btn-secondary" onclick="guardarNotasTaller('${prod.id}')">Guardar notas</button>
+          <button class="btn btn-primary" onclick="prodAvanzar('${prod.id}')">Iniciar producción →</button>
+        </div>
+      </div>
+    </div>`;
+  }
+
+  if (prod.stage === 'produccion') {
+    const etapaColor = ETAPA_COLORS[prod.etapa_produccion] || '#888';
+    const fmtDate = d => d ? new Date(d).toLocaleDateString('es-BO') : '—';
+    const fmtInput = d => d ? new Date(d).toISOString().slice(0,16) : '';
+    const canEditEntrega = currentRole==='gerente';
+    const fotos = prod.fotos || [];
+    stageHtml = `<div style="padding:16px;background:#fff;border:1px solid #E4E4E3;border-radius:8px;margin-bottom:20px">
+      <div style="font-weight:600;margin-bottom:16px;font-size:15px">🏭 Seguimiento de producción</div>
+      <div style="overflow-x:auto">
+        <table style="width:100%;border-collapse:collapse;font-size:13px;min-width:900px">
+          <thead>
+            <tr style="background:#F9F9F8;border-bottom:2px solid #E4E4E3">
+              <th style="padding:10px 12px;text-align:left;white-space:nowrap">Código cliente</th>
+              <th style="padding:10px 12px;text-align:left;white-space:nowrap">Imágenes</th>
+              <th style="padding:10px 12px;text-align:left;white-space:nowrap">Fecha recepción</th>
+              <th style="padding:10px 12px;text-align:left;white-space:nowrap">Fecha est. cierre</th>
+              <th style="padding:10px 12px;text-align:left;white-space:nowrap">Fecha entrega</th>
+              <th style="padding:10px 12px;text-align:left;white-space:nowrap">Notas</th>
+              <th style="padding:10px 12px;text-align:left;white-space:nowrap">Fecha cierre</th>
+              <th style="padding:10px 12px;text-align:left;white-space:nowrap">Etapa</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr style="border-bottom:1px solid #F0F0EF">
+              <td style="padding:12px">
+                <div style="font-weight:700">${prod.codigo_cliente}</div>
+                <div style="font-size:11px;color:#888">${leadName}</div>
+              </td>
+              <td style="padding:12px">
+                <a href="data:application/json;charset=utf-8,${encodeURIComponent(JSON.stringify(fotos))}" download="${prod.codigo_cliente}-fotos.json"
+                  style="display:inline-flex;align-items:center;gap:4px;padding:5px 10px;background:#F0F0EF;border-radius:6px;text-decoration:none;font-size:12px;color:#333;font-weight:600">
+                  ⬇️ ${fotos.length} foto${fotos.length!==1?'s':''}
+                </a>
+              </td>
+              <td style="padding:12px;white-space:nowrap">${fmtDate(prod.fecha_recepcion)}</td>
+              <td style="padding:12px">
+                <input type="date" id="prod-est-cierre" value="${prod.fecha_estimada_cierre?prod.fecha_estimada_cierre.slice(0,10):''}"
+                  style="border:1px solid #E4E4E3;border-radius:5px;padding:4px 6px;font-size:12px;width:130px"
+                  onchange="guardarProdField('${prod.id}','fecha_estimada_cierre',this.value)">
+              </td>
+              <td style="padding:12px">
+                ${canEditEntrega
+                  ? `<input type="date" id="prod-fecha-entrega" value="${prod.fecha_entrega?prod.fecha_entrega.slice(0,10):''}"
+                      style="border:1px solid #E4E4E3;border-radius:5px;padding:4px 6px;font-size:12px;width:130px"
+                      onchange="guardarProdField('${prod.id}','fecha_entrega',this.value)">`
+                  : `<span style="font-size:13px">${fmtDate(prod.fecha_entrega)}</span>`}
+              </td>
+              <td style="padding:12px">
+                <textarea id="prod-notas-row" style="border:1px solid #E4E4E3;border-radius:5px;padding:4px 6px;font-size:12px;width:140px;resize:vertical;min-height:50px"
+                  onblur="guardarProdField('${prod.id}','notas',this.value)">${prod.notas||''}</textarea>
+              </td>
+              <td style="padding:12px">
+                <input type="date" id="prod-fecha-cierre" value="${prod.fecha_cierre?prod.fecha_cierre.slice(0,10):''}"
+                  style="border:1px solid #E4E4E3;border-radius:5px;padding:4px 6px;font-size:12px;width:130px"
+                  onchange="guardarProdField('${prod.id}','fecha_cierre',this.value)">
+              </td>
+              <td style="padding:12px">
+                <select id="prod-etapa-sel" style="border:1px solid #E4E4E3;border-radius:5px;padding:5px 8px;font-size:12px;background:${etapaColor}20;color:${etapaColor};font-weight:600"
+                  onchange="guardarProdField('${prod.id}','etapa_produccion',this.value)">
+                  ${ETAPAS_PROD.map(e=>`<option value="${e}" ${prod.etapa_produccion===e?'selected':''}>${e}</option>`).join('')}
+                </select>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      ${prod.notas_taller ? `<div style="margin-top:16px;padding:12px;background:#F9F9F8;border-radius:6px;border-left:3px solid #F27141"><div style="font-size:11px;color:#888;font-weight:600;margin-bottom:4px">NOTAS DEL TALLER</div><div style="font-size:13px">${prod.notas_taller}</div></div>` : ''}
+    </div>`;
+  }
+
+  document.getElementById('prod-detail-body').innerHTML = stepper + headerInfo + stageHtml;
+}
+
+async function prodAvanzar(id) {
+  try {
+    const data = await fetch(API+'/produccion/'+id+'/avanzar',{method:'POST',credentials:'same-origin'}).then(r=>r.json());
+    if (data.error) throw new Error(data.error);
+    currentProd = data;
+    const lead = prodOrders.find(p=>p.id===id)?.lead || null;
+    toast('Etapa avanzada ✓');
+    renderProdDetail(data, lead);
+    loadProduccion();
+  } catch(e) { toast('Error: '+e.message); }
+}
+
+async function prodAprobarRevision(id) {
+  const notas = document.getElementById('prod-rev-notas')?.value || '';
+  try {
+    const data = await fetch(API+'/produccion/'+id+'/aprobar',{method:'POST',headers:{'Content-Type':'application/json'},credentials:'same-origin',body:JSON.stringify({notas})}).then(r=>r.json());
+    if (data.error) throw new Error(data.error);
+    currentProd = data;
+    const lead = prodOrders.find(p=>p.id===id)?.lead || null;
+    toast('Revisión aprobada — enviado a taller ✅');
+    renderProdDetail(data, lead);
+    loadProduccion();
+  } catch(e) { toast('Error: '+e.message); }
+}
+
+async function prodRechazarRevision(id) {
+  const notas = document.getElementById('prod-rev-notas')?.value || '';
+  try {
+    const data = await fetch(API+'/produccion/'+id+'/rechazar',{method:'POST',headers:{'Content-Type':'application/json'},credentials:'same-origin',body:JSON.stringify({notas})}).then(r=>r.json());
+    if (data.error) throw new Error(data.error);
+    currentProd = data;
+    const lead = prodOrders.find(p=>p.id===id)?.lead || null;
+    toast('Revisión rechazada — volvió a ingreso');
+    renderProdDetail(data, lead);
+    loadProduccion();
+  } catch(e) { toast('Error: '+e.message); }
+}
+
+async function guardarNotasTaller(id) {
+  const notas = document.getElementById('prod-taller-notas')?.value || '';
+  try {
+    const data = await fetch(API+'/produccion/'+id,{method:'PATCH',headers:{'Content-Type':'application/json'},credentials:'same-origin',body:JSON.stringify({notas_taller:notas})}).then(r=>r.json());
+    if (data.error) throw new Error(data.error);
+    currentProd = data;
+    toast('Notas guardadas ✓');
+  } catch(e) { toast('Error: '+e.message); }
+}
+
+async function guardarProdField(id, field, value) {
+  const body = { [field]: value || null };
+  try {
+    const data = await fetch(API+'/produccion/'+id,{method:'PATCH',headers:{'Content-Type':'application/json'},credentials:'same-origin',body:JSON.stringify(body)}).then(r=>r.json());
+    if (data.error) throw new Error(data.error);
+    currentProd = data;
+    // Actualizar color del selector de etapa si aplica
+    if (field === 'etapa_produccion') {
+      const sel = document.getElementById('prod-etapa-sel');
+      const col = ETAPA_COLORS[value] || '#888';
+      if (sel) { sel.style.background=col+'20'; sel.style.color=col; }
+    }
+    toast('Guardado ✓');
+  } catch(e) { toast('Error: '+e.message); }
+}
+
+// Crear orden de producción desde asesoramiento completado
+async function crearProdDesdeAses(asesoramiento_id) {
+  try {
+    const data = await fetch(API+'/produccion',{method:'POST',headers:{'Content-Type':'application/json'},credentials:'same-origin',body:JSON.stringify({asesoramiento_id})}).then(r=>r.json());
+    if (data.error) throw new Error(data.error);
+    toast('Orden de producción creada ✅');
+    switchTab('produccion');
+  } catch(e) { toast('Error: '+e.message); }
 }
 
 // ── Init ──
