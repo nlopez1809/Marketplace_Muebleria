@@ -563,9 +563,12 @@
 
   <!-- ═══ PROFORMAS TAB ═══ -->
   <div id="tab-proformas" style="display:none">
-    <div class="section-header" style="margin-bottom:20px">
+    <div class="section-header" style="margin-bottom:12px">
       <div><div class="section-title">Proformas</div><div class="section-sub">Cotizaciones formales para clientes</div></div>
       <button class="btn btn-primary" onclick="openProformaModal(null,null)">+ Nueva proforma</button>
+    </div>
+    <div style="margin-bottom:14px">
+      <input id="proformas-search" type="text" placeholder="Buscar por cliente, teléfono, # proforma o estado…" oninput="renderProformasTable()" style="width:100%;max-width:420px;padding:8px 12px;border:1px solid #ddd;border-radius:6px;font-size:14px;outline:none">
     </div>
     <div class="table-wrap">
       <table>
@@ -2224,10 +2227,22 @@ function proformaTotal(items, descGlobal) {
 
 function renderProformasTable() {
   const tb = document.getElementById('proformas-tbody');
-  if(!proformas.length) { tb.innerHTML='<tr><td colspan="8" style="text-align:center;color:#aaa;padding:30px">Sin proformas aún. Crea la primera con "+ Nueva proforma"</td></tr>'; return; }
+  const q = (document.getElementById('proformas-search')?.value || '').toLowerCase().trim();
+  const list = q ? proformas.filter(p =>
+    (p.numero && String(p.numero).includes(q)) ||
+    (p.cliente_nombre && p.cliente_nombre.toLowerCase().includes(q)) ||
+    (p.cliente_telefono && p.cliente_telefono.toLowerCase().includes(q)) ||
+    (p.estado && p.estado.toLowerCase().includes(q))
+  ) : proformas;
+  if(!list.length) {
+    tb.innerHTML = proformas.length
+      ? '<tr><td colspan="8" style="text-align:center;color:#aaa;padding:30px">Sin resultados para tu búsqueda</td></tr>'
+      : '<tr><td colspan="8" style="text-align:center;color:#aaa;padding:30px">Sin proformas aún. Crea la primera con "+ Nueva proforma"</td></tr>';
+    return;
+  }
   const estadoColor = {borrador:'#E4E4E3',enviada:'#e3f2fd',aceptada:'#e8f5e9',rechazada:'#ffebee'};
   const estadoText = {borrador:'Borrador',enviada:'Enviada',aceptada:'Aceptada',rechazada:'Rechazada'};
-  tb.innerHTML = proformas.map(p => {
+  tb.innerHTML = list.map(p => {
     const total = proformaTotal(p.items, p.descuento_global);
     const fecha = new Date(p.created_at).toLocaleDateString('es-BO');
     const st = p.estado||'borrador';
